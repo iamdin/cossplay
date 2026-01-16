@@ -1,0 +1,53 @@
+name: Build and Release Chrome Extension
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v0.1.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "latest"
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build chrome extension
+        run: bun --cwd chrome-extension build
+
+      - name: Package extension
+        run: |
+          cd chrome-extension
+          rm -rf release
+          mkdir -p release
+          cp manifest.json release/
+          cp -R dist release/dist
+          cd release
+          zip -r ../coss-ui-theme-tweak.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          files: chrome-extension/coss-ui-theme-tweak.zip

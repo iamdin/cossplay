@@ -5,15 +5,14 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: false,
-    lib: {
-      entry: resolve(__dirname, "src/background.ts"),
-      name: "background",
-      fileName: () => "background.js",
-      formats: ["es"],
-    },
     rollupOptions: {
+      input: {
+        background: resolve(__dirname, "src/background.ts"),
+        contentScript: resolve(__dirname, "src/contentScript.ts"),
+      },
       output: {
-        entryFileNames: "background.js",
+        entryFileNames: "[name].js",
+        format: "es",
       },
     },
   },

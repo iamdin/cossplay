@@ -5,20 +5,33 @@
   "description": "A Chrome extension for UI theme tweaking",
   "permissions": [
     "sidePanel",
-    "storage"
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://coss.com/*"
   ],
   "side_panel": {
-    "default_path": "dist/sidePanel/index.html"
+    "default_path": "dist/side-panel/index.html"
   },
   "background": {
     "service_worker": "dist/background.js",
     "type": "module"
   },
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://coss.com/ui/docs/*",
+        "https://coss.com/ui/docs",
+        "https://coss.com/ui/particles/*",
+        "https://coss.com/ui/particles"
+      ],
+      "js": [
+        "dist/contentScript.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
   "action": {
     "default_title": "Open Side Panel"
   }
