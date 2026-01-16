@@ -8,14 +8,11 @@ on:
     inputs:
       tag:
         description: "Release tag (e.g. v0.1.0)"
-        required: true
+        required: false
         type: string
 
 permissions:
   contents: write
-
-env:
-  RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
 
 jobs:
   build-release:
@@ -35,6 +32,18 @@ jobs:
       - name: Build chrome extension
         run: bun --cwd chrome-extension build
 
+      - name: Resolve release tag
+        id: resolve_tag
+        run: |
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            echo "RELEASE_TAG=${{ github.ref_name }}" >> "$GITHUB_ENV"
+          elif [ -n "${{ inputs.tag }}" ]; then
+            echo "RELEASE_TAG=${{ inputs.tag }}" >> "$GITHUB_ENV"
+          else
+            VERSION=$(node -p "require('./chrome-extension/package.json').version")
+            echo "RELEASE_TAG=v${VERSION}" >> "$GITHUB_ENV"
+          fi
+
       - name: Package extension
         run: |
           cd chrome-extension
@@ -43,11 +52,11 @@ jobs:
           cp manifest.json release/
           cp -R dist release/dist
           cd release
-          zip -r ../coss-ui-theme-tweak.zip .
+          zip -r ../coss-ui-theme-tweak-${RELEASE_TAG}.zip .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
-          files: chrome-extension/coss-ui-theme-tweak.zip
+          files: chrome-extension/coss-ui-theme-tweak-${{ env.RELEASE_TAG }}.zip
