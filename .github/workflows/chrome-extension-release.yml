@@ -60,3 +60,4 @@ jobs:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
           files: chrome-extension/coss-ui-theme-tweak-${{ env.RELEASE_TAG }}.zip
+          generate_release_notes: true
