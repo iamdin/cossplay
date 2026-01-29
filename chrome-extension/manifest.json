@@ -27,7 +27,7 @@
         "https://coss.com/ui/particles"
       ],
       "js": [
-        "dist/contentScript.js"
+        "dist/content-script.js"
       ],
       "run_at": "document_start"
     }

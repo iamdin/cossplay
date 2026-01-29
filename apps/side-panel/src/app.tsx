@@ -2,6 +2,14 @@ import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import tailwindColorsModule from "tailwindcss/colors"
 
 type ChromeRuntime = {
   sendMessage: (message: unknown, callback?: (response: unknown) => void) => void
@@ -30,6 +38,88 @@ type VarsPayload = {
   computed: ThemeVarValues
   names: string[]
 }
+
+const TAILWIND_PALETTES = [
+  "slate",
+  "gray",
+  "zinc",
+  "neutral",
+  "stone",
+  "red",
+  "orange",
+  "amber",
+  "yellow",
+  "lime",
+  "green",
+  "emerald",
+  "teal",
+  "cyan",
+  "sky",
+  "blue",
+  "indigo",
+  "violet",
+  "purple",
+  "fuchsia",
+  "pink",
+  "rose",
+] as const
+
+const TAILWIND_SHADES = [
+  "50",
+  "100",
+  "200",
+  "300",
+  "400",
+  "500",
+  "600",
+  "700",
+  "800",
+  "900",
+  "950",
+] as const
+
+type TailwindColorOption = {
+  label: string
+  value: string
+  swatch: string
+}
+
+const TAILWIND_COLOR_OPTIONS: TailwindColorOption[] = (() => {
+  const tailwindColors: Record<string, Record<string, string> | string> = tailwindColorsModule
+  const options: TailwindColorOption[] = []
+  const coreNames = ["white", "black"]
+
+  coreNames.forEach((name) => {
+    const value = tailwindColors[name]
+    if (typeof value === "string") {
+      options.push({ label: name, value, swatch: value })
+    }
+  })
+
+  TAILWIND_PALETTES.forEach((palette) => {
+    const paletteValues = tailwindColors[palette]
+    if (!paletteValues || typeof paletteValues === "string") {
+      return
+    }
+    TAILWIND_SHADES.forEach((shade) => {
+      const colorValue = paletteValues[shade]
+      if (!colorValue) {
+        return
+      }
+      options.push({
+        label: `${palette}-${shade}`,
+        value: colorValue,
+        swatch: colorValue,
+      })
+    })
+  })
+
+  return options
+})()
+
+const TAILWIND_COLOR_VALUE_SET = new Set(
+  TAILWIND_COLOR_OPTIONS.map((option) => option.value)
+)
 
 export function App() {
   const [varNames, setVarNames] = React.useState<string[]>([])
@@ -258,12 +348,41 @@ export function App() {
                     </div>
                   )}
                 </div>
-                <Input
-                  value={values[name] ?? ""}
-                  onChange={(event) =>
-                    handleChange(name, event.target.value)
-                  }
-              />
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 min-w-0">
+                    <Input
+                      value={values[name] ?? ""}
+                      onChange={(event) =>
+                        handleChange(name, event.target.value)
+                      }
+                    />
+                  </div>
+                  <Select
+                    value={values[name] && TAILWIND_COLOR_VALUE_SET.has(values[name]) ? values[name] : undefined}
+                    onValueChange={(value) => value && handleChange(name, value)}
+                  >
+                    <SelectTrigger className="min-w-36 shrink-0">
+                      <SelectValue placeholder="Tailwind 颜色" />
+                    </SelectTrigger>
+                    <SelectContent align="end">
+                      {TAILWIND_COLOR_OPTIONS.map((option) => (
+                        <SelectItem
+                          key={`${option.label}-${option.value}`}
+                          value={option.value}
+                        >
+                          <span
+                            className="size-3 rounded border border-border shrink-0"
+                            style={{ backgroundColor: option.swatch }}
+                          />
+                          <span className="text-foreground">{option.label}</span>
+                          <span className="text-muted-foreground/70">
+                            {option.value}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </label>
             )
           })

@@ -1,7 +1,11 @@
 const STORAGE_KEY = "cossThemeVars"
 
 const isTargetUrl = (url?: string) =>
-  typeof url === "string" && (url === "https://coss.com/ui/docs" || url.startsWith("https://coss.com/ui/docs/"))
+  typeof url === "string" &&
+  (url === "https://coss.com/ui/docs" ||
+    url.startsWith("https://coss.com/ui/docs/") ||
+    url === "https://coss.com/ui/particles" ||
+    url.startsWith("https://coss.com/ui/particles/"))
 
 const sendToActiveTab = async (payload: unknown) => {
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
