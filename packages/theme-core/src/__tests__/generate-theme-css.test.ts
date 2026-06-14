@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { generateThemeCss } from "../generate-theme-css";
 import { defaultThemeStyles } from "../theme-model";
 import { normalizeThemeStyles } from "../normalize-theme-styles";
+import { FONTS } from "../fonts";
 
 describe("generateThemeCss", () => {
   it("emits :root and .dark blocks", () => {
@@ -37,5 +38,27 @@ describe("generateThemeCss", () => {
     const css = generateThemeCss(defaultThemeStyles, { colorFormat: "hex" });
     expect(css).toMatch(/--primary: #[0-9a-fA-F]{6}/);
     expect(css).not.toMatch(/--primary: oklch\(/);
+  });
+
+  it("prepends a Google @import when a Google font is selected, with :root following", () => {
+    const inter = FONTS.find((f) => f.id === "inter")!;
+    const styles = normalizeThemeStyles(
+      { light: { "font-sans": inter.stack }, dark: { "font-sans": inter.stack } },
+      defaultThemeStyles
+    );
+    const css = generateThemeCss(styles);
+    // (a) output starts with @import url(
+    expect(css.startsWith("@import url(")).toBe(true);
+    expect(css).toContain("fonts.googleapis.com/css2?");
+    expect(css).toContain("family=Inter:wght@");
+    // (b) the :root block still follows
+    expect(css).toContain(":root {");
+    expect(css.indexOf("@import")).toBeLessThan(css.indexOf(":root {"));
+  });
+
+  it("emits no @import when all fonts are system/non-Google (defaults)", () => {
+    const css = generateThemeCss(defaultThemeStyles);
+    expect(css).not.toContain("@import");
+    expect(css.startsWith(":root {")).toBe(true);
   });
 });

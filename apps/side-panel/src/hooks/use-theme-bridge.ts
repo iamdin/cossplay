@@ -10,10 +10,13 @@ import type { ThemeEditorState } from "@/types/editor"
 
 /**
  * Bridges the editor store to the live coss page:
- *  1. On mount, auto-discovers coss defaults via `{type:"get-vars"}` and seeds
- *     the store as the baseline (no undo-history pollution, then a checkpoint).
+ *  1. On mount, auto-discovers coss defaults via `{type:"get-vars"}`：
+ *     - 始终把发现到的 coss 默认值刷新为「重置基线」（themeCheckpoint），
+ *       让「重置」恢复到 coss 真实默认值；
+ *     - 仅在首次（!seeded，即尚无持久化的用户状态）时用默认值播种工作样式并清空
+ *       history/future，之后回访不再覆盖用户编辑（用户的 themeState 由 persist 存活）。
  *  2. Subscribes to style changes and pushes generated CSS via `{type:"apply-css"}`
- *     (debounced).
+ *     (debounced)。挂载时会先推送当前（可能是持久化的）样式，使主题重新应用到 coss。
  *  3. Toggles `.dark` on the coss page when `currentMode` flips.
  *
  * All chrome calls are guarded so the panel still works outside the extension
@@ -81,20 +84,28 @@ export function useThemeBridge() {
       const { base, light, dark } = payload.vars
       const seededStyles = normalizeThemeStyles({ base, light, dark }, defaultThemeStyles)
 
-      // Seed without pushing onto the undo history: write state directly, then
-      // checkpoint so this becomes the reset baseline.
-      const currentMode = useEditorStore.getState().themeState.currentMode
-      const seededState: ThemeEditorState = {
+      const store = useEditorStore.getState()
+      const currentMode = store.themeState.currentMode
+      const cossDefaultState: ThemeEditorState = {
         ...defaultThemeState,
         styles: seededStyles,
         currentMode,
       }
-      useEditorStore.setState({
-        themeState: seededState,
-        history: [],
-        future: [],
-      })
-      useEditorStore.getState().saveThemeCheckpoint()
+
+      if (!store.seeded) {
+        // 首次：尚无持久化的用户状态。用 coss 默认值播种工作样式，并清空 history/future；
+        // 同时把它作为重置基线。置 seeded=true 后续不再覆盖。
+        useEditorStore.setState({
+          themeState: cossDefaultState,
+          themeCheckpoint: cossDefaultState,
+          history: [],
+          future: [],
+          seeded: true,
+        })
+      } else {
+        // 回访：保留用户的工作样式与 history/future，只把重置基线刷新为 coss 默认值。
+        useEditorStore.setState({ themeCheckpoint: cossDefaultState })
+      }
     })
   }, [])
 

@@ -13,6 +13,7 @@ import type { ThemeStyles, ThemeStyleProps } from "./theme-model";
 import { defaultLightThemeStyles } from "./theme-model";
 import { colorFormatter, type ColorFormat } from "./color-converter";
 import { getShadowMap } from "./shadows";
+import { googleFontHref } from "./fonts";
 
 /** Color tokens emitted, in tweakcn order. */
 const COLOR_KEYS: (keyof ThemeStyleProps)[] = [
@@ -123,5 +124,11 @@ export function generateThemeCss(
   const root = modeBlock(":root", styles.light, true, formatColor);
   const dark = modeBlock(".dark", styles.dark, false, formatColor);
 
-  return `${root}\n\n${dark}`;
+  // 若选中的字体栈解析出非空的 Google webfont URL，则在样式表最顶部插入
+  // `@import`（必须是第一条规则才有效），让 apply-css 注入路径也能加载 Google 字体。
+  // 字体栈与内容脚本 applyFontLink 保持一致：[font-sans, font-mono]。
+  const href = googleFontHref([styles.light["font-sans"], styles.light["font-mono"]]);
+  const fontImport = href ? `@import url('${href}');\n\n` : "";
+
+  return `${fontImport}${root}\n\n${dark}`;
 }

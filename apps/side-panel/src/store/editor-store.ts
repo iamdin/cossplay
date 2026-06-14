@@ -54,6 +54,12 @@ interface EditorStore {
   themeCheckpoint: ThemeEditorState | null
   history: ThemeHistoryEntry[]
   future: ThemeHistoryEntry[]
+  /**
+   * 是否已用 coss 实测默认值播种过工作样式。持久化，默认 false。
+   * 首次发现（无持久化用户状态）时播种并置 true；之后重新打开面板不再覆盖用户编辑。
+   */
+  seeded: boolean
+  setSeeded: (seeded: boolean) => void
   setThemeState: (state: ThemeEditorState) => void
   applyThemePreset: (preset: string) => void
   saveThemeCheckpoint: () => void
@@ -74,6 +80,10 @@ export const useEditorStore = create<EditorStore>()(
       themeCheckpoint: null,
       history: [],
       future: [],
+      seeded: false,
+      setSeeded: (seeded: boolean) => {
+        set({ seeded })
+      },
       setThemeState: (newState: ThemeEditorState) => {
         const oldThemeState = get().themeState
         let currentHistory = get().history
@@ -262,6 +272,15 @@ export const useEditorStore = create<EditorStore>()(
     }),
     {
       name: "coss-editor-storage",
+      // 只持久化工作状态：用户的 themeState 必须在重开面板后存活，并作为面板 UI 的权威来源；
+      // seeded 用于区分首次发现（需播种）与回访（不得覆盖用户编辑）。
+      partialize: (state) => ({
+        themeState: state.themeState,
+        themeCheckpoint: state.themeCheckpoint,
+        history: state.history,
+        future: state.future,
+        seeded: state.seeded,
+      }),
     }
   )
 )
