@@ -1,1 +1,1 @@
-{"root":["./src/background.ts","./src/contentscript.ts"],"version":"5.9.3"}
+{"root":["./src/background.ts","./src/contentscript.ts","./src/shared/messages.ts"],"version":"5.9.3"}

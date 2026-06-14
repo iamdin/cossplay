@@ -21,10 +21,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://coss.com/ui/docs/*",
-        "https://coss.com/ui/docs",
-        "https://coss.com/ui/particles/*",
-        "https://coss.com/ui/particles"
+        "https://coss.com/ui",
+        "https://coss.com/ui/*"
       ],
       "js": [
         "dist/contentScript.js"
