@@ -6,6 +6,30 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Trailing-edge debounce with a `.cancel()` escape hatch. Ported from tweakcn
+ * `utils/debounce.ts` so the color picker can throttle keystroke-driven updates.
+ */
+export function debounce<T extends (...args: never[]) => void>(
+  fn: T,
+  delay: number
+): T & { cancel: () => void } {
+  let timeoutId: ReturnType<typeof setTimeout>
+
+  const debounced = function (this: unknown, ...args: Parameters<T>) {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => {
+      fn.apply(this, args)
+    }, delay)
+  } as T & { cancel: () => void }
+
+  debounced.cancel = () => {
+    clearTimeout(timeoutId)
+  }
+
+  return debounced
+}
+
+/**
  * Structural deep-equality check. Ported (as a dependency-free local util) to
  * replace tweakcn's `@ngard/tiny-isequal`-backed `isDeepEqual`. The editor
  * store uses this to dedupe history entries and detect unsaved changes.
