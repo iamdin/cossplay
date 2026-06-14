@@ -16,3 +16,7 @@ export * from "./normalize-theme-styles";
 export * from "./theme-code-generator";
 export * from "./parse-css-input";
 export * from "./registry-generator";
+
+// M4 Batch A: global HSL adjustments + WCAG contrast checking (logic only).
+export * from "./hsl-adjust";
+export * from "./contrast";
