@@ -1,7 +1,9 @@
 import { lazy, Suspense, useState } from "react"
 import {
+  Check,
   ChevronLeft,
   ChevronRight,
+  ChevronsUpDown,
   Code2,
   FileDown,
   MoreVertical,
@@ -21,11 +23,21 @@ const CodePanelDialog = lazy(() =>
 import { CssImportDialog } from "@/components/editor/css-import-dialog"
 import { Button } from "@/components/ui/button"
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 import { useThemeBridge } from "@/hooks/use-theme-bridge"
 import { useEditorStore } from "@/store/editor-store"
 
@@ -52,10 +64,13 @@ export function App() {
   const [codeOpen, setCodeOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
   const [contrastOpen, setContrastOpen] = useState(false)
+  const [presetOpen, setPresetOpen] = useState(false)
 
   const mode = themeState.currentMode
   const currentPreset = themeState.preset ?? ""
   const dirty = hasUnsavedChanges()
+  const currentLabel =
+    PRESET_OPTIONS.find((p) => p.value === currentPreset)?.label ?? "选择预设…"
 
   const switchMode = (m: "light" | "dark") => {
     // currentMode-only change: the bridge subscription toggles `.dark` on the page.
@@ -123,22 +138,54 @@ export function App() {
             >
               <ChevronLeft />
             </Button>
-            <select
-              value={currentPreset}
-              onChange={(e) => {
-                if (e.target.value) applyThemePreset(e.target.value)
-              }}
-              className="bg-input/25 border-input h-7 min-w-0 flex-1 rounded-md border px-2 text-xs outline-none"
-            >
-              <option value="" disabled>
-                选择预设…
-              </option>
-              {PRESET_OPTIONS.map((p) => (
-                <option key={p.value} value={p.value}>
-                  {p.value === currentPreset && dirty ? `${p.label} *` : p.label}
-                </option>
-              ))}
-            </select>
+            <Popover open={presetOpen} onOpenChange={setPresetOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  role="combobox"
+                  aria-expanded={presetOpen}
+                  aria-label="选择预设"
+                  className="min-w-0 flex-1 justify-between font-normal"
+                >
+                  <span className="truncate">
+                    {currentLabel}
+                    {dirty && currentPreset ? " *" : ""}
+                  </span>
+                  <ChevronsUpDown className="opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-56 p-0">
+                <Command>
+                  <CommandInput placeholder="搜索预设…" className="h-9" />
+                  <CommandList>
+                    <CommandEmpty>未找到预设</CommandEmpty>
+                    <CommandGroup
+                      heading={`${PRESET_OPTIONS.length} 个预设`}
+                    >
+                      {PRESET_OPTIONS.map((p) => (
+                        <CommandItem
+                          key={p.value}
+                          value={p.label}
+                          onSelect={() => {
+                            applyThemePreset(p.value)
+                            setPresetOpen(false)
+                          }}
+                        >
+                          <span className="truncate">{p.label}</span>
+                          <Check
+                            className={cn(
+                              "ml-auto",
+                              p.value === currentPreset ? "opacity-100" : "opacity-0",
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
             <Button
               size="icon-sm"
               variant="outline"
