@@ -25,3 +25,7 @@ dist-ssr
 
 # Turbo
 .turbo
+
+# Playwright
+test-results
+playwright-report
