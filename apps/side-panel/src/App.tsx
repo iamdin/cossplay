@@ -1,9 +1,12 @@
-import { useState } from "react"
+import { lazy, Suspense, useState } from "react"
 import { Code2, FileDown } from "lucide-react"
 import { defaultPresets } from "theme-core"
 
 import ThemeControlPanel from "@/components/editor/theme-control-panel"
-import { CodePanelDialog } from "@/components/editor/code-panel-dialog"
+// 懒加载:Code 面板内含 react-syntax-highlighter（~1MB），只在打开时才拉取该 chunk。
+const CodePanelDialog = lazy(() =>
+  import("@/components/editor/code-panel-dialog").then((m) => ({ default: m.CodePanelDialog })),
+)
 import { CssImportDialog } from "@/components/editor/css-import-dialog"
 import { Button } from "@/components/ui/button"
 import { useThemeBridge } from "@/hooks/use-theme-bridge"
@@ -85,7 +88,11 @@ export function App() {
 
       <ThemeControlPanel />
 
-      <CodePanelDialog open={codeOpen} onOpenChange={setCodeOpen} />
+      {codeOpen && (
+        <Suspense fallback={null}>
+          <CodePanelDialog open={codeOpen} onOpenChange={setCodeOpen} />
+        </Suspense>
+      )}
       <CssImportDialog open={importOpen} onOpenChange={setImportOpen} />
     </div>
   )

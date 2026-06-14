@@ -31,7 +31,8 @@ describe("generateThemeCss", () => {
       dark: {},
     });
     const css = generateThemeCss(styles);
-    expect(css).toMatch(/--primary: oklch\([^)]*\/ 0\.5\)/);
+    // formatNumber 字节对齐后非整数保留 4 位小数：0.5 → 0.5000
+    expect(css).toMatch(/--primary: oklch\([^)]*\/ 0\.5000\)/);
   });
 
   it("colorFormat:hex changes color output format", () => {

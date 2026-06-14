@@ -4,7 +4,8 @@ export type ColorFormat = "hsl" | "rgb" | "oklch" | "hex";
 
 export const formatNumber = (num?: number) => {
   if (!num) return "0";
-  return num % 1 === 0 ? num : Number(num.toFixed(4));
+  // tweakcn 字节对齐:非整数保留 4 位小数（含尾零，如 0.1450），整数原样返回。
+  return num % 1 === 0 ? num : num.toFixed(4);
 };
 
 const alphaOf = (color: { alpha?: number }): number | null => {
