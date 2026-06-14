@@ -10,6 +10,7 @@ import {
 import { ColorsTabContent } from "@/components/editor/colors-tab-content"
 import ControlSection from "@/components/editor/control-section"
 import { FontPicker } from "@/components/editor/font-picker"
+import HslAdjustmentControls from "@/components/editor/hsl-adjustment-controls"
 import ShadowControl from "@/components/editor/shadow-control"
 import { SliderWithInput } from "@/components/editor/slider-with-input"
 import { Label } from "@/components/ui/label"
@@ -199,6 +200,10 @@ const ThemeControlPanel = () => {
 
         <TabsContent value="shadows" className="mt-2 min-h-0 flex-1 overflow-hidden">
           <ScrollArea className="h-full px-1">
+            <ControlSection title="HSL 调整" expanded>
+              <HslAdjustmentControls />
+            </ControlSection>
+
             <ControlSection title="Radius" expanded>
               <SliderWithInput
                 value={radius}
