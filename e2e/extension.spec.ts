@@ -41,14 +41,28 @@ test("content script injects :root/.dark override style on a page", async () => 
   ));
   await page.addScriptTag({ path: path.resolve(extPath, "dist/contentScript.js") });
   await page.evaluate(() => {
-    const w = window as unknown as { __cossInject?: (o: { light: Record<string, string>; dark: Record<string, string> }) => void };
-    w.__cossInject?.({ light: { primary: "oklch(0.6 0.2 250)" }, dark: { primary: "oklch(0.7 0.1 250)" } });
+    const w = window as unknown as {
+      __cossInject?: (o: {
+        base: Record<string, string>;
+        light: Record<string, string>;
+        dark: Record<string, string>;
+      }) => void;
+    };
+    w.__cossInject?.({
+      base: { radius: "1.25rem" },
+      light: { primary: "oklch(0.6 0.2 250)" },
+      dark: { primary: "oklch(0.7 0.1 250)" },
+    });
   });
   const styleText = await page.locator("#coss-tweak").textContent();
   expect(styleText).toContain(":root {");
+  expect(styleText).toContain("--radius: 1.25rem;");
   expect(styleText).toContain("--primary: oklch(0.6 0.2 250);");
-  const primary = await page.evaluate(() =>
-    getComputedStyle(document.documentElement).getPropertyValue("--primary").trim()
+  // base 只进 :root，不进 .dark
+  const darkBlock = styleText!.slice(styleText!.indexOf(".dark {"));
+  expect(darkBlock).not.toContain("--radius");
+  const radius = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue("--radius").trim()
   );
-  expect(primary).toBe("oklch(0.6 0.2 250)");
+  expect(radius).toBe("1.25rem");
 });
