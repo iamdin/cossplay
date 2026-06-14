@@ -11,9 +11,11 @@
     "dev": "bun --cwd apps/side-panel build:watch & bun --cwd chrome-extension dev",
     "build": "bun run --filter '*' build",
     "lint": "bun run --filter '*' lint",
-    "test": "bun run --filter '*' test"
+    "test": "bun run --filter '*' test",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "bumpp": "^10.4.0"
   }
 }
