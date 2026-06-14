@@ -1,15 +1,7 @@
 import { COLOR_TOKENS } from "./tokens";
 import type { ThemeOverride } from "./types";
-
-export type ThemePreset = {
-  source?: "SAVED" | "BUILT_IN";
-  createdAt?: string;
-  label?: string;
-  styles: {
-    light: Record<string, string>;
-    dark: Record<string, string>;
-  };
-};
+import type { ThemePreset, ThemeStyles, ThemeStyleProps } from "./theme-model";
+import { defaultThemeStyles } from "./theme-model";
 
 export const defaultPresets: Record<string, ThemePreset> = {
   "modern-minimal": {
@@ -3617,4 +3609,22 @@ export function presetToOverride(preset: ThemePreset): ThemeOverride {
     return out;
   };
   return { base: {}, light: pick(preset.styles.light), dark: pick(preset.styles.dark) };
+}
+
+/**
+ * Merge a preset's partial light/dark onto `defaults`, returning a full
+ * `ThemeStyles`. Ported from tweakcn `utils/theme-preset-helper.ts`
+ * (`getPresetThemeStyles` / `mergePresetWithDefaults`): dark mode inherits the
+ * preset's LIGHT overrides first, then its dark overrides on top.
+ */
+export function presetToThemeStyles(
+  preset: ThemePreset,
+  defaults: ThemeStyles = defaultThemeStyles
+): ThemeStyles {
+  const presetLight = (preset.styles?.light ?? {}) as Partial<ThemeStyleProps>;
+  const presetDark = (preset.styles?.dark ?? {}) as Partial<ThemeStyleProps>;
+  return {
+    light: { ...defaults.light, ...presetLight },
+    dark: { ...defaults.dark, ...presetLight, ...presetDark },
+  };
 }

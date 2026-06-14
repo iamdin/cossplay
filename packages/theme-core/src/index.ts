@@ -6,3 +6,10 @@ export * from "./color-converter";
 export * from "./override-css";
 export * from "./export-css";
 export * from "./presets";
+
+// M2 Batch A: full tweakcn-parity theme model + generators (additive).
+export * from "./theme-model";
+export * from "./shadows";
+export * from "./tailwind-palette";
+export * from "./generate-theme-css";
+export * from "./normalize-theme-styles";
