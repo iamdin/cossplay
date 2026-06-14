@@ -30,6 +30,7 @@ export function NonColorControls({ defaults, overrides, onChange }: NonColorCont
                   <>
                     <input
                       type="range"
+                      aria-label={c.label}
                       min={c.min}
                       max={c.max}
                       step={c.step}

@@ -42,6 +42,7 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
       <button
         type="button"
         aria-label="选择颜色"
+        aria-expanded={open}
         className="border-border size-6 shrink-0 rounded border"
         style={{ background: CHECKER }}
         onClick={() => setOpen((o) => !o)}

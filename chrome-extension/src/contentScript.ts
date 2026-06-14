@@ -125,7 +125,10 @@ const readBaseDefaults = (): Record<string, string> => {
   return out;
 };
 
-/** 读 light + dark 两套默认值；过程中暂停 observer、同步恢复注入，避免竞态与闪烁。 */
+/**
+ * 读 light + dark 两套默认值；过程中暂停 observer、同步恢复注入，避免竞态与闪烁。
+ * 注意：只移除/恢复 #coss-tweak 样式；字体 <link>（#coss-tweak-fonts）由 applyFontLink 独立驱动，此处故意不动。
+ */
 const discover = (): DiscoverResult => {
   styleObserver?.disconnect();
 

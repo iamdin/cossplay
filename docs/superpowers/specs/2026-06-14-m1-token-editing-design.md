@@ -113,7 +113,7 @@ theme-core 提供精选 `FONTS`(~12 项):系统栈(System / Inter-ish system-ui)
 **chrome-extension**
 - `shared/messages.ts`:`DiscoverResult` 加 `base`。
 - `contentScript.ts`:`loadStored`/guard/apply 经 `normalizeOverride`;`discover` 读 base 默认;注入后处理 `<link id="coss-tweak-fonts">`。
-- `background.ts`:存取 override 时 `normalizeOverride`(防旧数据)。
+- `background.ts`:**不改**——透明转发 override(不假设其形状),旧数据由 content 的 `injectOverride` → `normalizeOverride` 在注入时兜底。
 
 **side-panel**
 - `hooks/use-theme-override.ts`:`ThemeOverride` 含 base;`defaults` 加 base;新增 `setBaseToken`;`DiscoverResult` 本地类型加 base。
