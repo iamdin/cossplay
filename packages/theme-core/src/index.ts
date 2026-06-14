@@ -11,3 +11,8 @@ export * from "./shadows";
 export * from "./tailwind-palette";
 export * from "./generate-theme-css";
 export * from "./normalize-theme-styles";
+
+// M3 Batch A: full-file export generators + css import parser + registry item.
+export * from "./theme-code-generator";
+export * from "./parse-css-input";
+export * from "./registry-generator";

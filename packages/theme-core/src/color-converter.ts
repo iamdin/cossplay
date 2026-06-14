@@ -14,7 +14,8 @@ const alphaOf = (color: { alpha?: number }): number | null => {
 
 export const colorFormatter = (
   colorValue: string,
-  format: ColorFormat = "oklch"
+  format: ColorFormat = "oklch",
+  tailwindVersion: "3" | "4" = "4"
 ): string => {
   try {
     const color = culori.parse(colorValue);
@@ -24,6 +25,11 @@ export const colorFormatter = (
     switch (format) {
       case "hsl": {
         const hsl = culori.converter("hsl")(color);
+        // tweakcn parity: v3 hsl emits BARE triples `H S% L%` (consumed by
+        // `hsl(var(--x))` in tailwind config); v4 wraps as `hsl(...)`.
+        if (tailwindVersion === "3") {
+          return `${formatNumber(hsl.h)} ${formatNumber((hsl.s ?? 0) * 100)}% ${formatNumber((hsl.l ?? 0) * 100)}%`;
+        }
         const head = `hsl(${formatNumber(hsl.h)} ${formatNumber((hsl.s ?? 0) * 100)}% ${formatNumber((hsl.l ?? 0) * 100)}%`;
         return a === null ? `${head})` : `${head} / ${formatNumber(a)})`;
       }

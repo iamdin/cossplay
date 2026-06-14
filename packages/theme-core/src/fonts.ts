@@ -24,6 +24,40 @@ export function findFontByStack(stack: string): Font | undefined {
   return FONTS.find((f) => f.stack === stack);
 }
 
+/**
+ * System / generic font keywords that should NOT be treated as a named
+ * (e.g. Google) font. Ported from tweakcn `utils/fonts/index.ts`.
+ */
+export const SYSTEM_FONTS = [
+  "ui-sans-serif",
+  "ui-serif",
+  "ui-monospace",
+  "system-ui",
+  "sans-serif",
+  "serif",
+  "monospace",
+  "cursive",
+  "fantasy",
+];
+
+/**
+ * Extract the leading named font family from a CSS font-family stack.
+ * Returns null for empty input or when the first family is a system/generic
+ * keyword. Ported byte-faithfully from tweakcn `extractFontFamily`.
+ *
+ * e.g. "Inter, ui-sans-serif, system-ui, sans-serif" -> "Inter"
+ *      "ui-sans-serif, system-ui, sans-serif" -> null
+ */
+export function extractFontFamily(fontFamilyValue: string): string | null {
+  if (!fontFamilyValue) return null;
+
+  const firstFont = fontFamilyValue.split(",")[0].trim();
+  const cleanFont = firstFont.replace(/['"]/g, "");
+
+  if (SYSTEM_FONTS.includes(cleanFont.toLowerCase())) return null;
+  return cleanFont;
+}
+
 /** 由当前选中的字体栈算出 Google webfont URL；无 Google 字体则 null。 */
 export function googleFontHref(stacks: string[]): string | null {
   const families = stacks
