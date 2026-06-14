@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { ColorPicker } from "./color-picker";
 
 interface TokenRowProps {
@@ -13,7 +14,7 @@ export function TokenRow({ token, defaultValue, overrideValue, onChange }: Token
   const current = overrideValue ?? defaultValue ?? "";
   const changed = !!overrideValue;
   return (
-    <div className={`flex items-center gap-2 rounded-md p-1.5 ${changed ? "bg-accent" : ""}`}>
+    <div className={cn("flex items-center gap-2 rounded-md p-1.5", changed && "bg-accent")}>
       <ColorPicker value={current} onChange={(v) => onChange(token, v)} />
       <span className="text-foreground flex-1 truncate text-xs font-medium">--{token}</span>
       {changed && <span className="text-primary/60 text-[10px]">改</span>}
