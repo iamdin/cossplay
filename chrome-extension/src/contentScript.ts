@@ -1,9 +1,7 @@
-import { buildOverrideCss, type ThemeOverride } from "theme-core";
+import { buildOverrideCss, emptyOverride, type ThemeOverride } from "theme-core";
 import { STORAGE_KEY, type BgToContent, type DiscoverResult } from "./shared/messages";
 
 const STYLE_ID = "coss-tweak";
-
-const emptyOverride = (): ThemeOverride => ({ light: {}, dark: {} });
 
 /** 注入/更新覆盖样式：写 :root{} + .dark{} 两段，追加到 <head> 末尾。 */
 const injectOverride = (override: ThemeOverride) => {
@@ -27,9 +25,11 @@ const loadStored = () => {
   });
 };
 
+let styleObserver: MutationObserver | null = null;
+
 /** 被框架移除时重新注入。 */
 const guardStyle = () => {
-  const observer = new MutationObserver(() => {
+  styleObserver = new MutationObserver(() => {
     if (!document.getElementById(STYLE_ID)) {
       chrome.storage.local.get([STORAGE_KEY], (result) => {
         const stored = result[STORAGE_KEY] as ThemeOverride | undefined;
@@ -37,12 +37,12 @@ const guardStyle = () => {
       });
     }
   });
-  observer.observe(document.head, { childList: true });
+  styleObserver.observe(document.head, { childList: true });
 };
 
-/** 收集所有 coss 颜色 token 名（来自样式表 :root/.dark 规则，不带 `--`）。 */
-const collectTokenNames = (): string[] => {
-  const set = new Set<string>();
+/** 收集 coss 的颜色 token（名不带 `--`）。用 CSS.supports 过滤掉 radius/font 等非颜色变量。 */
+const collectTokens = (): string[] => {
+  const raw: Record<string, string> = {};
   for (const sheet of Array.from(document.styleSheets)) {
     let rules: CSSRuleList;
     try {
@@ -57,12 +57,24 @@ const collectTokenNames = (): string[] => {
       ) {
         for (let i = 0; i < rule.style.length; i++) {
           const prop = rule.style[i];
-          if (prop.startsWith("--")) set.add(prop.slice(2));
+          if (prop.startsWith("--")) {
+            const name = prop.slice(2);
+            const value = rule.style.getPropertyValue(prop).trim();
+            if (value && !(name in raw)) raw[name] = value;
+          }
         }
       }
     }
   }
-  return Array.from(set).sort();
+  return Object.keys(raw)
+    .filter((name) => {
+      try {
+        return CSS.supports("color", raw[name]);
+      } catch {
+        return false;
+      }
+    })
+    .sort();
 };
 
 /** 读某模式下每个 token 的解析色值（#hex），通过临时元素让 var() resolve。 */
@@ -82,27 +94,34 @@ const readResolved = (names: string[]): Record<string, string> => {
   return out;
 };
 
-/** 读 light + dark 两套默认值；临时移除注入样式与切换 .dark 以取原始值。 */
+/** 读 light + dark 两套默认值；过程中暂停 observer、同步恢复注入，避免竞态与闪烁。 */
 const discover = (): DiscoverResult => {
-  const names = collectTokenNames();
+  styleObserver?.disconnect();
+
+  const names = collectTokens();
   const root = document.documentElement;
 
-  const hadOverride = !!document.getElementById(STYLE_ID);
+  const existing = document.getElementById(STYLE_ID);
+  const savedCss = existing?.textContent ?? null;
   removeOverride();
-  const wasDark = root.classList.contains("dark");
 
-  // light
+  const wasDark = root.classList.contains("dark");
   root.classList.remove("dark");
   const light = readResolved(names);
-  // dark
   root.classList.add("dark");
   const dark = readResolved(names);
-
-  // 还原
   if (wasDark) root.classList.add("dark");
   else root.classList.remove("dark");
-  if (hadOverride) loadStored();
 
+  // 同步恢复之前的注入（如果有）
+  if (savedCss !== null) {
+    const el = document.createElement("style");
+    el.id = STYLE_ID;
+    el.textContent = savedCss;
+    document.head.appendChild(el);
+  }
+
+  styleObserver?.observe(document.head, { childList: true });
   return { names, light, dark };
 };
 

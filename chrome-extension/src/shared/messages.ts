@@ -12,8 +12,7 @@ export interface DiscoverResult {
 export type PanelToBg =
   | { type: "set-vars"; override: ThemeOverride }
   | { type: "reset-vars" }
-  | { type: "get-vars" }
-  | { type: "reload-target" };
+  | { type: "get-vars" };
 
 export type BgToContent =
   | { type: "apply-vars"; override: ThemeOverride }

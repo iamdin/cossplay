@@ -2,7 +2,8 @@ import type { ThemeOverride } from "theme-core";
 import { STORAGE_KEY, type PanelToBg } from "./shared/messages";
 
 const isTargetUrl = (url?: string) =>
-  typeof url === "string" && url.startsWith("https://coss.com/ui");
+  typeof url === "string" &&
+  (url === "https://coss.com/ui" || url.startsWith("https://coss.com/ui/"));
 
 const sendToActiveTab = async (payload: unknown) => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -31,17 +32,7 @@ chrome.runtime.onMessage.addListener((message: PanelToBg, _sender, sendResponse)
     });
     return true;
   }
-  if (message?.type === "reload-target") {
-    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (!tab?.id || !isTargetUrl(tab.url)) {
-        sendResponse({ ok: false, error: "未找到目标页面" });
-        return;
-      }
-      chrome.tabs.reload(tab.id, {}, () => sendResponse({ ok: true }));
-    });
-    return true;
-  }
-  if (message?.type === "get-vars") {
+if (message?.type === "get-vars") {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (!tab?.id || !isTargetUrl(tab.url)) {
         sendResponse({ ok: false, error: "未找到目标页面" });
@@ -67,7 +58,12 @@ const reapply = (tabId: number) => {
   });
 };
 
-chrome.tabs.onActivated.addListener(({ tabId }) => reapply(tabId));
+chrome.tabs.onActivated.addListener(({ tabId }) => {
+  chrome.tabs.get(tabId, (tab) => {
+    if (chrome.runtime.lastError) return;
+    if (isTargetUrl(tab?.url)) reapply(tabId);
+  });
+});
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && isTargetUrl(tab.url)) reapply(tabId);
 });
