@@ -26,15 +26,13 @@ export function useThemeOverride() {
   }, []);
 
   const setToken = React.useCallback((token: string, value: string) => {
-    setOverride((prev) => {
-      const next: ThemeOverride = { light: { ...prev.light }, dark: { ...prev.dark } };
-      const bucket = next[mode];
-      if (!value.trim()) delete bucket[token];
-      else bucket[token] = value.trim();
-      chromeApi?.runtime?.sendMessage({ type: "set-vars", override: next });
-      return next;
-    });
-  }, [mode]);
+    const next: ThemeOverride = { light: { ...override.light }, dark: { ...override.dark } };
+    const bucket = next[mode];
+    if (!value.trim()) delete bucket[token];
+    else bucket[token] = value.trim();
+    setOverride(next);
+    chromeApi?.runtime?.sendMessage({ type: "set-vars", override: next });
+  }, [override, mode]);
 
   const applyPreset = React.useCallback((ov: ThemeOverride) => push(ov), [push]);
 
