@@ -1,6 +1,10 @@
+import { useState } from "react"
+import { Code2, FileDown } from "lucide-react"
 import { defaultPresets } from "theme-core"
 
 import ThemeControlPanel from "@/components/editor/theme-control-panel"
+import { CodePanelDialog } from "@/components/editor/code-panel-dialog"
+import { CssImportDialog } from "@/components/editor/css-import-dialog"
 import { Button } from "@/components/ui/button"
 import { useThemeBridge } from "@/hooks/use-theme-bridge"
 import { useEditorStore } from "@/store/editor-store"
@@ -17,6 +21,9 @@ export function App() {
   const setThemeState = useEditorStore((s) => s.setThemeState)
   const applyThemePreset = useEditorStore((s) => s.applyThemePreset)
   const restoreThemeCheckpoint = useEditorStore((s) => s.restoreThemeCheckpoint)
+
+  const [codeOpen, setCodeOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
 
   const mode = themeState.currentMode
 
@@ -62,6 +69,14 @@ export function App() {
               </option>
             ))}
           </select>
+          <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}>
+            <FileDown />
+            导入
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setCodeOpen(true)}>
+            <Code2 />
+            代码
+          </Button>
           <Button size="sm" variant="outline" onClick={() => restoreThemeCheckpoint()}>
             重置
           </Button>
@@ -69,6 +84,9 @@ export function App() {
       </header>
 
       <ThemeControlPanel />
+
+      <CodePanelDialog open={codeOpen} onOpenChange={setCodeOpen} />
+      <CssImportDialog open={importOpen} onOpenChange={setImportOpen} />
     </div>
   )
 }
