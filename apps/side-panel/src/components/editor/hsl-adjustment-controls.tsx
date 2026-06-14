@@ -12,7 +12,7 @@ import {
 import { HslPresetButton } from "@/components/editor/hsl-preset-button"
 import { SliderWithInput } from "@/components/editor/slider-with-input"
 import { Button } from "@/components/ui/button"
-import { cn, debounce } from "@/lib/utils"
+import { cn, debounce, isDeepEqual } from "@/lib/utils"
 import { useEditorStore } from "@/store/editor-store"
 
 /**
@@ -28,10 +28,19 @@ const HslAdjustmentControls = () => {
   const themeState = useEditorStore((s) => s.themeState)
   const themeCheckpoint = useEditorStore((s) => s.themeCheckpoint)
   const setThemeState = useEditorStore((s) => s.setThemeState)
+  const saveThemeCheckpoint = useEditorStore((s) => s.saveThemeCheckpoint)
 
   const [isExpanded, setIsExpanded] = useState(false)
 
   const currentAdjustments = themeState.hslAdjustments ?? defaultHslAdjustments
+
+  // 对齐 tweakcn:当 HSL 处于默认值时把 checkpoint 重钉到当前 styles —— 这样在中性 HSL 下
+  // 通过 Colors/Typography/Shadows 做的手动编辑会成为后续 HSL 调整的新基准,而非被静默还原。
+  useEffect(() => {
+    if (isDeepEqual(themeState.hslAdjustments, defaultHslAdjustments)) {
+      saveThemeCheckpoint()
+    }
+  }, [themeState.hslAdjustments, saveThemeCheckpoint])
 
   // 在 debounce 回调里读最新 store 状态(idiomatic Zustand),避免 stale closure /
   // 重建 debounce。base = checkpoint styles(非破坏式基准),回退到当前 styles。
