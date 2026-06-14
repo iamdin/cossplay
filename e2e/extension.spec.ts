@@ -32,6 +32,25 @@ test("panel page renders", async () => {
   await expect(page.getByText("COSS 主题调色")).toBeVisible();
 });
 
+test("content script injects verbatim CSS string via __cossInjectCss (apply-css dumb-injector path)", async () => {
+  const page = await ctx.newPage();
+  await page.goto("data:text/html," + encodeURIComponent(
+    `<!doctype html><html><head></head><body></body></html>`
+  ));
+  await page.addScriptTag({ path: path.resolve(extPath, "dist/contentScript.js") });
+  const css = ":root{--radius:2rem}";
+  await page.evaluate((cssStr) => {
+    const w = window as unknown as { __cossInjectCss?: (css: string) => void };
+    w.__cossInjectCss?.(cssStr);
+  }, css);
+  const styleText = await page.locator("#coss-tweak").textContent();
+  expect(styleText).toBe(css);
+  const radius = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue("--radius").trim()
+  );
+  expect(radius).toBe("2rem");
+});
+
 test("content script injects :root/.dark override style on a page", async () => {
   const page = await ctx.newPage();
   await page.goto("data:text/html," + encodeURIComponent(

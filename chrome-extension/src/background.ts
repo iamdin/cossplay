@@ -1,5 +1,5 @@
 import type { ThemeOverride } from "theme-core";
-import { STORAGE_KEY, type PanelToBg } from "./shared/messages";
+import { STORAGE_KEY, STORAGE_KEY_CSS, type PanelToBg } from "./shared/messages";
 
 const isTargetUrl = (url?: string) =>
   typeof url === "string" &&
@@ -17,6 +17,14 @@ chrome.action.onClicked.addListener((tab) => {
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 
 chrome.runtime.onMessage.addListener((message: PanelToBg, _sender, sendResponse) => {
+  if (message?.type === "apply-css") {
+    const { css } = message;
+    chrome.storage.local.set({ [STORAGE_KEY_CSS]: css }, () => {
+      sendToActiveTab({ type: "apply-css", css });
+      sendResponse({ ok: true });
+    });
+    return true;
+  }
   if (message?.type === "set-vars") {
     const override = message.override as ThemeOverride;
     chrome.storage.local.set({ [STORAGE_KEY]: override }, () => {
@@ -26,7 +34,7 @@ chrome.runtime.onMessage.addListener((message: PanelToBg, _sender, sendResponse)
     return true;
   }
   if (message?.type === "reset-vars") {
-    chrome.storage.local.remove([STORAGE_KEY], () => {
+    chrome.storage.local.remove([STORAGE_KEY, STORAGE_KEY_CSS], () => {
       sendToActiveTab({ type: "reset-vars" });
       sendResponse({ ok: true });
     });
@@ -52,7 +60,12 @@ if (message?.type === "get-vars") {
 });
 
 const reapply = (tabId: number) => {
-  chrome.storage.local.get([STORAGE_KEY], (result) => {
+  chrome.storage.local.get([STORAGE_KEY_CSS, STORAGE_KEY], (result) => {
+    const css = result[STORAGE_KEY_CSS] as string | undefined;
+    if (css) {
+      chrome.tabs.sendMessage(tabId, { type: "apply-css", css });
+      return;
+    }
     const override = result[STORAGE_KEY] as ThemeOverride | undefined;
     if (override) chrome.tabs.sendMessage(tabId, { type: "apply-vars", override });
   });

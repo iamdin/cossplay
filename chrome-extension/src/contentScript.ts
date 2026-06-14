@@ -1,5 +1,5 @@
 import { buildOverrideCss, emptyOverride, normalizeOverride, googleFontHref, NON_COLOR_CONTROLS, type ThemeOverride } from "theme-core";
-import { STORAGE_KEY, type BgToContent, type DiscoverResult } from "./shared/messages";
+import { STORAGE_KEY, STORAGE_KEY_CSS, type BgToContent, type DiscoverResult } from "./shared/messages";
 
 const STYLE_ID = "coss-tweak";
 const FONT_LINK_ID = "coss-tweak-fonts";
@@ -22,6 +22,17 @@ const applyFontLink = (base: Record<string, string>) => {
   if (link.href !== href) link.href = href;
 };
 
+/** Creates or updates <style id="coss-tweak"> with verbatim CSS and appends to head (wins via source order). */
+const injectCss = (css: string) => {
+  let el = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
+  if (!el) {
+    el = document.createElement("style");
+    el.id = STYLE_ID;
+  }
+  el.textContent = css;
+  document.head.appendChild(el); // 保证在最后，源顺序取胜
+};
+
 const injectOverride = (override: ThemeOverride) => {
   const ov = normalizeOverride(override);
   let el = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
@@ -39,7 +50,12 @@ const removeOverride = () => {
 };
 
 const loadStored = () => {
-  chrome.storage.local.get([STORAGE_KEY], (result) => {
+  chrome.storage.local.get([STORAGE_KEY_CSS, STORAGE_KEY], (result) => {
+    const css = result[STORAGE_KEY_CSS] as string | undefined;
+    if (css) {
+      injectCss(css);
+      return;
+    }
     const stored = result[STORAGE_KEY] as ThemeOverride | undefined;
     if (stored) injectOverride(stored);
   });
@@ -51,7 +67,12 @@ let styleObserver: MutationObserver | null = null;
 const guardStyle = () => {
   styleObserver = new MutationObserver(() => {
     if (!document.getElementById(STYLE_ID)) {
-      chrome.storage.local.get([STORAGE_KEY], (result) => {
+      chrome.storage.local.get([STORAGE_KEY_CSS, STORAGE_KEY], (result) => {
+        const css = result[STORAGE_KEY_CSS] as string | undefined;
+        if (css) {
+          injectCss(css);
+          return;
+        }
         const stored = result[STORAGE_KEY] as ThemeOverride | undefined;
         if (stored) injectOverride(stored);
       });
@@ -165,6 +186,12 @@ const discover = (): DiscoverResult => {
 // and chrome.runtime.id is falsy, so these blocks are safely skipped.
 if (typeof chrome !== "undefined" && chrome?.runtime?.id) {
   chrome.runtime.onMessage.addListener((message: BgToContent, _sender, sendResponse) => {
+    if (message?.type === "apply-css") {
+      injectCss(message.css);
+      chrome.storage.local.set({ [STORAGE_KEY_CSS]: message.css });
+      sendResponse({ ok: true });
+      return true;
+    }
     if (message?.type === "apply-vars") {
       injectOverride(message.override ?? emptyOverride());
       sendResponse({ ok: true });
@@ -192,8 +219,9 @@ if (typeof chrome !== "undefined" && chrome?.runtime?.id) {
   }
 }
 
-// Test-only: expose the pure injector when not running in an extension context.
+// Test-only: expose the pure injectors when not running in an extension context.
 // In a real extension, chrome.runtime.id is truthy so this never executes (no leakage).
 if (typeof chrome === "undefined" || !chrome?.runtime?.id) {
   (window as unknown as { __cossInject?: typeof injectOverride }).__cossInject = injectOverride;
+  (window as unknown as { __cossInjectCss?: typeof injectCss }).__cossInjectCss = injectCss;
 }

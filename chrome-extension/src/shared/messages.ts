@@ -14,11 +14,15 @@ export interface DiscoverResult {
 export type PanelToBg =
   | { type: "set-vars"; override: ThemeOverride }
   | { type: "reset-vars" }
-  | { type: "get-vars" };
+  | { type: "get-vars" }
+  | { type: "apply-css"; css: string };
 
 export type BgToContent =
   | { type: "apply-vars"; override: ThemeOverride }
   | { type: "reset-vars" }
-  | { type: "get-vars" };
+  | { type: "get-vars" }
+  | { type: "apply-css"; css: string };
 
 export const STORAGE_KEY = "cossThemeOverride";
+/** Storage key for the panel-generated CSS string (M2 dumb-injector path). */
+export const STORAGE_KEY_CSS = "cossThemeCss";
