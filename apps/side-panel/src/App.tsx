@@ -4,6 +4,7 @@ import { useThemeOverride } from "@/hooks/use-theme-override";
 import { TokenGroup } from "@/components/token-group";
 import { PresetSelect } from "@/components/preset-select";
 import { ExportDialog } from "@/components/export-dialog";
+import { NonColorControls } from "@/components/non-color-controls";
 
 type ChromeApi = {
   tabs?: {
@@ -24,7 +25,7 @@ type ChromeApi = {
 const chromeApi = (globalThis as { chrome?: ChromeApi }).chrome;
 
 export function App() {
-  const { override, names, defaults, mode, setMode, setToken, applyPreset, reset, status, fetchDefaults } =
+  const { override, names, defaults, mode, setMode, setToken, setBaseToken, applyPreset, reset, status, fetchDefaults } =
     useThemeOverride();
 
   const groups = groupTokens(names);
@@ -69,6 +70,11 @@ export function App() {
       </div>
 
       <div className="mt-5 space-y-4">
+        <NonColorControls
+          defaults={defaults.base}
+          overrides={override.base}
+          onChange={setBaseToken}
+        />
         {groups.length === 0 ? (
           <p className="text-muted-foreground text-sm">请先打开 coss.com/ui 页面，再点「读取当前」</p>
         ) : (
