@@ -1,5 +1,3 @@
-import { COLOR_TOKENS } from "./tokens";
-import type { ThemeOverride } from "./types";
 import type { ThemePreset, ThemeStyles, ThemeStyleProps } from "./theme-model";
 import { defaultThemeStyles } from "./theme-model";
 
@@ -3598,18 +3596,6 @@ export const defaultPresets: Record<string, ThemePreset> = {
     },
   },
 };
-
-/** 把预设取色键裁剪到我们管理的颜色 token，转成 ThemeOverride（base 留空）。 */
-export function presetToOverride(preset: ThemePreset): ThemeOverride {
-  const pick = (styles: Record<string, string>): Record<string, string> => {
-    const out: Record<string, string> = {};
-    for (const [k, v] of Object.entries(styles)) {
-      if (COLOR_TOKENS.has(k) && typeof v === "string") out[k] = v;
-    }
-    return out;
-  };
-  return { base: {}, light: pick(preset.styles.light), dark: pick(preset.styles.dark) };
-}
 
 /**
  * Merge a preset's partial light/dark onto `defaults`, returning a full

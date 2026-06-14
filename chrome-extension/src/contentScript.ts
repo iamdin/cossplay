@@ -1,26 +1,7 @@
-import { buildOverrideCss, emptyOverride, normalizeOverride, googleFontHref, NON_COLOR_CONTROLS, type ThemeOverride } from "theme-core";
-import { STORAGE_KEY, STORAGE_KEY_CSS, type BgToContent, type DiscoverResult } from "./shared/messages";
+import { NON_COLOR_CONTROLS } from "theme-core";
+import { STORAGE_KEY_CSS, type BgToContent, type DiscoverResult } from "./shared/messages";
 
 const STYLE_ID = "coss-tweak";
-const FONT_LINK_ID = "coss-tweak-fonts";
-
-/** 按 base 中的字体栈注入/更新/移除 Google webfont <link>（联网,失败不影响其余）。 */
-const applyFontLink = (base: Record<string, string>) => {
-  const stacks = [base["font-sans"], base["font-mono"]].filter(Boolean) as string[];
-  const href = googleFontHref(stacks);
-  let link = document.getElementById(FONT_LINK_ID) as HTMLLinkElement | null;
-  if (!href) {
-    link?.remove();
-    return;
-  }
-  if (!link) {
-    link = document.createElement("link");
-    link.id = FONT_LINK_ID;
-    link.rel = "stylesheet";
-    document.head.appendChild(link);
-  }
-  if (link.href !== href) link.href = href;
-};
 
 /** Creates or updates <style id="coss-tweak"> with verbatim CSS and appends to head (wins via source order). */
 const injectCss = (css: string) => {
@@ -33,31 +14,14 @@ const injectCss = (css: string) => {
   document.head.appendChild(el); // 保证在最后，源顺序取胜
 };
 
-const injectOverride = (override: ThemeOverride) => {
-  const ov = normalizeOverride(override);
-  let el = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
-  if (!el) {
-    el = document.createElement("style");
-    el.id = STYLE_ID;
-  }
-  el.textContent = buildOverrideCss(ov);
-  document.head.appendChild(el); // 保证在最后，源顺序取胜
-  applyFontLink(ov.base);
-};
-
-const removeOverride = () => {
+const removeStyle = () => {
   document.getElementById(STYLE_ID)?.remove();
 };
 
 const loadStored = () => {
-  chrome.storage.local.get([STORAGE_KEY_CSS, STORAGE_KEY], (result) => {
+  chrome.storage.local.get([STORAGE_KEY_CSS], (result) => {
     const css = result[STORAGE_KEY_CSS] as string | undefined;
-    if (css) {
-      injectCss(css);
-      return;
-    }
-    const stored = result[STORAGE_KEY] as ThemeOverride | undefined;
-    if (stored) injectOverride(stored);
+    if (css) injectCss(css);
   });
 };
 
@@ -67,14 +31,9 @@ let styleObserver: MutationObserver | null = null;
 const guardStyle = () => {
   styleObserver = new MutationObserver(() => {
     if (!document.getElementById(STYLE_ID)) {
-      chrome.storage.local.get([STORAGE_KEY_CSS, STORAGE_KEY], (result) => {
+      chrome.storage.local.get([STORAGE_KEY_CSS], (result) => {
         const css = result[STORAGE_KEY_CSS] as string | undefined;
-        if (css) {
-          injectCss(css);
-          return;
-        }
-        const stored = result[STORAGE_KEY] as ThemeOverride | undefined;
-        if (stored) injectOverride(stored);
+        if (css) injectCss(css);
       });
     }
   });
@@ -148,7 +107,7 @@ const readBaseDefaults = (): Record<string, string> => {
 
 /**
  * 读 light + dark 两套默认值；过程中暂停 observer、同步恢复注入，避免竞态与闪烁。
- * 注意：只移除/恢复 #coss-tweak 样式；字体 <link>（#coss-tweak-fonts）由 applyFontLink 独立驱动，此处故意不动。
+ * 注意：只移除/恢复 #coss-tweak 样式。
  */
 const discover = (): DiscoverResult => {
   styleObserver?.disconnect();
@@ -158,7 +117,7 @@ const discover = (): DiscoverResult => {
 
   const existing = document.getElementById(STYLE_ID);
   const savedCss = existing?.textContent ?? null;
-  removeOverride();
+  removeStyle();
 
   const base = readBaseDefaults();
 
@@ -192,13 +151,9 @@ if (typeof chrome !== "undefined" && chrome?.runtime?.id) {
       sendResponse({ ok: true });
       return true;
     }
-    if (message?.type === "apply-vars") {
-      injectOverride(message.override ?? emptyOverride());
-      sendResponse({ ok: true });
-      return true;
-    }
     if (message?.type === "reset-vars") {
-      removeOverride();
+      removeStyle();
+      chrome.storage.local.remove([STORAGE_KEY_CSS]);
       sendResponse({ ok: true });
       return true;
     }
@@ -222,6 +177,5 @@ if (typeof chrome !== "undefined" && chrome?.runtime?.id) {
 // Test-only: expose the pure injectors when not running in an extension context.
 // In a real extension, chrome.runtime.id is truthy so this never executes (no leakage).
 if (typeof chrome === "undefined" || !chrome?.runtime?.id) {
-  (window as unknown as { __cossInject?: typeof injectOverride }).__cossInject = injectOverride;
   (window as unknown as { __cossInjectCss?: typeof injectCss }).__cossInjectCss = injectCss;
 }

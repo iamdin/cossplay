@@ -51,7 +51,7 @@ test("content script injects verbatim CSS string via __cossInjectCss (apply-css 
   expect(radius).toBe("2rem");
 });
 
-test("content script injects :root/.dark override style on a page", async () => {
+test("content script injects a multi-block CSS string verbatim", async () => {
   const page = await ctx.newPage();
   await page.goto("data:text/html," + encodeURIComponent(
     `<!doctype html><html class="light"><head><style>` +
@@ -59,24 +59,15 @@ test("content script injects :root/.dark override style on a page", async () => 
     `</style></head><body><div id="swatch">coss mock</div></body></html>`
   ));
   await page.addScriptTag({ path: path.resolve(extPath, "dist/contentScript.js") });
-  await page.evaluate(() => {
-    const w = window as unknown as {
-      __cossInject?: (o: {
-        base: Record<string, string>;
-        light: Record<string, string>;
-        dark: Record<string, string>;
-      }) => void;
-    };
-    w.__cossInject?.({
-      base: { radius: "1.25rem" },
-      light: { primary: "oklch(0.6 0.2 250)" },
-      dark: { primary: "oklch(0.7 0.1 250)" },
-    });
-  });
+  const css =
+    ":root {\n  --radius: 1.25rem;\n  --primary: oklch(0.6 0.2 250);\n}\n\n" +
+    ".dark {\n  --primary: oklch(0.7 0.1 250);\n}";
+  await page.evaluate((cssStr) => {
+    const w = window as unknown as { __cossInjectCss?: (css: string) => void };
+    w.__cossInjectCss?.(cssStr);
+  }, css);
   const styleText = await page.locator("#coss-tweak").textContent();
-  expect(styleText).toContain(":root {");
-  expect(styleText).toContain("--radius: 1.25rem;");
-  expect(styleText).toContain("--primary: oklch(0.6 0.2 250);");
+  expect(styleText).toBe(css);
   // base 只进 :root，不进 .dark
   const darkBlock = styleText!.slice(styleText!.indexOf(".dark {"));
   expect(darkBlock).not.toContain("--radius");

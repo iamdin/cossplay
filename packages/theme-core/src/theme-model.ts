@@ -4,8 +4,6 @@
  * Ported from tweakcn `types/theme.ts` + `config/theme.ts`, with all Drizzle /
  * `@/db/schema` references removed. Plain TS types only (no zod) to stay
  * dependency-free; the exported names match tweakcn's public surface.
- *
- * This is ADDITIVE — the legacy `ThemeOverride` model in `types.ts` is untouched.
  */
 
 /** The full ~45-field theme style props (colors + fonts + radius + shadows + spacing/tracking). */
