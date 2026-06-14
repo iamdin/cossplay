@@ -106,29 +106,40 @@ const discover = (): DiscoverResult => {
   return { names, light, dark };
 };
 
-chrome.runtime.onMessage.addListener((message: BgToContent, _sender, sendResponse) => {
-  if (message?.type === "apply-vars") {
-    injectOverride(message.override ?? emptyOverride());
-    sendResponse({ ok: true });
-    return true;
-  }
-  if (message?.type === "reset-vars") {
-    removeOverride();
-    sendResponse({ ok: true });
-    return true;
-  }
-  if (message?.type === "get-vars") {
-    const run = () => sendResponse({ ok: true, vars: discover() });
-    if (document.readyState === "complete") run();
-    else window.addEventListener("load", run, { once: true });
-    return true;
-  }
-  return false;
-});
+// Guard all chrome API usage: only wire up when running as a real content script.
+// On a plain page (e.g. during E2E testing via addScriptTag), chrome is undefined
+// and chrome.runtime.id is falsy, so these blocks are safely skipped.
+if (typeof chrome !== "undefined" && chrome?.runtime?.id) {
+  chrome.runtime.onMessage.addListener((message: BgToContent, _sender, sendResponse) => {
+    if (message?.type === "apply-vars") {
+      injectOverride(message.override ?? emptyOverride());
+      sendResponse({ ok: true });
+      return true;
+    }
+    if (message?.type === "reset-vars") {
+      removeOverride();
+      sendResponse({ ok: true });
+      return true;
+    }
+    if (message?.type === "get-vars") {
+      const run = () => sendResponse({ ok: true, vars: discover() });
+      if (document.readyState === "complete") run();
+      else window.addEventListener("load", run, { once: true });
+      return true;
+    }
+    return false;
+  });
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => { loadStored(); guardStyle(); }, { once: true });
-} else {
-  loadStored();
-  guardStyle();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => { loadStored(); guardStyle(); }, { once: true });
+  } else {
+    loadStored();
+    guardStyle();
+  }
+}
+
+// Test-only: expose the pure injector when not running in an extension context.
+// In a real extension, chrome.runtime.id is truthy so this never executes (no leakage).
+if (typeof chrome === "undefined" || !chrome?.runtime?.id) {
+  (window as unknown as { __cossInject?: typeof injectOverride }).__cossInject = injectOverride;
 }
