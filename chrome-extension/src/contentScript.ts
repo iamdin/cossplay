@@ -1,17 +1,37 @@
-import { buildOverrideCss, emptyOverride, type ThemeOverride } from "theme-core";
+import { buildOverrideCss, emptyOverride, normalizeOverride, googleFontHref, NON_COLOR_CONTROLS, type ThemeOverride } from "theme-core";
 import { STORAGE_KEY, type BgToContent, type DiscoverResult } from "./shared/messages";
 
 const STYLE_ID = "coss-tweak";
+const FONT_LINK_ID = "coss-tweak-fonts";
 
-/** 注入/更新覆盖样式：写 :root{} + .dark{} 两段，追加到 <head> 末尾。 */
+/** 按 base 中的字体栈注入/更新/移除 Google webfont <link>（联网,失败不影响其余）。 */
+const applyFontLink = (base: Record<string, string>) => {
+  const stacks = [base["font-sans"], base["font-mono"]].filter(Boolean) as string[];
+  const href = googleFontHref(stacks);
+  let link = document.getElementById(FONT_LINK_ID) as HTMLLinkElement | null;
+  if (!href) {
+    link?.remove();
+    return;
+  }
+  if (!link) {
+    link = document.createElement("link");
+    link.id = FONT_LINK_ID;
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+  }
+  if (link.href !== href) link.href = href;
+};
+
 const injectOverride = (override: ThemeOverride) => {
+  const ov = normalizeOverride(override);
   let el = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
   if (!el) {
     el = document.createElement("style");
     el.id = STYLE_ID;
   }
-  el.textContent = buildOverrideCss(override);
+  el.textContent = buildOverrideCss(ov);
   document.head.appendChild(el); // 保证在最后，源顺序取胜
+  applyFontLink(ov.base);
 };
 
 const removeOverride = () => {
@@ -33,7 +53,7 @@ const guardStyle = () => {
     if (!document.getElementById(STYLE_ID)) {
       chrome.storage.local.get([STORAGE_KEY], (result) => {
         const stored = result[STORAGE_KEY] as ThemeOverride | undefined;
-        if (stored && buildOverrideCss(stored)) injectOverride(stored);
+        if (stored) injectOverride(stored);
       });
     }
   });
@@ -94,6 +114,17 @@ const readResolved = (names: string[]): Record<string, string> => {
   return out;
 };
 
+/** 读非颜色 token 的当前默认值（getComputedStyle）。 */
+const readBaseDefaults = (): Record<string, string> => {
+  const cs = getComputedStyle(document.documentElement);
+  const out: Record<string, string> = {};
+  for (const c of NON_COLOR_CONTROLS) {
+    const v = cs.getPropertyValue(`--${c.token}`).trim();
+    if (v) out[c.token] = v;
+  }
+  return out;
+};
+
 /** 读 light + dark 两套默认值；过程中暂停 observer、同步恢复注入，避免竞态与闪烁。 */
 const discover = (): DiscoverResult => {
   styleObserver?.disconnect();
@@ -105,6 +136,8 @@ const discover = (): DiscoverResult => {
   const savedCss = existing?.textContent ?? null;
   removeOverride();
 
+  const base = readBaseDefaults();
+
   const wasDark = root.classList.contains("dark");
   root.classList.remove("dark");
   const light = readResolved(names);
@@ -113,7 +146,6 @@ const discover = (): DiscoverResult => {
   if (wasDark) root.classList.add("dark");
   else root.classList.remove("dark");
 
-  // 同步恢复之前的注入（如果有）
   if (savedCss !== null) {
     const el = document.createElement("style");
     el.id = STYLE_ID;
@@ -122,7 +154,7 @@ const discover = (): DiscoverResult => {
   }
 
   styleObserver?.observe(document.head, { childList: true });
-  return { names, light, dark };
+  return { names, light, dark, base };
 };
 
 // Guard all chrome API usage: only wire up when running as a real content script.

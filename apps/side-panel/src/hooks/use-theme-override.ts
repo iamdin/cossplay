@@ -26,7 +26,7 @@ export function useThemeOverride() {
   }, []);
 
   const setToken = React.useCallback((token: string, value: string) => {
-    const next: ThemeOverride = { light: { ...override.light }, dark: { ...override.dark } };
+    const next: ThemeOverride = { base: { ...override.base }, light: { ...override.light }, dark: { ...override.dark } };
     const bucket = next[mode];
     if (!value.trim()) delete bucket[token];
     else bucket[token] = value.trim();
