@@ -1,19 +1,23 @@
 import * as React from "react";
-import { HexColorPicker } from "react-colorful";
-import { toHex, colorFormatter } from "theme-core";
+import { HexAlphaColorPicker } from "react-colorful";
+import { toHex8, colorFormatter } from "theme-core";
 import { Input } from "@/components/ui/input";
 
 interface ColorPickerProps {
   /** 当前生效值（覆盖值或默认值），任意颜色格式。 */
   value: string;
-  /** 输出 oklch 字符串。 */
+  /** 输出 oklch 字符串（含 alpha）。 */
   onChange: (oklch: string) => void;
 }
+
+/** 透明棋盘格，让半透明色块可辨。 */
+const CHECKER =
+  "repeating-conic-gradient(#bbb 0% 25%, #fff 0% 50%) 50% / 8px 8px";
 
 export function ColorPicker({ value, onChange }: ColorPickerProps) {
   const [open, setOpen] = React.useState(false);
   const rootRef = React.useRef<HTMLDivElement>(null);
-  const hex = toHex(value);
+  const hex8 = toHex8(value);
 
   React.useEffect(() => {
     if (!open) return;
@@ -39,12 +43,14 @@ export function ColorPicker({ value, onChange }: ColorPickerProps) {
         type="button"
         aria-label="选择颜色"
         className="border-border size-6 shrink-0 rounded border"
-        style={{ backgroundColor: hex }}
+        style={{ background: CHECKER }}
         onClick={() => setOpen((o) => !o)}
-      />
+      >
+        <span className="block size-full rounded" style={{ backgroundColor: hex8 }} />
+      </button>
       {open && (
         <div className="absolute z-50 mt-1 space-y-2 rounded-md border bg-popover p-2 shadow-md">
-          <HexColorPicker color={hex} onChange={(h) => onChange(colorFormatter(h, "oklch"))} />
+          <HexAlphaColorPicker color={hex8} onChange={(h) => onChange(colorFormatter(h, "oklch"))} />
           <Input
             value={value}
             onChange={(e) => onChange(e.target.value)}
