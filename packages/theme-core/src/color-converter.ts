@@ -7,6 +7,11 @@ export const formatNumber = (num?: number) => {
   return num % 1 === 0 ? num : Number(num.toFixed(4));
 };
 
+const alphaOf = (color: { alpha?: number }): number | null => {
+  const a = color.alpha;
+  return typeof a === "number" && a < 1 ? a : null;
+};
+
 export const colorFormatter = (
   colorValue: string,
   format: ColorFormat = "oklch"
@@ -14,20 +19,23 @@ export const colorFormatter = (
   try {
     const color = culori.parse(colorValue);
     if (!color) throw new Error("Invalid color input");
+    const a = alphaOf(color);
 
     switch (format) {
       case "hsl": {
         const hsl = culori.converter("hsl")(color);
-        return `hsl(${formatNumber(hsl.h)} ${formatNumber((hsl.s ?? 0) * 100)}% ${formatNumber((hsl.l ?? 0) * 100)}%)`;
+        const head = `hsl(${formatNumber(hsl.h)} ${formatNumber((hsl.s ?? 0) * 100)}% ${formatNumber((hsl.l ?? 0) * 100)}%`;
+        return a === null ? `${head})` : `${head} / ${formatNumber(a)})`;
       }
       case "rgb":
-        return culori.formatRgb(color);
+        return culori.formatRgb(color); // 已含 alpha (rgba)
       case "oklch": {
         const oklch = culori.converter("oklch")(color);
-        return `oklch(${formatNumber(oklch.l)} ${formatNumber(oklch.c)} ${formatNumber(oklch.h)})`;
+        const head = `oklch(${formatNumber(oklch.l)} ${formatNumber(oklch.c)} ${formatNumber(oklch.h)}`;
+        return a === null ? `${head})` : `${head} / ${formatNumber(a)})`;
       }
       case "hex":
-        return culori.formatHex(color);
+        return a === null ? culori.formatHex(color) : culori.formatHex8(color);
       default:
         return colorValue;
     }
@@ -37,9 +45,16 @@ export const colorFormatter = (
   }
 };
 
-/** 解析任意颜色为 #rrggbb；失败回退原值。供取色器显示用。 */
+/** 解析任意颜色为 #rrggbb（丢 alpha）；失败回退原值。 */
 export const toHex = (colorValue: string): string => {
   const parsed = culori.parse(colorValue);
   if (!parsed) return colorValue;
   return culori.formatHex(parsed);
+};
+
+/** 解析任意颜色为 8 位 #rrggbbaa（不透明则补 ff）；失败回退原值。供 alpha 取色器使用。 */
+export const toHex8 = (colorValue: string): string => {
+  const parsed = culori.parse(colorValue);
+  if (!parsed) return colorValue;
+  return culori.formatHex8(parsed);
 };
