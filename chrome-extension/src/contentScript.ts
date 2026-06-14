@@ -1,141 +1,134 @@
-const STORAGE_KEY = "cossThemeVars"
+import { buildOverrideCss, type ThemeOverride } from "theme-core";
+import { STORAGE_KEY, type BgToContent, type DiscoverResult } from "./shared/messages";
 
-type ThemeVarValues = Record<string, string>
+const STYLE_ID = "coss-tweak";
 
-const applyVars = (vars: ThemeVarValues) => {
-  const root = document.documentElement
-  Object.entries(vars).forEach(([name, value]) => {
-    root.style.setProperty(name, value)
-  })
-}
+const emptyOverride = (): ThemeOverride => ({ light: {}, dark: {} });
 
-const clearVars = (vars: ThemeVarValues) => {
-  const root = document.documentElement
-  Object.keys(vars).forEach((name) => {
-    root.style.removeProperty(name)
-  })
-}
+/** 注入/更新覆盖样式：写 :root{} + .dark{} 两段，追加到 <head> 末尾。 */
+const injectOverride = (override: ThemeOverride) => {
+  let el = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
+  if (!el) {
+    el = document.createElement("style");
+    el.id = STYLE_ID;
+  }
+  el.textContent = buildOverrideCss(override);
+  document.head.appendChild(el); // 保证在最后，源顺序取胜
+};
 
-const loadStoredVars = () => {
+const removeOverride = () => {
+  document.getElementById(STYLE_ID)?.remove();
+};
+
+const loadStored = () => {
   chrome.storage.local.get([STORAGE_KEY], (result) => {
-    const stored = result[STORAGE_KEY] as ThemeVarValues | undefined
-    if (stored && typeof stored === "object") {
-      applyVars(stored)
+    const stored = result[STORAGE_KEY] as ThemeOverride | undefined;
+    if (stored) injectOverride(stored);
+  });
+};
+
+/** 被框架移除时重新注入。 */
+const guardStyle = () => {
+  const observer = new MutationObserver(() => {
+    if (!document.getElementById(STYLE_ID)) {
+      chrome.storage.local.get([STORAGE_KEY], (result) => {
+        const stored = result[STORAGE_KEY] as ThemeOverride | undefined;
+        if (stored && buildOverrideCss(stored)) injectOverride(stored);
+      });
     }
-  })
-}
+  });
+  observer.observe(document.head, { childList: true });
+};
 
-type VarResult = {
-  raw: ThemeVarValues
-  computed: ThemeVarValues
-  names: string[]
-}
-
-// Discover all CSS custom properties from :root and .dark selectors
-const discoverAllVars = (callback: (result: VarResult) => void) => {
-  const raw: ThemeVarValues = {}
-  const computed: ThemeVarValues = {}
-  const namesSet = new Set<string>()
-
-  // Scan all stylesheets for CSS variables
-  for (const sheet of document.styleSheets) {
+/** 收集所有 coss 颜色 token 名（来自样式表 :root/.dark 规则，不带 `--`）。 */
+const collectTokenNames = (): string[] => {
+  const set = new Set<string>();
+  for (const sheet of Array.from(document.styleSheets)) {
+    let rules: CSSRuleList;
     try {
-      for (const rule of sheet.cssRules) {
-        if (rule instanceof CSSStyleRule && (rule.selectorText === ":root" || rule.selectorText === ".dark")) {
-          for (let i = 0; i < rule.style.length; i++) {
-            const prop = rule.style[i]
-            if (prop.startsWith("--") && !prop.startsWith("--jjext")) {
-              namesSet.add(prop)
-              const value = rule.style.getPropertyValue(prop).trim()
-              if (value && !raw[prop]) {
-                raw[prop] = value
-              }
-            }
-          }
-        }
-      }
+      rules = sheet.cssRules;
     } catch {
-      // Cross-origin stylesheets will throw, ignore them
+      continue; // 跨域样式表
     }
-  }
-
-  // Temporarily remove injected styles to get original computed values
-  chrome.storage.local.get([STORAGE_KEY], (result) => {
-    const stored = result[STORAGE_KEY] as ThemeVarValues | undefined
-    const root = document.documentElement
-
-    // Remove injected styles temporarily
-    if (stored) {
-      Object.keys(stored).forEach((name) => {
-        root.style.removeProperty(name)
-      })
-    }
-
-    // Get original computed values
-    const computedStyle = getComputedStyle(root)
-    for (const name of namesSet) {
-      const value = computedStyle.getPropertyValue(name).trim()
-      if (value) {
-        computed[name] = value
-        if (!raw[name]) {
-          raw[name] = value
+    for (const rule of Array.from(rules)) {
+      if (
+        rule instanceof CSSStyleRule &&
+        (rule.selectorText === ":root" || rule.selectorText === ".dark")
+      ) {
+        for (let i = 0; i < rule.style.length; i++) {
+          const prop = rule.style[i];
+          if (prop.startsWith("--")) set.add(prop.slice(2));
         }
       }
     }
+  }
+  return Array.from(set).sort();
+};
 
-    // Restore injected styles
-    if (stored) {
-      Object.entries(stored).forEach(([name, value]) => {
-        root.style.setProperty(name, value)
-      })
-    }
+/** 读某模式下每个 token 的解析色值（#hex），通过临时元素让 var() resolve。 */
+const readResolved = (names: string[]): Record<string, string> => {
+  const probe = document.createElement("span");
+  probe.style.position = "absolute";
+  probe.style.opacity = "0";
+  probe.style.pointerEvents = "none";
+  document.body.appendChild(probe);
+  const out: Record<string, string> = {};
+  for (const name of names) {
+    probe.style.color = `var(--${name})`;
+    const resolved = getComputedStyle(probe).color; // rgb(...)
+    if (resolved) out[name] = resolved;
+  }
+  probe.remove();
+  return out;
+};
 
-    // Sort names for consistent display
-    const names = Array.from(namesSet).sort()
+/** 读 light + dark 两套默认值；临时移除注入样式与切换 .dark 以取原始值。 */
+const discover = (): DiscoverResult => {
+  const names = collectTokenNames();
+  const root = document.documentElement;
 
-    callback({ raw, computed, names })
-  })
-}
+  const hadOverride = !!document.getElementById(STYLE_ID);
+  removeOverride();
+  const wasDark = root.classList.contains("dark");
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  // light
+  root.classList.remove("dark");
+  const light = readResolved(names);
+  // dark
+  root.classList.add("dark");
+  const dark = readResolved(names);
+
+  // 还原
+  if (wasDark) root.classList.add("dark");
+  else root.classList.remove("dark");
+  if (hadOverride) loadStored();
+
+  return { names, light, dark };
+};
+
+chrome.runtime.onMessage.addListener((message: BgToContent, _sender, sendResponse) => {
   if (message?.type === "apply-vars") {
-    applyVars((message.vars ?? {}) as ThemeVarValues)
-    sendResponse({ ok: true })
-    return true
+    injectOverride(message.override ?? emptyOverride());
+    sendResponse({ ok: true });
+    return true;
   }
-
   if (message?.type === "reset-vars") {
-    chrome.storage.local.get([STORAGE_KEY], (result) => {
-      const stored = result[STORAGE_KEY] as ThemeVarValues | undefined
-      if (stored && typeof stored === "object") {
-        clearVars(stored)
-      }
-      sendResponse({ ok: true })
-    })
-    return true
+    removeOverride();
+    sendResponse({ ok: true });
+    return true;
   }
-
   if (message?.type === "get-vars") {
-    // Wait for styles to be fully loaded
-    const doDiscover = () => {
-      discoverAllVars((vars) => {
-        sendResponse({ ok: true, vars })
-      })
-    }
-    if (document.readyState === "complete") {
-      doDiscover()
-    } else {
-      window.addEventListener("load", doDiscover, { once: true })
-    }
-    return true
+    const run = () => sendResponse({ ok: true, vars: discover() });
+    if (document.readyState === "complete") run();
+    else window.addEventListener("load", run, { once: true });
+    return true;
   }
+  return false;
+});
 
-  return false
-})
-
-// Apply stored vars when DOM is ready
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", loadStoredVars, { once: true })
+  document.addEventListener("DOMContentLoaded", () => { loadStored(); guardStyle(); }, { once: true });
 } else {
-  loadStoredVars()
+  loadStored();
+  guardStyle();
 }
