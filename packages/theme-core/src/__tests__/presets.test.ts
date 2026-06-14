@@ -8,8 +8,9 @@ describe("presets", () => {
     expect(defaultPresets["modern-minimal"]).toBeTruthy();
   });
 
-  it("presetToOverride keeps only color tokens", () => {
+  it("presetToOverride returns base/light/dark with only color tokens", () => {
     const ov = presetToOverride(defaultPresets["modern-minimal"]);
+    expect(ov.base).toEqual({});
     for (const k of Object.keys(ov.light)) {
       expect(COLOR_TOKENS.has(k)).toBe(true);
     }

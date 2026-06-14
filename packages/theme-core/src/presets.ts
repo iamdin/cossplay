@@ -3607,7 +3607,7 @@ export const defaultPresets: Record<string, ThemePreset> = {
   },
 };
 
-/** 把预设取色键裁剪到我们管理的颜色 token，转成 ThemeOverride。 */
+/** 把预设取色键裁剪到我们管理的颜色 token，转成 ThemeOverride（base 留空）。 */
 export function presetToOverride(preset: ThemePreset): ThemeOverride {
   const pick = (styles: Record<string, string>): Record<string, string> => {
     const out: Record<string, string> = {};
@@ -3616,5 +3616,5 @@ export function presetToOverride(preset: ThemePreset): ThemeOverride {
     }
     return out;
   };
-  return { light: pick(preset.styles.light), dark: pick(preset.styles.dark) };
+  return { base: {}, light: pick(preset.styles.light), dark: pick(preset.styles.dark) };
 }
