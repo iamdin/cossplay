@@ -4,12 +4,14 @@
   "version": "0.0.3",
   "workspaces": [
     "apps/*",
+    "packages/*",
     "chrome-extension"
   ],
   "scripts": {
     "dev": "bun --cwd apps/side-panel build:watch & bun --cwd chrome-extension dev",
     "build": "bun run --filter '*' build",
-    "lint": "bun run --filter '*' lint"
+    "lint": "bun run --filter '*' lint",
+    "test": "bun run --filter '*' test"
   },
   "devDependencies": {
     "bumpp": "^10.4.0"
