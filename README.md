@@ -4,7 +4,7 @@
 
 ## 功能特性
 
-- **coss ui 变量**：token 集合即 coss `globals.css`——41 个颜色（含 info / success / warning / code）、`--radius`、`--font-sans` / `--font-heading` / `--font-mono`
+- **coss ui 变量**：token 集合即 coss `globals.css`——41 个颜色（含 info / success / warning / code）、`--radius`、`--font-sans` / `--font-mono`
 - **从网站原主题开始**：检测页面 `:root` / `.dark` / `[data-theme]` 及字体变量类上的值；`var()`、`color-mix()`、`--alpha()` 由浏览器解析成具体颜色；写回时保持网站原颜色格式
 - **只注入改动的 token**：未改动的变量继续跟随网站自己的定义；Tailwind 任意属性（如 `[--radius:9999px]`）这类组件局部变量不会被覆盖
 - **按网站保存**：每个 origin 独立保存、可单独停用；刷新时在首帧前恢复，不闪原主题

@@ -44,7 +44,7 @@ test("the token set is coss ui globals.css: 41 colors, radius and three font var
     assert.ok(colorTokens.includes(key), key)
   assert.deepEqual(
     tokens.filter((k) => !colorTokens.includes(k as never)),
-    ["radius", "font-sans", "font-heading", "font-mono"]
+    ["radius", "font-sans", "font-mono"]
   )
   for (const mode of ["light", "dark"] as const)
     for (const key of tokens)
@@ -97,14 +97,14 @@ test("exports match the coss globals.css shape and import back", () => {
   theme.dark.info = "#ff00aa80"
   for (const mode of ["light", "dark"] as const) {
     theme[mode].radius = "1rem"
-    theme[mode]["font-heading"] = '"Lora", serif'
+    theme[mode]["font-sans"] = '"Lora", serif'
   }
   const css = exportCss(theme, "oklch")
   assert.match(
     css,
     /@theme inline \{[\s\S]*--color-info-foreground: var\(--info-foreground\);/
   )
-  assert.match(css, /--font-heading: var\(--font-heading\);/)
+  assert.match(css, /--font-heading: var\(--font-sans\);/)
   assert.match(css, /--radius-xl: calc\(var\(--radius\) \+ 4px\);/)
   assert.ok(
     !/\.dark \{[^}]*--radius/.test(css),
@@ -154,7 +154,7 @@ test("imports reject malformed input without accepting arbitrary CSS", () => {
   assert.equal(validValue("radius", "-1rem"), false)
   assert.equal(validValue("radius", "1"), false)
   assert.equal(validValue("radius", "0"), true)
-  assert.equal(validValue("font-heading", '"Cal Sans", sans-serif'), true)
+  assert.equal(validValue("font-sans", '"Cal Sans", sans-serif'), true)
 })
 
 test("only overridden tokens are injected, in the page format", () => {
@@ -166,7 +166,11 @@ test("only overridden tokens are injected, in the page format", () => {
     { primary: "#ff0000", radius: "0" },
     { primary: "hex" }
   )
-  assert.deepEqual(map, { primary: "#ff0000", radius: "0rem" })
+  assert.deepEqual(map, {
+    primary: "#ff0000",
+    radius: "0rem",
+    "radius-2xl": "calc(var(--radius) + 6px)",
+  })
   assert.match(variables(styles, { info: styles.info }).info, /^oklch\(/)
 })
 
@@ -196,16 +200,15 @@ test("contrast composites translucent colors", () => {
   )
 })
 
-test("layout export wires next/font variables for sans, heading and mono", () => {
+test("layout export wires next/font variables for sans and mono", () => {
   const theme = clone(defaults)
   theme.light["font-sans"] = '"Inter", sans-serif'
-  theme.light["font-heading"] = '"Inter", sans-serif'
   theme.light["font-mono"] = '"Geist Mono", monospace'
   const code = exportLayout(theme, [
     { family: "Inter", weights: ["400", "700"] },
     { family: "Geist Mono", weights: ["400"] },
   ])
   assert.match(code, /import \{ Inter, Geist_Mono \} from "next\/font\/google"/)
-  assert.match(code, /variable: "--font-heading"/)
+  assert.match(code, /variable: "--font-mono"/)
   assert.ok(!exportLayout(defaults, []).includes("next/font/google"))
 })

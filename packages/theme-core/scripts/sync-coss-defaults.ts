@@ -1,4 +1,5 @@
-// Resolves coss ui's globals.css (:root/.dark) into concrete colors and writes src/coss/defaults.json.
+// Resolves the coss registry style (what `npx shadcn init @coss/style` installs) into concrete
+// colors and writes src/coss/defaults.json.
 // Usage: pnpm sync:defaults [coss revision]
 
 import fs from "node:fs/promises"
@@ -6,9 +7,11 @@ import module from "node:module"
 import path from "node:path"
 import { type Color, converter, interpolate, parse } from "culori"
 
-const revision = process.argv[2] ?? "bd3777acfb44921d4a90b43693a9e26b970b2ecb"
-const source = `https://raw.githubusercontent.com/cosscom/coss/${revision}/packages/ui/src/styles/globals.css`
-const css = await (await fetch(source)).text()
+const revision = process.argv[2] ?? "dd49ec9c2c268ae751724ddc64b343cb3a7e773b"
+const source = `https://raw.githubusercontent.com/cosscom/coss/${revision}/apps/ui/public/r/style.json`
+const { cssVars } = (await (await fetch(source)).json()) as {
+  cssVars: Record<"light" | "dark", Record<string, string>>
+}
 const palette = await fs.readFile(
   module.createRequire(import.meta.url).resolve("tailwindcss/theme.css"),
   "utf8"
@@ -17,17 +20,6 @@ const palette = await fs.readFile(
 const vars: Record<string, string> = {}
 for (const [, name, value] of palette.matchAll(/--(color-[\w-]+):\s*([^;]+);/g))
   vars[name] = value.trim()
-
-function block(selector: string) {
-  const match = new RegExp(
-    `(?:^|\\n)${selector.replace(".", "\\.")} \\{([\\s\\S]*?)\\n\\}`
-  ).exec(css)
-  if (!match) throw Error(`Missing ${selector} block`)
-  const result: Record<string, string> = {}
-  for (const [, name, value] of match[1].matchAll(/--([\w-]+):\s*([^;]+);/g))
-    result[name] = value.replace(/\s+/g, " ").trim()
-  return result
-}
 
 const oklch = converter("oklch")
 function resolve(value: string, scope: Record<string, string>): Color {
@@ -52,12 +44,10 @@ const format = (color: Color) => {
   return `oklch(${n(c.l)} ${n(c.c)} ${n(c.h)}${(c.alpha ?? 1) < 1 ? ` / ${n(c.alpha)}` : ""})`
 }
 
-const root = block(":root"),
-  dark = block(".dark")
+const root = cssVars.light,
+  dark = cssVars.dark
 const fonts = {
   "font-sans":
-    'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-  "font-heading":
     'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
   "font-mono":
     'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
