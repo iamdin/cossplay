@@ -37,7 +37,7 @@ export function Section({
       className="group mb-2 overflow-hidden border bg-card text-card-foreground"
       open={open}
     >
-      <summary className="flex cursor-pointer select-none items-center gap-1.5 px-3 py-2.5 font-medium text-xs group-open:border-b [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer select-none items-center gap-1.5 px-2 py-2 font-medium text-xs group-open:border-b [&::-webkit-details-marker]:hidden">
         <span className="w-2 text-muted-foreground transition-transform group-open:rotate-90">
           ›
         </span>
@@ -120,7 +120,7 @@ export function ColorControl({
   }
   const name = title(token)
   return (
-    <div className="border-b px-3 py-2 last:border-b-0" data-control={token}>
+    <div className="border-b px-2 py-2 last:border-b-0" data-control={token}>
       <div className="flex items-center gap-2">
         <label
           htmlFor={`value-${token}`}

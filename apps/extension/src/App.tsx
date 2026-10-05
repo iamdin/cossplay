@@ -113,8 +113,8 @@ export function App() {
     `${group} ${key}`.toLowerCase().includes(search.toLowerCase())
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground text-xs">
-      <div className="sticky top-0 z-10 flex items-center gap-1 border-b bg-background px-3 py-2">
+    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground text-xs">
+      <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
         <select
           aria-label="Theme preset"
           className={cn(selectClass, "min-w-0 flex-1")}
@@ -201,7 +201,7 @@ export function App() {
       {error && (
         <div
           role="alert"
-          className="relative mx-3 my-2 border border-destructive/30 bg-destructive/5 py-2.5 pr-7 pl-3 text-[11px] text-destructive [overflow-wrap:anywhere]"
+          className="relative mx-2 my-2 border border-destructive/30 bg-destructive/5 py-2.5 pr-7 pl-3 text-[11px] text-destructive [overflow-wrap:anywhere]"
         >
           {error}
           <button
@@ -215,7 +215,7 @@ export function App() {
         </div>
       )}
       {detection?.warnings.length ? (
-        <details className="mx-4 my-2 text-[10px] text-amber-700">
+        <details className="mx-2 my-2 text-[10px] text-amber-700">
           <summary>Stylesheet warnings</summary>
           {detection.warnings.map((w) => (
             <p key={w} className="mt-1 [overflow-wrap:anywhere]">
@@ -225,11 +225,14 @@ export function App() {
         </details>
       ) : null}
 
-      <fieldset disabled={!detected} className="flex min-w-0 flex-1 flex-col">
-        <Tabs defaultValue="colors" className="flex-1 gap-0">
+      <fieldset
+        disabled={!detected}
+        className="flex min-h-0 min-w-0 flex-1 flex-col"
+      >
+        <Tabs defaultValue="colors" className="min-h-0 flex-1 gap-0">
           <TabsList
             aria-label="Editor sections"
-            className="mx-3 my-2 grid w-auto grid-cols-4"
+            className="mx-2 my-1.5 grid w-auto shrink-0 grid-cols-4"
           >
             <TabsTrigger value="colors" className="text-[11px]">
               Colors
@@ -247,7 +250,7 @@ export function App() {
 
           <TabsContent
             value="colors"
-            className="mt-0 border-t px-4 pt-3.5 pb-4"
+            className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
           >
             <div className="mb-3 flex items-center gap-2">
               <Input
@@ -283,7 +286,7 @@ export function App() {
                     }
                   >
                     {group === "Sidebar" && (
-                      <label className="flex items-center gap-1.5 px-3 py-2 text-[10px] text-muted-foreground">
+                      <label className="flex items-center gap-1.5 px-2 py-2 text-[10px] text-muted-foreground">
                         <input
                           type="checkbox"
                           aria-label="Sync sidebar colors"
@@ -312,10 +315,10 @@ export function App() {
                 keys.some((k) => matches(g, k))
               ) && <p className={muted}>No matching colors.</p>}
             <Section label="Contrast checker" count="WCAG">
-              <p className={cn(muted, "mx-3 my-2.5")}>
+              <p className={cn(muted, "mx-2 my-2")}>
                 AA normal text ≥ 4.5:1 · large text ≥ 3:1 · AAA ≥ 7:1
               </p>
-              <label className="flex items-center gap-1.5 px-3 py-2 text-[10px] text-muted-foreground">
+              <label className="flex items-center gap-1.5 px-2 py-2 text-[10px] text-muted-foreground">
                 <input
                   type="checkbox"
                   aria-label="Show contrast issues only"
@@ -335,7 +338,7 @@ export function App() {
                 return (
                   <div
                     key={label}
-                    className="flex justify-between px-3 py-1.5 text-[10px]"
+                    className="flex justify-between px-2 py-1.5 text-[10px]"
                   >
                     <span>{label}</span>
                     <output
@@ -360,13 +363,13 @@ export function App() {
 
           <TabsContent
             value="typography"
-            className="mt-0 border-t px-4 pt-3.5 pb-4"
+            className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
           >
             <p className={cn(muted, "mb-3")}>
               Typography and geometry are shared between light and dark, like
               tweakcn. Custom fonts need to be installed or loaded.
             </p>
-            <section className="mb-2 border bg-card p-3">
+            <section className="mb-2 border bg-card p-2">
               <h2 className="pb-3 font-semibold text-xs">Font family</h2>
               {fontTokens.map((token) => (
                 <FontControl
@@ -378,7 +381,7 @@ export function App() {
                 />
               ))}
             </section>
-            <section className="mb-2 border bg-card p-3">
+            <section className="mb-2 border bg-card p-2">
               <h2 className="pb-3 font-semibold text-xs">Letter spacing</h2>
               <NumericControl
                 token="letter-spacing"
@@ -388,12 +391,15 @@ export function App() {
             </section>
           </TabsContent>
 
-          <TabsContent value="other" className="mt-0 border-t px-4 pt-3.5 pb-4">
+          <TabsContent
+            value="other"
+            className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
+          >
             <Section label="HSL adjustments" open>
-              <p className={cn(muted, "mx-3 my-2.5")}>
+              <p className={cn(muted, "mx-2 my-2")}>
                 Adjust all colors in both modes from one checkpoint.
               </p>
-              <div className="mx-3 my-2.5 flex flex-wrap gap-1">
+              <div className="mx-2 my-2 flex flex-wrap gap-1">
                 {hslPresets.map((p) => (
                   <Button
                     key={p.label}
@@ -423,7 +429,7 @@ export function App() {
               {hslControls.map((c) => (
                 <label
                   key={c.key}
-                  className="m-3 block text-[11px] text-muted-foreground"
+                  className="m-2 block text-[11px] text-muted-foreground"
                 >
                   {c.label}
                   <div className="flex items-center gap-2.5">
@@ -455,7 +461,7 @@ export function App() {
                 </label>
               ))}
             </Section>
-            <section className="mb-2 border bg-card p-3">
+            <section className="mb-2 border bg-card p-2">
               <h2 className="pb-3 font-semibold text-xs">Radius & spacing</h2>
               {(["radius", "spacing"] as const).map((token) => (
                 <NumericControl
@@ -473,7 +479,7 @@ export function App() {
                 format={format}
                 onChange={(v) => updateToken("shadow-color", v)}
               />
-              <div className="p-3">
+              <div className="p-2">
                 {shadowTokens.map((token) => (
                   <NumericControl
                     key={token}
@@ -499,9 +505,9 @@ export function App() {
 
           <TabsContent
             value="themes"
-            className="mt-0 border-t px-4 pt-3.5 pb-4"
+            className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
           >
-            <section className="mb-2 border bg-card p-3">
+            <section className="mb-2 border bg-card p-2">
               <h2 className="pb-1 font-semibold text-xs">Save locally</h2>
               <p className={cn(muted, "mb-2")}>
                 No account. Themes stay in this browser.
@@ -532,7 +538,7 @@ export function App() {
             {locals.map((local) => (
               <section
                 key={`${local.id}:${local.name}`}
-                className="mb-2 border bg-card p-3"
+                className="mb-2 border bg-card p-2"
               >
                 <Input
                   aria-label={`Rename ${local.name}`}
@@ -576,7 +582,7 @@ export function App() {
         </Tabs>
       </fieldset>
 
-      <footer className="sticky bottom-0 z-10 flex items-center gap-2 border-t bg-background px-3 py-2">
+      <footer className="flex shrink-0 items-center gap-2 border-t px-2 py-1.5">
         <div
           role="status"
           className="min-w-0 flex-1 truncate text-[10px] text-muted-foreground"
