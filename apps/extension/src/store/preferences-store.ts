@@ -1,6 +1,6 @@
+import type { ColorFormat } from "@coss-tweak/theme-core"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import type { ColorFormat } from "@coss-tweak/theme-core"
 
 /**
  * 导出偏好（颜色格式 / 包管理器）。

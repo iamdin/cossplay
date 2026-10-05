@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react"
-import { AlertTriangle, Check } from "lucide-react"
-
-import { contrast, contrastPairs, formatColor } from "@coss-tweak/theme-core/coss"
-
+import {
+  contrast,
+  contrastPairs,
+  formatColor,
+} from "@coss-tweak/theme-core/coss"
 import { Badge } from "@coss-tweak/ui/components/badge"
 import {
   Dialog,
@@ -14,6 +14,8 @@ import {
 import { ScrollArea } from "@coss-tweak/ui/components/scroll-area"
 import { Separator } from "@coss-tweak/ui/components/separator"
 import { cn } from "@coss-tweak/ui/lib/utils"
+import { AlertTriangle, Check } from "lucide-react"
+import { useMemo, useState } from "react"
 import { useSiteStore, useTheme } from "@/store/site-store"
 
 const MIN_CONTRAST_RATIO = 4.5
@@ -49,7 +51,11 @@ const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
       {
         name: "coss 颜色对",
         pairs: contrastPairs.map<ResolvedPair>((pair) => {
-          const ratio = contrast(styles[pair.foreground], styles[pair.background], formatColor(styles.background, "hex"))
+          const ratio = contrast(
+            styles[pair.foreground],
+            styles[pair.background],
+            formatColor(styles.background, "hex")
+          )
           return {
             key: `${pair.foreground}__${pair.background}`,
             label: pair.label,
@@ -64,7 +70,11 @@ const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
   }, [theme, mode])
 
   const totalIssues = useMemo(
-    () => groups.reduce((sum, g) => sum + g.pairs.filter((p) => !p.isValid).length, 0),
+    () =>
+      groups.reduce(
+        (sum, g) => sum + g.pairs.filter((p) => !p.isValid).length,
+        0
+      ),
     [groups]
   )
 
@@ -92,7 +102,9 @@ const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
             onClick={() => setFilter("all")}
             className={cn(
               "rounded-md border px-2.5 py-1 text-xs transition-colors",
-              filter === "all" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+              filter === "all"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
             )}
           >
             全部
@@ -103,7 +115,9 @@ const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
             onClick={() => setFilter("issues")}
             className={cn(
               "flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs transition-colors disabled:pointer-events-none disabled:opacity-50",
-              filter === "issues" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+              filter === "issues"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-muted"
             )}
           >
             <AlertTriangle className="size-3" />
@@ -115,8 +129,8 @@ const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
           <div className="space-y-4 pr-2">
             {visibleGroups.map((group) => (
               <div key={group.name}>
-                <div className="bg-background sticky top-0 z-10 flex items-center gap-2 pb-2">
-                  <h2 className="text-xs font-semibold">{group.name}</h2>
+                <div className="sticky top-0 z-10 flex items-center gap-2 bg-background pb-2">
+                  <h2 className="font-semibold text-xs">{group.name}</h2>
                   <Separator className="flex-1" />
                 </div>
                 <div className="grid grid-cols-1 gap-2">
@@ -131,14 +145,18 @@ const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
                       <div className="mb-2 flex items-center justify-between">
                         <span
                           className={cn(
-                            "flex items-center gap-1 text-xs font-medium",
+                            "flex items-center gap-1 font-medium text-xs",
                             !pair.isValid && "text-destructive"
                           )}
                         >
                           {pair.label}
-                          {!pair.isValid && <AlertTriangle className="size-3" />}
+                          {!pair.isValid && (
+                            <AlertTriangle className="size-3" />
+                          )}
                         </span>
-                        <Badge variant={pair.isValid ? "secondary" : "destructive"}>
+                        <Badge
+                          variant={pair.isValid ? "secondary" : "destructive"}
+                        >
                           {pair.isValid ? (
                             <Check className="size-3" />
                           ) : (
@@ -154,7 +172,7 @@ const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
                               className="size-7 shrink-0 rounded-md border"
                               style={{ backgroundColor: pair.background }}
                             />
-                            <span className="text-muted-foreground truncate font-mono text-[10px]">
+                            <span className="truncate font-mono text-[10px] text-muted-foreground">
                               背景 {pair.background}
                             </span>
                           </div>
@@ -163,7 +181,7 @@ const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
                               className="size-7 shrink-0 rounded-md border"
                               style={{ backgroundColor: pair.foreground }}
                             />
-                            <span className="text-muted-foreground truncate font-mono text-[10px]">
+                            <span className="truncate font-mono text-[10px] text-muted-foreground">
                               前景 {pair.foreground}
                             </span>
                           </div>
@@ -172,9 +190,14 @@ const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
                           className="flex h-16 w-20 shrink-0 items-center justify-center rounded-md border"
                           style={{ backgroundColor: pair.background }}
                         >
-                          <div className="text-center" style={{ color: pair.foreground }}>
-                            <p className="text-xl font-bold leading-none">Aa</p>
-                            <p className="mt-1 text-[10px] font-medium">示例文本</p>
+                          <div
+                            className="text-center"
+                            style={{ color: pair.foreground }}
+                          >
+                            <p className="font-bold text-xl leading-none">Aa</p>
+                            <p className="mt-1 font-medium text-[10px]">
+                              示例文本
+                            </p>
                           </div>
                         </div>
                       </div>

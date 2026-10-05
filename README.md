@@ -22,19 +22,19 @@
 
 1. 克隆本仓库并安装依赖：
    ```bash
-   bun install
+   pnpm install
    ```
 
 2. 构建扩展：
    ```bash
-   bun run build
+   pnpm build
    ```
 
 3. 在 Chrome 中加载扩展：
    - 打开 `chrome://extensions/`
    - 开启「开发者模式」
    - 点击「加载已解压的扩展程序」
-   - 选择 `chrome-extension` 目录
+   - 选择 `apps/extension/dist` 目录
 
 4. 访问使用 coss ui 的网站（如 `https://coss.com/ui`），点击扩展图标打开侧边栏即可开始调整主题
 
@@ -46,24 +46,28 @@
 
 常用脚本（仓库根目录）：
 
-- `bun run dev`：同时监听侧边栏与扩展构建
-- `bun run build`：构建所有工作区包
-- `bun run lint`：运行所有工作区包的 lint
-- `bun run test`：单元测试（theme-core）
-- `bun run test:e2e`：Playwright E2E 测试（需先执行 `bun run build`）
+- `pnpm dev`：CRXJS 开发模式（HMR），加载 `apps/extension/dist`
+- `pnpm build`：构建扩展到 `apps/extension/dist`
+- `pnpm check:type`：TypeScript 类型检查
+- `pnpm format` / `pnpm lint`：Biome 格式与 lint 检查（`:fix` 后缀自动修复）
+- `pnpm test`：单元测试（theme-core）
+- `pnpm test:e2e`：先构建，再跑 Playwright E2E 测试
 
 ## 仓库结构
 
-- `apps/side-panel`：侧边栏界面（React + Vite）
-- `chrome-extension`：扩展构建与打包
-- `packages/theme-core`：共享纯逻辑；`theme-core/coss` 为 coss token、站点状态与历史、worker 存储、消息协议（移植自 Shadify）
-- `packages/theme-core/scripts/sync-coss-defaults.ts`：从 coss 仓库的 `globals.css` 重新生成默认值
+pnpm + Turborepo monorepo：
+
+- `apps/extension`：Chrome MV3 扩展（Vite + CRXJS）：侧边栏（React）、内容脚本、service worker
+- `packages/ui`：shadcn 组件、`cn` 与 `globals.css`
+- `packages/theme-core`：共享纯逻辑；`@coss-tweak/theme-core/coss` 为 coss token、站点状态与历史、worker 存储、消息协议（`@webext-core/messaging`）；`/coss/import` 为仅侧边栏使用的主题 CSS/JSON 导入（postcss）
+- `packages/theme-core/scripts/sync-coss-defaults.ts`：`pnpm --filter @coss-tweak/theme-core sync:defaults` 从 coss 仓库的 `globals.css` 重新生成默认值
+- `tooling/typescript`：共享 tsconfig
 
 ## 手动冒烟清单
 
 以下步骤需人工在真实浏览器中验证（自动化测试不覆盖）：
 
-- [ ] 在 `chrome://extensions/` 加载已解压的 `chrome-extension/` 目录，扩展正常出现
+- [ ] 在 `chrome://extensions/` 加载已解压的 `apps/extension/dist/` 目录，扩展正常出现
 - [ ] 打开 `https://coss.com/ui`，侧边栏面板可以打开
 - [ ] 修改任意 token 颜色，页面实时生效（无需刷新）
 - [ ] 切换 Light ↔ Dark 模式，两套颜色互不串扰

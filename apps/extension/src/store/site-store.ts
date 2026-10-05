@@ -1,30 +1,30 @@
-import { useMemo } from "react"
-import { create } from "zustand"
 import {
   coalesces,
   content,
-  effective,
-  localThemesKey,
-  newSite,
-  readLocalThemes,
-  readSite,
-  siteKey,
-  transition,
-  validValue,
-  worker,
   type Detection,
   type Edit,
+  effective,
   type Hsl,
   type LastEdit,
   type LocalTheme,
+  localThemesKey,
   type Mode,
+  newSite,
   type Overrides,
+  readLocalThemes,
+  readSite,
   type SiteState,
+  siteKey,
   type ThemeOp,
   type Token,
+  transition,
+  validValue,
+  worker,
 } from "@coss-tweak/theme-core/coss"
 import { importTheme } from "@coss-tweak/theme-core/coss/import"
 import { storage } from "@wxt-dev/storage"
+import { useMemo } from "react"
+import { create } from "zustand"
 
 /**
  * Side panel state for the active tab, ported from Shadify's panel.
@@ -67,7 +67,10 @@ export function useTheme() {
   const site = useSiteStore((s) => s.site)
   const detection = useSiteStore((s) => s.detection)
   return useMemo(
-    () => (site && detection ? effective(detection.theme, site.current.overrides) : null),
+    () =>
+      site && detection
+        ? effective(detection.theme, site.current.overrides)
+        : null,
     [site, detection]
   )
 }
@@ -76,7 +79,8 @@ export const setError = (error: string) => set({ error })
 
 async function resync(origin: string) {
   const stored = await storage.getItem(siteKey(origin))
-  if (pending === 0 && get().site?.origin === origin) set({ site: readSite(stored, origin) ?? newSite(origin) })
+  if (pending === 0 && get().site?.origin === origin)
+    set({ site: readSite(stored, origin) ?? newSite(origin) })
 }
 
 async function loadTab(id: number) {
@@ -88,7 +92,11 @@ async function loadTab(id: number) {
     const tab = await chrome.tabs.get(id)
     if (signal.aborted) return
     if (!tab.url?.startsWith("http")) {
-      set({ status: "打开一个 HTTP(S) 网站来编辑它的主题。", site: null, detection: null })
+      set({
+        status: "打开一个 HTTP(S) 网站来编辑它的主题。",
+        site: null,
+        detection: null,
+      })
       return
     }
     set({ status: "正在读取页面原始主题…", error: "" })
@@ -101,7 +109,8 @@ async function loadTab(id: number) {
         break
       } catch (error) {
         // tabs.sendMessage gets no response until the content script has loaded.
-        if (attempt === 11 || !String(error).includes("No response")) throw error
+        if (attempt === 11 || !String(error).includes("No response"))
+          throw error
         await new Promise((resolve) => setTimeout(resolve, 150))
       }
     }
@@ -115,13 +124,16 @@ async function loadTab(id: number) {
     // Another panel (or window) may change the same origin.
     unwatchSite?.()
     unwatchSite = storage.watch(siteKey(origin), (value) => {
-      if (pending === 0 && get().site?.origin === origin) set({ site: readSite(value, origin) ?? newSite(origin) })
+      if (pending === 0 && get().site?.origin === origin)
+        set({ site: readSite(value, origin) ?? newSite(origin) })
     })
     set({
       site,
       detection,
       mode: site.previewMode ?? detection.mode,
-      status: detection.detected ? "已检测到页面主题变量" : "未检测到 coss / shadcn 主题变量",
+      status: detection.detected
+        ? "已检测到页面主题变量"
+        : "未检测到 coss / shadcn 主题变量",
     })
   } catch (e) {
     if (!signal.aborted)
@@ -141,8 +153,12 @@ export function connect() {
     windowId = tabs[0].windowId
     if (tabs[0].id) loadTab(tabs[0].id)
   })
-  storage.getItem(localThemesKey).then((value) => set({ locals: readLocalThemes(value) }))
-  const unwatchThemes = storage.watch(localThemesKey, (value) => set({ locals: readLocalThemes(value) }))
+  storage
+    .getItem(localThemesKey)
+    .then((value) => set({ locals: readLocalThemes(value) }))
+  const unwatchThemes = storage.watch(localThemesKey, (value) =>
+    set({ locals: readLocalThemes(value) })
+  )
   const activated = (info: chrome.tabs.TabActiveInfo) => {
     if (info.windowId === windowId) loadTab(info.tabId)
   }
@@ -166,25 +182,33 @@ export function dispatch(edit: Edit, key = "") {
   const baseline = get().detection?.theme
   if (!current || !baseline) return
   const now = Date.now()
-  const next = transition(current, edit, baseline, coalesces(lastEdit, key, current, now))
+  const next = transition(
+    current,
+    edit,
+    baseline,
+    coalesces(lastEdit, key, current, now)
+  )
   lastEdit = { key, at: now, current: JSON.stringify(next.current) }
   set({ site: next, status: "保存中…" })
   pending++
-  worker.sendMessage("edit", { origin: current.origin, edit, baseline, key }).then(
-    ({ state }) => {
-      if (--pending || get().site?.origin !== state.origin) return
-      set({ site: state, status: "已保存到本地" })
-    },
-    (e) => {
-      set({ error: `保存失败：${String(e)}`, status: "未保存" })
-      if (--pending === 0) resync(current.origin).catch(console.error)
-    }
-  )
+  worker
+    .sendMessage("edit", { origin: current.origin, edit, baseline, key })
+    .then(
+      ({ state }) => {
+        if (--pending || get().site?.origin !== state.origin) return
+        set({ site: state, status: "已保存到本地" })
+      },
+      (e) => {
+        set({ error: `保存失败：${String(e)}`, status: "未保存" })
+        if (--pending === 0) resync(current.origin).catch(console.error)
+      }
+    )
 }
 
 export function updateToken(token: Token, value: string) {
   const mode = get().mode
-  if (validValue(token, value)) dispatch({ kind: "token", mode, token, value }, `${mode}:${token}`)
+  if (validValue(token, value))
+    dispatch({ kind: "token", mode, token, value }, `${mode}:${token}`)
 }
 export const applyOverrides = (overrides: Overrides, themeId = "") =>
   dispatch({ kind: "theme", overrides, themeId })
@@ -229,15 +253,22 @@ export async function importFrom(text: string, rawUrl: string) {
   let input = text
   if (rawUrl.trim()) {
     const url = new URL(rawUrl.trim())
-    if ((url.hostname === "tweakcn.com" || url.hostname === "www.tweakcn.com") && !url.pathname.endsWith(".json")) {
-      const id = url.searchParams.get("theme") ?? url.pathname.split("/").filter(Boolean).at(-1)
-      if (!id || id === "editor") throw Error("请使用 tweakcn 主题 registry URL 或带 ID 的主题链接")
+    if (
+      (url.hostname === "tweakcn.com" || url.hostname === "www.tweakcn.com") &&
+      !url.pathname.endsWith(".json")
+    ) {
+      const id =
+        url.searchParams.get("theme") ??
+        url.pathname.split("/").filter(Boolean).at(-1)
+      if (!id || id === "editor")
+        throw Error("请使用 tweakcn 主题 registry URL 或带 ID 的主题链接")
       url.pathname = `/r/themes/${encodeURIComponent(id)}.json`
       url.search = ""
     }
     input = (await worker.sendMessage("fetch", { url: url.href })).text
   }
-  if (!signal || signal.aborted) throw Error("目标标签页已切换，请在要编辑的网站上重试导入")
+  if (!signal || signal.aborted)
+    throw Error("目标标签页已切换，请在要编辑的网站上重试导入")
   applyOverrides(importTheme(input))
   set({ error: "" })
 }

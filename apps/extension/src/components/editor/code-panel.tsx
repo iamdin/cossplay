@@ -1,12 +1,11 @@
-import { useState } from "react"
-import { Check, Copy, Download } from "lucide-react"
 import type { ColorFormat } from "@coss-tweak/theme-core"
-import { exportCss, exportLayout, registryTheme } from "@coss-tweak/theme-core/coss"
-
+import {
+  exportCss,
+  exportLayout,
+  registryTheme,
+} from "@coss-tweak/theme-core/coss"
 import { Button } from "@coss-tweak/ui/components/button"
-import { CodeBlock } from "@/components/editor/code-block"
 import { ScrollArea, ScrollBar } from "@coss-tweak/ui/components/scroll-area"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@coss-tweak/ui/components/tabs"
 import {
   Select,
   SelectContent,
@@ -14,15 +13,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@coss-tweak/ui/components/select"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@coss-tweak/ui/components/tabs"
+import { Check, Copy, Download } from "lucide-react"
+import { useState } from "react"
+import { CodeBlock } from "@/components/editor/code-block"
 import { FALLBACK_FONTS } from "@/lib/fonts"
-import { useTheme } from "@/store/site-store"
 import { usePreferencesStore } from "@/store/preferences-store"
+import { useTheme } from "@/store/site-store"
 
 // 本地导出无托管 URL，注册表始终以本地文件名引用。
 const REGISTRY_FILENAME = "theme-registry.json"
 const THEME_NAME = "coss-theme"
 const COLOR_FORMATS: ColorFormat[] = ["oklch", "hsl", "rgb", "hex"]
-const FONTS = FALLBACK_FONTS.map((f) => ({ family: f.family, weights: f.variants }))
+const FONTS = FALLBACK_FONTS.map((f) => ({
+  family: f.family,
+  weights: f.variants,
+}))
 
 /** 选中包管理器对应的本地 registry 安装命令。 */
 function getLocalRegistryCommand(pm: "pnpm" | "npm" | "yarn" | "bun"): string {
@@ -83,7 +94,9 @@ export function CodePanel() {
       <div className="flex flex-none flex-wrap items-center gap-2">
         <Select
           value={colorFormat}
-          onValueChange={(value: string | null) => value && setColorFormat(value as ColorFormat)}
+          onValueChange={(value: string | null) =>
+            value && setColorFormat(value as ColorFormat)
+          }
         >
           <SelectTrigger size="sm" className="w-fit">
             <SelectValue />
@@ -127,15 +140,21 @@ export function CodePanel() {
           <TabsTrigger value="registry.json">registry.json</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="index.css" className="min-h-0 flex-1 overflow-hidden">
-          <ScrollArea className="border-input h-full rounded-none border">
+        <TabsContent
+          value="index.css"
+          className="min-h-0 flex-1 overflow-hidden"
+        >
+          <ScrollArea className="h-full rounded-none border border-input">
             <CodeBlock code={cssCode} language="css" />
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </TabsContent>
 
-        <TabsContent value="layout.tsx" className="min-h-0 flex-1 overflow-hidden">
-          <ScrollArea className="border-input h-full rounded-none border">
+        <TabsContent
+          value="layout.tsx"
+          className="min-h-0 flex-1 overflow-hidden"
+        >
+          <ScrollArea className="h-full rounded-none border border-input">
             <CodeBlock code={layoutCode} language="tsx" />
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
@@ -152,8 +171,8 @@ export function CodePanel() {
             </Button>
           </div>
           {/* 本地文件安装命令（按所选包管理器） */}
-          <div className="border-input bg-muted/50 flex flex-none items-center gap-2 rounded-none border px-2 py-1.5">
-            <code className="flex-1 overflow-x-auto font-mono text-xs whitespace-nowrap">
+          <div className="flex flex-none items-center gap-2 rounded-none border border-input bg-muted/50 px-2 py-1.5">
+            <code className="flex-1 overflow-x-auto whitespace-nowrap font-mono text-xs">
               {localRegistryCommand}
             </code>
             <Button
@@ -165,11 +184,11 @@ export function CodePanel() {
               {cmdCopied ? <Check /> : <Copy />}
             </Button>
           </div>
-          <p className="text-muted-foreground flex-none text-xs/relaxed">
-            提示：托管式 <code>npx shadcn add &lt;url&gt;</code> 需要 tweakcn 账号，不在本扩展范围内。
-            请下载上方 JSON 到项目根目录后执行命令。
+          <p className="flex-none text-muted-foreground text-xs/relaxed">
+            提示：托管式 <code>npx shadcn add &lt;url&gt;</code> 需要 tweakcn
+            账号，不在本扩展范围内。 请下载上方 JSON 到项目根目录后执行命令。
           </p>
-          <ScrollArea className="border-input min-h-0 flex-1 rounded-none border">
+          <ScrollArea className="min-h-0 flex-1 rounded-none border border-input">
             <CodeBlock code={registryJson} language="json" />
             <ScrollBar orientation="horizontal" />
           </ScrollArea>

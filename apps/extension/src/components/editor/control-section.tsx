@@ -1,7 +1,6 @@
-import { useState } from "react"
-import { ChevronRight } from "lucide-react"
-
 import { cn } from "@coss-tweak/ui/lib/utils"
+import { ChevronRight } from "lucide-react"
+import { useState } from "react"
 import { SectionContext } from "./section-context"
 
 export type ControlSectionProps = {
@@ -42,14 +41,14 @@ const ControlSection = ({
             onClick={() => setIsExpanded(!isExpanded)}
             aria-label={isExpanded ? "Collapse section" : "Expand section"}
           >
-            <div className="bg-muted group-hover/section:bg-muted/80 group-has-focus-within/accordion:bg-muted/70 flex items-center gap-1 rounded-md border border-transparent px-2 py-0.5 transition-all group-has-focus-within/accordion:border-ring/50">
+            <div className="flex items-center gap-1 rounded-md border border-transparent bg-muted px-2 py-0.5 transition-all group-hover/section:bg-muted/80 group-has-focus-within/accordion:border-ring/50 group-has-focus-within/accordion:bg-muted/70">
               <ChevronRight
                 className={cn(
-                  "text-muted-foreground size-3 transition-transform duration-200",
+                  "size-3 text-muted-foreground transition-transform duration-200",
                   isExpanded && "rotate-90"
                 )}
               />
-              <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">
+              <span className="font-semibold text-[11px] text-muted-foreground uppercase tracking-wider">
                 {title}
               </span>
             </div>
@@ -63,7 +62,9 @@ const ControlSection = ({
             isExpanded ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"
           )}
         >
-          <div className={cn("flex flex-col pt-1 pb-2", className)}>{children}</div>
+          <div className={cn("flex flex-col pt-1 pb-2", className)}>
+            {children}
+          </div>
         </div>
       </div>
     </SectionContext.Provider>

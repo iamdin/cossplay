@@ -1,11 +1,18 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { colorFormatter, toHex } from "@coss-tweak/theme-core"
-
 import { cn } from "@coss-tweak/ui/lib/utils"
 import { debounce } from "es-toolkit"
+import type React from "react"
 import {
-  useColorControlFocus,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+import {
   type FocusColorId,
+  useColorControlFocus,
 } from "@/store/color-control-focus-store"
 import { ColorSelectorPopover } from "./color-selector-popover"
 import { SectionContext } from "./section-context"
@@ -38,7 +45,8 @@ const ColorPicker = ({ color, onChange, label, name }: ColorPickerProps) => {
   const textInputRef = useRef<HTMLInputElement>(null)
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const sectionCtx = useContext(SectionContext)
-  const { registerColor, unregisterColor, highlightTarget } = useColorControlFocus()
+  const { registerColor, unregisterColor, highlightTarget } =
+    useColorControlFocus()
 
   // Normalise every change through oklch so the store + generated CSS stay
   // consistent and alpha is preserved.
@@ -101,7 +109,10 @@ const ColorPicker = ({ color, onChange, label, name }: ColorPickerProps) => {
 
       setTimeout(
         () => {
-          rootRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+          rootRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          })
         },
         sectionCtx?.isExpanded ? 0 : 100
       )
@@ -128,10 +139,12 @@ const ColorPicker = ({ color, onChange, label, name }: ColorPickerProps) => {
     <div
       ref={rootRef}
       className={cn(
-        "group hover:bg-muted/50 -mx-1 flex items-center gap-2.5 rounded-lg px-2 py-0.5 transition-all duration-200",
-        shouldAnimate && "bg-muted ring-primary ring-2"
+        "group -mx-1 flex items-center gap-2.5 rounded-lg px-2 py-0.5 transition-all duration-200 hover:bg-muted/50",
+        shouldAnimate && "bg-muted ring-2 ring-primary"
       )}
     >
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: the native color input inside is the keyboard target */}
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: the native color input inside is the keyboard target */}
       <div
         className="relative flex size-7 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-md border shadow-sm"
         style={{ backgroundColor: color }}
@@ -146,7 +159,9 @@ const ColorPicker = ({ color, onChange, label, name }: ColorPickerProps) => {
         />
       </div>
 
-      <span className="text-foreground min-w-0 shrink-0 text-[13px] font-medium">{label}</span>
+      <span className="min-w-0 shrink-0 font-medium text-[13px] text-foreground">
+        {label}
+      </span>
 
       <div className="flex min-w-0 flex-1 items-center justify-end gap-1">
         <input
@@ -154,7 +169,7 @@ const ColorPicker = ({ color, onChange, label, name }: ColorPickerProps) => {
           type="text"
           defaultValue={color}
           onChange={handleTextInputChange}
-          className="bg-muted/50 text-muted-foreground focus:text-foreground focus:border-ring h-7 w-full min-w-0 rounded border px-2 text-xs font-mono transition-colors outline-none"
+          className="h-7 w-full min-w-0 rounded border bg-muted/50 px-2 font-mono text-muted-foreground text-xs outline-none transition-colors focus:border-ring focus:text-foreground"
           placeholder="hex or tailwind"
         />
         <ColorSelectorPopover currentColor={color} onChange={emitChange} />

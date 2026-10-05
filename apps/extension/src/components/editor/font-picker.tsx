@@ -1,6 +1,3 @@
-import { useMemo, useState } from "react"
-import { Check, ChevronDown } from "lucide-react"
-
 import {
   Command,
   CommandEmpty,
@@ -9,11 +6,17 @@ import {
   CommandItem,
   CommandList,
 } from "@coss-tweak/ui/components/command"
-import { Popover, PopoverContent, PopoverTrigger } from "@coss-tweak/ui/components/popover"
-import { cn } from "@coss-tweak/ui/lib/utils"
 import {
-  FALLBACK_FONTS,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@coss-tweak/ui/components/popover"
+import { cn } from "@coss-tweak/ui/lib/utils"
+import { Check, ChevronDown } from "lucide-react"
+import { useMemo, useState } from "react"
+import {
   buildFontFamily,
+  FALLBACK_FONTS,
   type FontCategory,
   type FontInfo,
 } from "@/lib/fonts"
@@ -58,7 +61,7 @@ export function FontPicker({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         className={cn(
-          "bg-input/25 border-input hover:bg-muted flex h-8 w-full items-center justify-between gap-2 rounded-md border px-2.5 text-xs transition-colors",
+          "flex h-8 w-full items-center justify-between gap-2 rounded-md border border-input bg-input/25 px-2.5 text-xs transition-colors hover:bg-muted",
           className
         )}
       >
@@ -70,7 +73,7 @@ export function FontPicker({
             {currentFamily}
           </span>
         ) : (
-          <span className="text-muted-foreground truncate">{placeholder}</span>
+          <span className="truncate text-muted-foreground">{placeholder}</span>
         )}
         <ChevronDown className="ml-2 size-4 shrink-0 opacity-50" />
       </PopoverTrigger>
@@ -95,11 +98,15 @@ export function FontPicker({
                   >
                     <span
                       className="truncate"
-                      style={{ fontFamily: buildFontFamily(font.family, font.category) }}
+                      style={{
+                        fontFamily: buildFontFamily(font.family, font.category),
+                      }}
                     >
                       {font.family}
                     </span>
-                    {isSelected && <Check className="size-4 shrink-0 opacity-70" />}
+                    {isSelected && (
+                      <Check className="size-4 shrink-0 opacity-70" />
+                    )}
                   </CommandItem>
                 )
               })}

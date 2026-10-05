@@ -1,6 +1,4 @@
-import { useState } from "react"
-import { AlertCircle } from "lucide-react"
-
+import { Button } from "@coss-tweak/ui/components/button"
 import {
   Dialog,
   DialogContent,
@@ -9,9 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@coss-tweak/ui/components/dialog"
-import { Button } from "@coss-tweak/ui/components/button"
 import { Input } from "@coss-tweak/ui/components/input"
 import { Textarea } from "@coss-tweak/ui/components/textarea"
+import { AlertCircle } from "lucide-react"
+import { useState } from "react"
 import { importFrom } from "@/store/site-store"
 
 interface CssImportDialogProps {
@@ -69,12 +68,13 @@ export function CssImportDialog({ open, onOpenChange }: CssImportDialogProps) {
         <DialogHeader>
           <DialogTitle>导入主题</DialogTitle>
           <DialogDescription>
-            粘贴 CSS 或 JSON，或填写 tweakcn / registry URL。颜色支持 oklch / hsl / rgb / hex / lab，未定义的 token 保持网站原值。
+            粘贴 CSS 或 JSON，或填写 tweakcn / registry URL。颜色支持 oklch /
+            hsl / rgb / hex / lab，未定义的 token 保持网站原值。
           </DialogDescription>
         </DialogHeader>
 
         {error && (
-          <div className="text-destructive flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-destructive text-xs">
             <AlertCircle className="size-4 shrink-0" />
             <span>{error}</span>
           </div>

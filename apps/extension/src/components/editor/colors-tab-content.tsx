@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react"
-import { RefreshCw, Search, X } from "lucide-react"
 import type { ColorToken, Token } from "@coss-tweak/theme-core/coss"
-
-import ColorPicker from "@/components/editor/color-picker"
-import ControlSection from "@/components/editor/control-section"
 import { ScrollArea } from "@coss-tweak/ui/components/scroll-area"
 import { cn } from "@coss-tweak/ui/lib/utils"
+import { RefreshCw, Search, X } from "lucide-react"
+import { useMemo, useState } from "react"
+import ColorPicker from "@/components/editor/color-picker"
+import ControlSection from "@/components/editor/control-section"
 import { syncSidebar, useSiteStore } from "@/store/site-store"
 
 /**
@@ -152,7 +151,10 @@ interface ColorsTabContentProps {
   updateStyle: (key: Token, value: string) => void
 }
 
-export function ColorsTabContent({ currentStyles, updateStyle }: ColorsTabContentProps) {
+export function ColorsTabContent({
+  currentStyles,
+  updateStyle,
+}: ColorsTabContentProps) {
   const [search, setSearch] = useState("")
   const sidebarSyncEnabled = useSiteStore((s) => !!s.site?.current.sidebarSync)
 
@@ -173,21 +175,22 @@ export function ColorsTabContent({ currentStyles, updateStyle }: ColorsTabConten
   }, [search])
 
   return (
-    <div className="flex min-h-0 h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       <div className="px-1 pb-3">
-        <div className="bg-muted/50 flex items-center gap-2.5 rounded-lg border px-3">
-          <Search className="text-muted-foreground size-4 shrink-0" />
+        <div className="flex items-center gap-2.5 rounded-lg border bg-muted/50 px-3">
+          <Search className="size-4 shrink-0 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search colors..."
-            className="text-foreground placeholder:text-muted-foreground h-9 min-w-0 flex-1 bg-transparent text-sm outline-none"
+            className="h-9 min-w-0 flex-1 bg-transparent text-foreground text-sm outline-none placeholder:text-muted-foreground"
           />
           {search && (
             <button
+              type="button"
               onClick={() => setSearch("")}
-              className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+              className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
             >
               <X className="size-4" />
             </button>
@@ -197,7 +200,9 @@ export function ColorsTabContent({ currentStyles, updateStyle }: ColorsTabConten
 
       <ScrollArea className="min-h-0 flex-1 px-1">
         {filteredGroups.length === 0 && (
-          <p className="text-muted-foreground py-8 text-center text-xs">No colors found</p>
+          <p className="py-8 text-center text-muted-foreground text-xs">
+            No colors found
+          </p>
         )}
         {filteredGroups.map((group) => (
           <ControlSection

@@ -1,5 +1,5 @@
-import { create } from "zustand"
 import type { ColorToken } from "@coss-tweak/theme-core/coss"
+import { create } from "zustand"
 
 /**
  * Ported from tweakcn `store/color-control-focus-store.ts`. The standalone
@@ -25,39 +25,41 @@ interface ColorControlFocusState {
   unregisterColor: (name: FocusColorId) => void
 }
 
-export const useColorControlFocusStore = create<ColorControlFocusState>((set, get) => ({
-  colorRefs: new Map(),
-  highlightTarget: null,
+export const useColorControlFocusStore = create<ColorControlFocusState>(
+  (set, get) => ({
+    colorRefs: new Map(),
+    highlightTarget: null,
 
-  registerColor: (name, ref) =>
-    set((state) => {
-      const map = new Map(state.colorRefs)
-      map.set(name, { ref })
-      return { colorRefs: map }
-    }),
+    registerColor: (name, ref) =>
+      set((state) => {
+        const map = new Map(state.colorRefs)
+        map.set(name, { ref })
+        return { colorRefs: map }
+      }),
 
-  unregisterColor: (name) =>
-    set((state) => {
-      const map = new Map(state.colorRefs)
-      map.delete(name)
-      return { colorRefs: map }
-    }),
+    unregisterColor: (name) =>
+      set((state) => {
+        const map = new Map(state.colorRefs)
+        map.delete(name)
+        return { colorRefs: map }
+      }),
 
-  focusColor: (name) => {
-    const { colorRefs } = get()
-    const entry = colorRefs.get(name)
-    if (!entry) return
+    focusColor: (name) => {
+      const { colorRefs } = get()
+      const entry = colorRefs.get(name)
+      if (!entry) return
 
-    // Scroll & highlight after a brief delay to ensure expansion has occurred.
-    setTimeout(() => {
-      if (entry.ref?.scrollIntoView) {
-        entry.ref.scrollIntoView({ behavior: "smooth", block: "center" })
-      }
-      set({ highlightTarget: name })
-      setTimeout(() => set({ highlightTarget: null }), 3000)
-    }, 175)
-  },
-}))
+      // Scroll & highlight after a brief delay to ensure expansion has occurred.
+      setTimeout(() => {
+        if (entry.ref?.scrollIntoView) {
+          entry.ref.scrollIntoView({ behavior: "smooth", block: "center" })
+        }
+        set({ highlightTarget: name })
+        setTimeout(() => set({ highlightTarget: null }), 3000)
+      }, 175)
+    },
+  })
+)
 
 /**
  * Hook that exposes helper functions for color control focus behaviour.

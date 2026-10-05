@@ -1,10 +1,12 @@
-import { useState } from "react"
-import { Check, Copy } from "lucide-react"
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
-import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
-
-import { cn } from "@coss-tweak/ui/lib/utils"
 import { Button } from "@coss-tweak/ui/components/button"
+import { cn } from "@coss-tweak/ui/lib/utils"
+import { Check, Copy } from "lucide-react"
+import { useState } from "react"
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
+import {
+  oneDark,
+  oneLight,
+} from "react-syntax-highlighter/dist/esm/styles/prism"
 import { useSiteStore } from "@/store/site-store"
 
 /**
@@ -36,7 +38,7 @@ export function CodeBlock({ code, language, className }: CodeBlockProps) {
   return (
     <div
       className={cn(
-        "bg-background text-foreground relative w-full overflow-hidden",
+        "relative w-full overflow-hidden bg-background text-foreground",
         className
       )}
     >

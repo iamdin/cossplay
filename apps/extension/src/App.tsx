@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react"
+import { presetOverrides, presets } from "@coss-tweak/theme-core/coss"
 import {
   Check,
   ChevronLeft,
@@ -13,16 +13,18 @@ import {
   Shuffle,
   Undo2,
 } from "lucide-react"
-import { presetOverrides, presets } from "@coss-tweak/theme-core/coss"
+import { lazy, Suspense, useEffect, useState } from "react"
 
 import ContrastChecker from "@/components/editor/contrast-checker"
 import ThemeControlPanel from "@/components/editor/theme-control-panel"
+
 // 懒加载:Code 面板内含 react-syntax-highlighter（~1MB），只在打开时才拉取该 chunk。
 const CodePanelDialog = lazy(() =>
-  import("@/components/editor/code-panel-dialog").then((m) => ({ default: m.CodePanelDialog })),
+  import("@/components/editor/code-panel-dialog").then((m) => ({
+    default: m.CodePanelDialog,
+  }))
 )
-import { CssImportDialog } from "@/components/editor/css-import-dialog"
-import { LocalThemesDialog } from "@/components/editor/local-themes-dialog"
+
 import { Button } from "@coss-tweak/ui/components/button"
 import {
   Command,
@@ -38,9 +40,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@coss-tweak/ui/components/dropdown-menu"
-import { Popover, PopoverContent, PopoverTrigger } from "@coss-tweak/ui/components/popover"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@coss-tweak/ui/components/popover"
 import { cn } from "@coss-tweak/ui/lib/utils"
-import { applyOverrides, connect, dispatch, preview, useSiteStore } from "@/store/site-store"
+import { CssImportDialog } from "@/components/editor/css-import-dialog"
+import { LocalThemesDialog } from "@/components/editor/local-themes-dialog"
+import {
+  applyOverrides,
+  connect,
+  dispatch,
+  preview,
+  useSiteStore,
+} from "@/store/site-store"
 
 const PRESET_OPTIONS = Object.entries(presets).map(([value, preset]) => ({
   value,
@@ -66,15 +80,18 @@ export function App() {
 
   const currentPreset = site?.current.themeId ?? ""
   const dirty =
-    !!site && Object.values(site.current.overrides).some((o) => Object.keys(o).length > 0)
+    !!site &&
+    Object.values(site.current.overrides).some((o) => Object.keys(o).length > 0)
   const presetEdited =
     !!currentPreset &&
     Object.hasOwn(presets, currentPreset) &&
-    JSON.stringify(site?.current.overrides) !== JSON.stringify(presetOverrides(currentPreset))
+    JSON.stringify(site?.current.overrides) !==
+      JSON.stringify(presetOverrides(currentPreset))
   const currentLabel =
     PRESET_OPTIONS.find((p) => p.value === currentPreset)?.label ?? "选择预设…"
 
-  const applyThemePreset = (id: string) => applyOverrides(presetOverrides(id), id)
+  const applyThemePreset = (id: string) =>
+    applyOverrides(presetOverrides(id), id)
 
   const shufflePreset = () => {
     if (PRESET_KEYS.length === 0) return
@@ -92,30 +109,41 @@ export function App() {
   }
 
   return (
-    <div className="bg-background text-foreground flex h-screen flex-col">
+    <div className="flex h-screen flex-col bg-background text-foreground">
       <header className="flex flex-col gap-2 border-b p-3">
         <div className="flex items-center justify-between gap-2">
-          <h1 className="text-sm font-semibold">COSS 主题调色</h1>
+          <h1 className="font-semibold text-sm">COSS 主题调色</h1>
           <div className="flex items-center gap-1">
             <Button
               size="icon-sm"
               variant={site?.enabled === false ? "outline" : "ghost"}
               disabled={!ready}
-              onClick={() => dispatch({ kind: "enabled", enabled: site?.enabled === false })}
-              aria-label={site?.enabled === false ? "在此网站启用" : "在此网站停用"}
+              onClick={() =>
+                dispatch({ kind: "enabled", enabled: site?.enabled === false })
+              }
+              aria-label={
+                site?.enabled === false ? "在此网站启用" : "在此网站停用"
+              }
               aria-pressed={site?.enabled !== false}
-              title={site?.enabled === false ? "已停用，点击在此网站启用" : "已启用，点击在此网站停用"}
+              title={
+                site?.enabled === false
+                  ? "已停用，点击在此网站启用"
+                  : "已启用，点击在此网站停用"
+              }
             >
               <Power className={site?.enabled === false ? "opacity-50" : ""} />
             </Button>
             <div className="flex overflow-hidden rounded-md border">
               {(["light", "dark"] as const).map((m) => (
                 <button
+                  type="button"
                   key={m}
                   disabled={!ready}
                   onClick={() => preview(m)}
                   className={`px-2.5 py-1 text-xs transition-colors ${
-                    mode === m ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                    mode === m
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted"
                   }`}
                 >
                   {m === "light" ? "亮色" : "暗色"}
@@ -131,10 +159,16 @@ export function App() {
                 }
               />
               <DropdownMenuContent align="end">
-                <DropdownMenuItem disabled={!ready} onClick={() => setContrastOpen(true)}>
+                <DropdownMenuItem
+                  disabled={!ready}
+                  onClick={() => setContrastOpen(true)}
+                >
                   对比度检查
                 </DropdownMenuItem>
-                <DropdownMenuItem disabled={!ready} onClick={() => setLocalsOpen(true)}>
+                <DropdownMenuItem
+                  disabled={!ready}
+                  onClick={() => setLocalsOpen(true)}
+                >
                   本地主题
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -176,9 +210,7 @@ export function App() {
                   <CommandInput placeholder="搜索预设…" className="h-9" />
                   <CommandList>
                     <CommandEmpty>未找到预设</CommandEmpty>
-                    <CommandGroup
-                      heading={`${PRESET_OPTIONS.length} 个预设`}
-                    >
+                    <CommandGroup heading={`${PRESET_OPTIONS.length} 个预设`}>
                       {PRESET_OPTIONS.map((p) => (
                         <CommandItem
                           key={p.value}
@@ -192,7 +224,9 @@ export function App() {
                           <Check
                             className={cn(
                               "ml-auto",
-                              p.value === currentPreset ? "opacity-100" : "opacity-0",
+                              p.value === currentPreset
+                                ? "opacity-100"
+                                : "opacity-0"
                             )}
                           />
                         </CommandItem>
@@ -258,11 +292,21 @@ export function App() {
         </div>
 
         <div className="flex items-center gap-1.5">
-          <Button size="sm" variant="outline" disabled={!ready} onClick={() => setImportOpen(true)}>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!ready}
+            onClick={() => setImportOpen(true)}
+          >
             <FileDown />
             导入
           </Button>
-          <Button size="sm" variant="outline" disabled={!ready} onClick={() => setCodeOpen(true)}>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!ready}
+            onClick={() => setCodeOpen(true)}
+          >
             <Code2 />
             代码
           </Button>

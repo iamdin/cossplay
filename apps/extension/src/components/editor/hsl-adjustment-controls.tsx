@@ -1,12 +1,15 @@
-import { useState } from "react"
-import { ChevronDown, RotateCcw } from "lucide-react"
-
-import { defaultHslAdjustments, HSL_PRESETS, toHex, type HslAdjustments } from "@coss-tweak/theme-core"
-
-import { HslPresetButton } from "@/components/editor/hsl-preset-button"
-import { SliderWithInput } from "@/components/editor/slider-with-input"
+import {
+  defaultHslAdjustments,
+  HSL_PRESETS,
+  type HslAdjustments,
+  toHex,
+} from "@coss-tweak/theme-core"
 import { Button } from "@coss-tweak/ui/components/button"
 import { cn } from "@coss-tweak/ui/lib/utils"
+import { ChevronDown, RotateCcw } from "lucide-react"
+import { useState } from "react"
+import { HslPresetButton } from "@/components/editor/hsl-preset-button"
+import { SliderWithInput } from "@/components/editor/slider-with-input"
 import { adjust, useSiteStore, useTheme } from "@/store/site-store"
 
 /**
@@ -34,7 +37,11 @@ const HslAdjustmentControls = () => {
 
   const apply = (adj: HslAdjustments, continuous = false) =>
     adjust(
-      { hue: adj.hueShift, saturation: adj.saturationScale, lightness: adj.lightnessScale },
+      {
+        hue: adj.hueShift,
+        saturation: adj.saturationScale,
+        lightness: adj.lightnessScale,
+      },
       continuous
     )
   const handleChange = (property: keyof HslAdjustments, value: number) =>
@@ -50,7 +57,8 @@ const HslAdjustmentControls = () => {
 
   const isDirty =
     currentAdjustments.hueShift !== defaultHslAdjustments.hueShift ||
-    currentAdjustments.saturationScale !== defaultHslAdjustments.saturationScale ||
+    currentAdjustments.saturationScale !==
+      defaultHslAdjustments.saturationScale ||
     currentAdjustments.lightnessScale !== defaultHslAdjustments.lightnessScale
 
   return (
@@ -91,12 +99,15 @@ const HslAdjustmentControls = () => {
         <Button
           variant="ghost"
           size="xs"
-          className="text-muted-foreground flex-1 justify-center text-xs"
+          className="flex-1 justify-center text-muted-foreground text-xs"
           onClick={() => setIsExpanded((v) => !v)}
         >
           {isExpanded ? "收起" : "展开"}预设
           <ChevronDown
-            className={cn("ml-1 transition-transform duration-200", isExpanded && "rotate-180")}
+            className={cn(
+              "ml-1 transition-transform duration-200",
+              isExpanded && "rotate-180"
+            )}
           />
         </Button>
         <Button

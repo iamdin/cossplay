@@ -14,4 +14,6 @@ interface SectionContextType {
  * expanded / collapsed state of their parent section. Ported verbatim from
  * tweakcn `components/editor/section-context.tsx`.
  */
-export const SectionContext = createContext<SectionContextType | undefined>(undefined)
+export const SectionContext = createContext<SectionContextType | undefined>(
+  undefined
+)

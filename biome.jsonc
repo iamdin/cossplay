@@ -26,15 +26,33 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "nursery": {
         "useSortedClasses": "error"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "warn"
       }
     }
   },
+  "overrides": [
+    {
+      // Vendored shadcn components: keep them as upstream generates them.
+      "includes": ["packages/ui/src/components/**"],
+      "linter": {
+        "rules": {
+          "a11y": "off",
+          "suspicious": {
+            "noArrayIndexKey": "off",
+            "noDoubleEquals": "off"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "double",

@@ -49,21 +49,66 @@ export const FONT_CATEGORIES = {
 // Fallback fonts (must be in sync with the built-in fonts).
 export const FALLBACK_FONTS: FontInfo[] = [
   // Sans Serif fonts
-  { family: "Inter", category: "sans-serif", variants: ["400", "600", "700"], variable: true },
-  { family: "Roboto", category: "sans-serif", variants: ["400", "600", "700"], variable: false },
-  { family: "Open Sans", category: "sans-serif", variants: ["400", "600", "700"], variable: true },
-  { family: "Poppins", category: "sans-serif", variants: ["400", "600", "700"], variable: false },
-  { family: "Montserrat", category: "sans-serif", variants: ["400", "600", "700"], variable: false },
-  { family: "Outfit", category: "sans-serif", variants: ["400", "600", "700"], variable: false },
+  {
+    family: "Inter",
+    category: "sans-serif",
+    variants: ["400", "600", "700"],
+    variable: true,
+  },
+  {
+    family: "Roboto",
+    category: "sans-serif",
+    variants: ["400", "600", "700"],
+    variable: false,
+  },
+  {
+    family: "Open Sans",
+    category: "sans-serif",
+    variants: ["400", "600", "700"],
+    variable: true,
+  },
+  {
+    family: "Poppins",
+    category: "sans-serif",
+    variants: ["400", "600", "700"],
+    variable: false,
+  },
+  {
+    family: "Montserrat",
+    category: "sans-serif",
+    variants: ["400", "600", "700"],
+    variable: false,
+  },
+  {
+    family: "Outfit",
+    category: "sans-serif",
+    variants: ["400", "600", "700"],
+    variable: false,
+  },
   {
     family: "Plus Jakarta Sans",
     category: "sans-serif",
     variants: ["400", "600", "700"],
     variable: false,
   },
-  { family: "DM Sans", category: "sans-serif", variants: ["400", "600", "700"], variable: true },
-  { family: "Geist", category: "sans-serif", variants: ["400", "600", "700"], variable: true },
-  { family: "Oxanium", category: "sans-serif", variants: ["400", "600", "700"], variable: false },
+  {
+    family: "DM Sans",
+    category: "sans-serif",
+    variants: ["400", "600", "700"],
+    variable: true,
+  },
+  {
+    family: "Geist",
+    category: "sans-serif",
+    variants: ["400", "600", "700"],
+    variable: true,
+  },
+  {
+    family: "Oxanium",
+    category: "sans-serif",
+    variants: ["400", "600", "700"],
+    variable: false,
+  },
   {
     family: "Architects Daughter",
     category: "handwriting",
@@ -71,14 +116,24 @@ export const FALLBACK_FONTS: FontInfo[] = [
     variable: false,
   },
   // Serif fonts
-  { family: "Merriweather", category: "serif", variants: ["400", "600", "700"], variable: false },
+  {
+    family: "Merriweather",
+    category: "serif",
+    variants: ["400", "600", "700"],
+    variable: false,
+  },
   {
     family: "Playfair Display",
     category: "serif",
     variants: ["400", "600", "700"],
     variable: true,
   },
-  { family: "Lora", category: "serif", variants: ["400", "600", "700"], variable: true },
+  {
+    family: "Lora",
+    category: "serif",
+    variants: ["400", "600", "700"],
+    variable: true,
+  },
   {
     family: "Source Serif Pro",
     category: "serif",
@@ -91,10 +146,25 @@ export const FALLBACK_FONTS: FontInfo[] = [
     variants: ["400", "600", "700"],
     variable: false,
   },
-  { family: "Space Grotesk", category: "serif", variants: ["400", "600", "700"], variable: false },
+  {
+    family: "Space Grotesk",
+    category: "serif",
+    variants: ["400", "600", "700"],
+    variable: false,
+  },
   // Monospace fonts
-  { family: "JetBrains Mono", category: "monospace", variants: ["400", "600", "700"], variable: true },
-  { family: "Fira Code", category: "monospace", variants: ["400", "600", "700"], variable: true },
+  {
+    family: "JetBrains Mono",
+    category: "monospace",
+    variants: ["400", "600", "700"],
+    variable: true,
+  },
+  {
+    family: "Fira Code",
+    category: "monospace",
+    variants: ["400", "600", "700"],
+    variable: true,
+  },
   {
     family: "Source Code Pro",
     category: "monospace",
@@ -107,9 +177,24 @@ export const FALLBACK_FONTS: FontInfo[] = [
     variants: ["400", "600", "700"],
     variable: false,
   },
-  { family: "Roboto Mono", category: "monospace", variants: ["400", "600", "700"], variable: false },
-  { family: "Space Mono", category: "monospace", variants: ["400", "600", "700"], variable: false },
-  { family: "Geist Mono", category: "monospace", variants: ["400", "600", "700"], variable: true },
+  {
+    family: "Roboto Mono",
+    category: "monospace",
+    variants: ["400", "600", "700"],
+    variable: false,
+  },
+  {
+    family: "Space Mono",
+    category: "monospace",
+    variants: ["400", "600", "700"],
+    variable: false,
+  },
+  {
+    family: "Geist Mono",
+    category: "monospace",
+    variants: ["400", "600", "700"],
+    variable: true,
+  },
 ]
 
 export const SYSTEM_FONTS = [
@@ -134,7 +219,10 @@ export const SYSTEM_FONTS_FALLBACKS: Record<FontCategory, string> = {
 
 // Build font-family value for CSS.
 // e.g. font: "Inter", category: "sans-serif" -> "Inter, ui-sans-serif, sans-serif, system-ui"
-export function buildFontFamily(fontFamily: string, category: FontCategory): string {
+export function buildFontFamily(
+  fontFamily: string,
+  category: FontCategory
+): string {
   return `${fontFamily}, ${SYSTEM_FONTS_FALLBACKS[category]}`
 }
 
@@ -152,17 +240,31 @@ export function extractFontFamily(fontFamilyValue: string): string | null {
 
 // Get default weights for a font based on its available variants.
 export function getDefaultWeights(variants: string[]): string[] {
-  const weightMap = ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
-  const availableWeights = variants.filter((variant) => weightMap.includes(variant))
+  const weightMap = [
+    "100",
+    "200",
+    "300",
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+  ]
+  const availableWeights = variants.filter((variant) =>
+    weightMap.includes(variant)
+  )
 
   if (availableWeights.length === 0) return ["400"] // Fallback to normal weight
 
   const preferredWeights = ["400", "500", "600", "700"]
-  const selectedWeights = preferredWeights.filter((weight) => availableWeights.includes(weight))
+  const selectedWeights = preferredWeights.filter((weight) =>
+    availableWeights.includes(weight)
+  )
 
   if (selectedWeights.length === 0) {
     const fallbackWeights = availableWeights.slice(0, 2)
-    return fallbackWeights.sort((a, b) => parseInt(a) - parseInt(b))
+    return fallbackWeights.sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
   }
 
   const finalWeights = [
@@ -170,7 +272,7 @@ export function getDefaultWeights(variants: string[]): string[] {
     ...availableWeights.filter((w) => !selectedWeights.includes(w)),
   ].slice(0, 4)
 
-  return finalWeights.sort((a, b) => parseInt(a) - parseInt(b))
+  return finalWeights.sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
 }
 
 // Check if a font is available using the native document.fonts API.
@@ -192,7 +294,9 @@ export async function waitForFont(
   try {
     await Promise.race([
       document.fonts.load(font),
-      new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), timeout)),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Timeout")), timeout)
+      ),
     ])
     return document.fonts.check(font)
   } catch {

@@ -19,7 +19,9 @@ export function CodePanelDialog({ open, onOpenChange }: CodePanelDialogProps) {
       <DialogContent className="flex h-[92dvh] max-w-[min(92vw,560px)] flex-col gap-3">
         <DialogHeader>
           <DialogTitle>主题代码</DialogTitle>
-          <DialogDescription>导出当前主题为可直接使用的代码。</DialogDescription>
+          <DialogDescription>
+            导出当前主题为可直接使用的代码。
+          </DialogDescription>
         </DialogHeader>
         <div className="min-h-0 flex-1 overflow-hidden">
           <CodePanel />

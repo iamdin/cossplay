@@ -299,4 +299,4 @@ export const TAILWIND_PALETTE = {
     900: "oklch(0.216 0.006 56.043)",
     950: "oklch(0.147 0.004 49.25)",
   },
-};
+}

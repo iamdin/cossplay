@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
+import { Input } from "@coss-tweak/ui/components/input"
 
 import { Label } from "@coss-tweak/ui/components/label"
-import { Input } from "@coss-tweak/ui/components/input"
 import { Slider } from "@coss-tweak/ui/components/slider"
+import { useEffect, useState } from "react"
 
 /**
  * Slider + numeric input pair. Ported as-is from tweakcn
@@ -35,7 +35,7 @@ export const SliderWithInput = ({
     const raw = e.target.value
     setLocalValue(raw)
     const num = parseFloat(raw.replace(",", "."))
-    if (!isNaN(num)) {
+    if (!Number.isNaN(num)) {
       onChange(Math.max(min, Math.min(max, num)))
     }
   }
@@ -44,7 +44,7 @@ export const SliderWithInput = ({
     <div className="flex items-center gap-2 py-0.5">
       <Label
         htmlFor={`slider-${label.replace(/\s+/g, "-").toLowerCase()}`}
-        className="text-muted-foreground w-16 shrink-0 text-[11px] font-medium"
+        className="w-16 shrink-0 font-medium text-[11px] text-muted-foreground"
       >
         {label}
       </Label>
@@ -73,7 +73,7 @@ export const SliderWithInput = ({
           step={step}
           className="h-6 w-14 px-1.5 text-xs"
         />
-        <span className="text-muted-foreground w-5 text-[11px]">{unit}</span>
+        <span className="w-5 text-[11px] text-muted-foreground">{unit}</span>
       </div>
     </div>
   )

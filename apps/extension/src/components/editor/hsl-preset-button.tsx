@@ -1,9 +1,7 @@
-import type React from "react"
-
 import { adjustColorByHsl } from "@coss-tweak/theme-core"
-
 import { Button } from "@coss-tweak/ui/components/button"
 import { cn } from "@coss-tweak/ui/lib/utils"
+import type React from "react"
 
 interface HslPresetButtonProps {
   label: string
@@ -33,8 +31,18 @@ export const HslPresetButton: React.FC<HslPresetButtonProps> = ({
   onClick,
   selected,
 }) => {
-  const previewBg = adjustColorByHsl(baseBg, hueShift, saturationScale, lightnessScale)
-  const previewPrimary = adjustColorByHsl(basePrimary, hueShift, saturationScale, lightnessScale)
+  const previewBg = adjustColorByHsl(
+    baseBg,
+    hueShift,
+    saturationScale,
+    lightnessScale
+  )
+  const previewPrimary = adjustColorByHsl(
+    basePrimary,
+    hueShift,
+    saturationScale,
+    lightnessScale
+  )
   const previewSecondary = adjustColorByHsl(
     baseSecondary,
     hueShift,
@@ -51,16 +59,19 @@ export const HslPresetButton: React.FC<HslPresetButtonProps> = ({
       title={label}
       className={cn(
         "relative h-7 w-full overflow-hidden p-0 transition-all",
-        selected ? "ring-primary ring-1 ring-offset-1" : "border-border border"
+        selected ? "ring-1 ring-primary ring-offset-1" : "border border-border"
       )}
       style={{ background: previewBg }}
     >
       <div className="absolute inset-0 flex">
         <div className="h-full w-1/2" style={{ background: previewPrimary }} />
-        <div className="h-full w-1/2" style={{ background: previewSecondary }} />
+        <div
+          className="h-full w-1/2"
+          style={{ background: previewSecondary }}
+        />
       </div>
       {selected && (
-        <div className="bg-primary absolute right-0.5 bottom-0.5 size-1.5 rounded-full" />
+        <div className="absolute right-0.5 bottom-0.5 size-1.5 rounded-full bg-primary" />
       )}
     </Button>
   )
