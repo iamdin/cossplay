@@ -2,20 +2,37 @@
   "name": "coss-ui-theme-tweak",
   "private": true,
   "version": "0.0.3",
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "chrome-extension"
-  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.8.0",
   "scripts": {
-    "dev": "bun --cwd apps/side-panel build:watch & bun --cwd chrome-extension dev",
-    "build": "bun run --filter '*' build",
-    "lint": "bun run --filter '*' lint",
-    "test": "bun run --filter '*' test",
-    "test:e2e": "playwright test"
+    "prepare": "simple-git-hooks",
+    "build": "turbo run build",
+    "dev": "turbo watch dev --continue",
+    "check:type": "turbo run check:type",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "format": "biome check --linter-enabled=false",
+    "format:fix": "biome check --linter-enabled=false --write",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write",
+    "lint:workspace": "pnpm dlx sherif@latest"
   },
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
-    "bumpp": "^10.4.0"
+    "@biomejs/biome": "catalog:",
+    "bumpp": "^10.4.0",
+    "lint-staged": "^16.1.0",
+    "simple-git-hooks": "^2.13.0",
+    "turbo": "^2.5.0",
+    "typescript": "catalog:"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": [
+      "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
+    ]
   }
 }

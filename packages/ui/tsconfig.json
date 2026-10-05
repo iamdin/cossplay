@@ -1,0 +1,4 @@
+{
+  "extends": "@coss-tweak/typescript/react-app.json",
+  "include": ["src"]
+}

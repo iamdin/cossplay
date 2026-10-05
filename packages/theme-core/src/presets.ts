@@ -1,15 +1,4 @@
-import { COLOR_TOKENS } from "./tokens";
-import type { ThemeOverride } from "./types";
-
-export type ThemePreset = {
-  source?: "SAVED" | "BUILT_IN";
-  createdAt?: string;
-  label?: string;
-  styles: {
-    light: Record<string, string>;
-    dark: Record<string, string>;
-  };
-};
+import type { ThemePreset } from "./theme-model"
 
 export const defaultPresets: Record<string, ThemePreset> = {
   "modern-minimal": {
@@ -751,7 +740,8 @@ export const defaultPresets: Record<string, ThemePreset> = {
         "sidebar-border": "#505050",
         "sidebar-ring": "#b71c1c",
         "font-sans": '"Oxanium", sans-serif',
-        "font-serif": 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
+        "font-serif":
+          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
         "font-mono": '"Source Code Pro", monospace',
         radius: "0px",
         "shadow-color": "hsl(0 0% 0%)",
@@ -797,7 +787,8 @@ export const defaultPresets: Record<string, ThemePreset> = {
         "sidebar-border": "#4a4a4a",
         "sidebar-ring": "#e53935",
         "font-sans": '"Oxanium", sans-serif',
-        "font-serif": 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
+        "font-serif":
+          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
         "font-mono": '"Source Code Pro", monospace',
         radius: "0px",
         "shadow-color": "hsl(0 0% 0%)",
@@ -1797,7 +1788,8 @@ export const defaultPresets: Record<string, ThemePreset> = {
         "sidebar-border": "#dfdfdf",
         "sidebar-ring": "#72e3ad",
         "font-sans": "Outfit, sans-serif",
-        "font-serif": 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
+        "font-serif":
+          'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif',
         "font-mono": "monospace",
         radius: "0.5rem",
         "shadow-color": "#000000",
@@ -3605,16 +3597,4 @@ export const defaultPresets: Record<string, ThemePreset> = {
       },
     },
   },
-};
-
-/** 把预设取色键裁剪到我们管理的颜色 token，转成 ThemeOverride。 */
-export function presetToOverride(preset: ThemePreset): ThemeOverride {
-  const pick = (styles: Record<string, string>): Record<string, string> => {
-    const out: Record<string, string> = {};
-    for (const [k, v] of Object.entries(styles)) {
-      if (COLOR_TOKENS.has(k) && typeof v === "string") out[k] = v;
-    }
-    return out;
-  };
-  return { light: pick(preset.styles.light), dark: pick(preset.styles.dark) };
 }

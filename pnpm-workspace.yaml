@@ -1,0 +1,24 @@
+packages:
+  - apps/*
+  - packages/*
+  - tooling/*
+catalog:
+  '@biomejs/biome': ^2.5.15
+  '@types/chrome': ^0.0.304
+  '@types/culori': ^4.0.1
+  culori: ^4.0.2
+  tailwindcss: ^4.1.17
+  typescript: ~5.9.3
+  vite: ^7.2.4
+  vitest: ^3.0.0
+  jsdom: ^29.1.1
+catalogs:
+  react19:
+    '@types/react': ^19.2.5
+    '@types/react-dom': ^19.2.3
+    react: ^19.2.0
+    react-dom: ^19.2.0
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - esbuild
+  - simple-git-hooks
