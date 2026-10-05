@@ -29,7 +29,7 @@ test.afterAll(async () => {
 test("panel page renders", async () => {
   const page = await ctx.newPage()
   await page.goto(`chrome-extension://${extId}/sidepanel.html`)
-  await expect(page.getByText("COSS 主题调色")).toBeVisible()
+  await expect(page.getByRole("heading", { name: "coss tweak" })).toBeVisible()
 })
 
 // A coss-style page: colors declared through var(), color-mix() and --alpha() output.

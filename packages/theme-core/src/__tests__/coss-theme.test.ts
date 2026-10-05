@@ -31,8 +31,9 @@ function equivalent(a: string, b: string, tolerance = 0.002) {
   )
 }
 
-test("the token set is coss ui globals.css: 41 colors, radius and three font variables", () => {
-  assert.equal(colorTokens.length, 41)
+test("the token set is coss ui globals.css plus tweakcn's shared fields", () => {
+  assert.equal(colorTokens.length, 42)
+  assert.ok(colorTokens.includes("shadow-color"))
   for (const key of [
     "info",
     "success-foreground",
@@ -44,8 +45,21 @@ test("the token set is coss ui globals.css: 41 colors, radius and three font var
     assert.ok(colorTokens.includes(key), key)
   assert.deepEqual(
     tokens.filter((k) => !colorTokens.includes(k as never)),
-    ["radius", "font-sans", "font-mono"]
+    [
+      "font-sans",
+      "font-serif",
+      "font-mono",
+      "radius",
+      "shadow-opacity",
+      "shadow-blur",
+      "shadow-spread",
+      "shadow-offset-x",
+      "shadow-offset-y",
+      "letter-spacing",
+      "spacing",
+    ]
   )
+  assert.equal(defaults.light.radius, "0.625rem")
   for (const mode of ["light", "dark"] as const)
     for (const key of tokens)
       assert.ok(validValue(key, defaults[mode][key]), `${mode}.${key}`)
@@ -98,8 +112,10 @@ test("exports match the coss globals.css shape and import back", () => {
   for (const mode of ["light", "dark"] as const) {
     theme[mode].radius = "1rem"
     theme[mode]["font-sans"] = '"Lora", serif'
+    theme[mode]["letter-spacing"] = "0.025em"
+    theme[mode]["shadow-blur"] = "8px"
   }
-  const css = exportCss(theme, "oklch")
+  const css = exportCss(theme, "4")
   assert.match(
     css,
     /@theme inline \{[\s\S]*--color-info-foreground: var\(--info-foreground\);/
@@ -110,8 +126,11 @@ test("exports match the coss globals.css shape and import back", () => {
     !/\.dark \{[^}]*--radius/.test(css),
     "shared tokens live on :root only"
   )
+  assert.match(css, /--shadow-md: var\(--shadow-md\);/)
+  assert.match(css, /--tracking-normal: 0\.025em;/)
   for (const input of [
     css,
+    exportCss(theme, "3"),
     JSON.stringify(registryTheme(theme)),
     themeCss(theme, "hsl"),
   ]) {

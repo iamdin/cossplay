@@ -146,7 +146,7 @@ function apply() {
     applied = null
   }
   const activeFonts = Object.entries(fonts).filter(([family]) =>
-    (["font-sans", "font-mono"] as const).some(
+    (["font-sans", "font-serif", "font-mono"] as const).some(
       (token) =>
         token in overrides[mode] &&
         theme[mode][token]

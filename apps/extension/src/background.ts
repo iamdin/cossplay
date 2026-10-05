@@ -114,8 +114,8 @@ worker.onMessage("detected", async ({ data, sender }) => {
   await chrome.action.setTitle({
     tabId,
     title: detected
-      ? "coss tweak — 已检测主题变量"
-      : "coss tweak — 未检测到主题变量",
+      ? "coss tweak — theme variables detected"
+      : "coss tweak — no theme variables detected",
   })
   await chrome.action.setBadgeBackgroundColor({
     tabId,
