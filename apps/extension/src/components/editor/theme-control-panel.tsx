@@ -26,8 +26,7 @@ import {
 } from "@/store/site-store"
 
 /**
- * Tabbed control panel over coss ui's theme variables. Ported from tweakcn
- * `components/editor/theme-control-panel.tsx`; edits go through the site store, which
+ * Tabbed control panel over coss ui's theme variables. Edits go through the site store, which
  * applies shared tokens (radius, fonts) to both modes.
  */
 

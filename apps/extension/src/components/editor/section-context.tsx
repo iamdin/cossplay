@@ -11,8 +11,7 @@ interface SectionContextType {
 
 /**
  * Context that allows descendants of a ControlSection to query or mutate the
- * expanded / collapsed state of their parent section. Ported verbatim from
- * tweakcn `components/editor/section-context.tsx`.
+ * expanded / collapsed state of their parent section.
  */
 export const SectionContext = createContext<SectionContextType | undefined>(
   undefined

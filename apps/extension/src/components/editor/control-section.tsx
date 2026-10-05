@@ -12,9 +12,7 @@ export type ControlSectionProps = {
 }
 
 /**
- * Collapsible control section. Ported from tweakcn
- * `components/editor/control-section.tsx`; the only adaptation is inlining the
- * `ControlSectionProps` type (tweakcn kept it in `@/types`).
+ * Collapsible control section.
  */
 const ControlSection = ({
   title,

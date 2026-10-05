@@ -4,7 +4,6 @@ import { persist } from "zustand/middleware"
 
 /**
  * 导出偏好（颜色格式 / 包管理器）。
- * 从 tweakcn `store/preferences-store.ts` 移植；coss ui 基于 Tailwind v4，不再提供 v3 导出。
  */
 
 type PackageManager = "pnpm" | "npm" | "yarn" | "bun"

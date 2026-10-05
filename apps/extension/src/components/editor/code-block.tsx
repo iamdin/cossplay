@@ -10,9 +10,7 @@ import {
 import { useSiteStore } from "@/store/site-store"
 
 /**
- * 语法高亮 + 一键复制的只读代码视图。
- * 从 tweakcn `components/ai-elements/code-block.tsx` 移植，去除 PostHog/analytics，
- * 主题随侧栏当前明暗模式（site-store `mode`）切换。
+ * 语法高亮 + 一键复制的只读代码视图，主题随侧栏当前明暗模式（site-store `mode`）切换。
  */
 
 interface CodeBlockProps {

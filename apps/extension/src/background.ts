@@ -142,8 +142,6 @@ worker.onMessage("font", async ({ data, sender }) => {
   await store.font(data.origin, data.family, data.css)
 })
 chrome.runtime.onInstalled.addListener(() => {
-  // The single global CSS string of earlier versions is replaced by per-origin site state.
-  storage.removeItem("local:cossThemeCss").catch(console.error)
   syncEarlyScripts().catch(console.error)
 })
 chrome.runtime.onStartup.addListener(() => {

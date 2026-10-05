@@ -5,8 +5,7 @@ import { Slider } from "@coss-tweak/ui/components/slider"
 import { useEffect, useState } from "react"
 
 /**
- * Slider + numeric input pair. Ported as-is from tweakcn
- * `components/editor/slider-with-input.tsx` (only the import paths changed).
+ * Slider + numeric input pair.
  */
 export const SliderWithInput = ({
   value,

@@ -17,7 +17,6 @@ import {
 import { ColorSelectorPopover } from "./color-selector-popover"
 import { SectionContext } from "./section-context"
 
-/** Local 50ms debounce, matching tweakcn `DEBOUNCE_DELAY`. */
 const DEBOUNCE_DELAY = 50
 
 export type ColorPickerProps = {
@@ -29,10 +28,8 @@ export type ColorPickerProps = {
 
 /**
  * Dual color control (native swatch + text input + Tailwind palette popover).
- * Ported from tweakcn `components/editor/color-picker.tsx`, adapted to:
- *  - the side-panel color-control-focus store;
- *  - theme-core's color helpers so values round-trip through
- *    `colorFormatter(_, "oklch")` and translucent coss tokens keep their alpha.
+ * Values round-trip through `colorFormatter(_, "oklch")`, so translucent coss tokens
+ * keep their alpha.
  *
  * The native `<input type="color">` can only represent opaque 6-digit hex, so it
  * is fed `toHex(color)`; the text input and palette popover preserve full

@@ -1,7 +1,5 @@
 /**
- * tweakcn theme data model, used to type the built-in tweakcn presets.
- *
- * Ported from tweakcn `types/theme.ts`. Plain TS types only (no zod). Presets are
+ * tweakcn theme data model, used to type the built-in tweakcn presets. Presets are
  * mapped onto coss ui's own tokens by `coss/theme.ts` (`presetOverrides`).
  */
 
