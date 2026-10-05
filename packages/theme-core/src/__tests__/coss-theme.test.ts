@@ -10,6 +10,7 @@ import {
   defaults,
   exportCss,
   exportLayout,
+  importOverrides,
   presetOverrides,
   presets,
   registryTheme,
@@ -79,6 +80,26 @@ test("every built-in preset converts to valid overrides", () => {
         assert.ok(validValue(key as never, value), `${id}.${mode}.${key}`)
     assert.ok(Object.keys(overrides.light).length >= 32, id)
   }
+})
+
+test("shadcn themes map onto coss token semantics", () => {
+  const { styles } = presets.catppuccin
+  const overrides = presetOverrides("catppuccin")
+  for (const mode of ["light", "dark"] as const) {
+    assert.equal(
+      overrides[mode]["destructive-foreground"],
+      styles[mode].destructive
+    )
+    assert.equal(overrides[mode].code, styles[mode].card)
+    assert.equal(
+      overrides[mode]["code-foreground"],
+      styles[mode]["card-foreground"]
+    )
+  }
+  const coss = importOverrides({
+    light: { info: "#00f", "destructive-foreground": "#b00" },
+  })
+  assert.equal(coss.light["destructive-foreground"], "#b00")
 })
 
 test("color formats round trip with alpha, including computed color-mix results", () => {

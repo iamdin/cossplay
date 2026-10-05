@@ -206,7 +206,25 @@ export function importOverrides(value: unknown): Overrides {
       isCommon(key as Token)
     )
   )
-  return { light: { ...shared, ...light }, dark: { ...common, ...dark } }
+  const result = {
+    light: { ...shared, ...light },
+    dark: { ...common, ...dark },
+  }
+  return "info" in result.light || "info" in result.dark
+    ? result
+    : { light: fromShadcn(result.light), dark: fromShadcn(result.dark) }
+}
+// shadcn/tweakcn themes have no coss-only tokens, and their destructive-foreground is text on the
+// solid color. coss uses destructive-foreground as colored text on the page and derives code
+// blocks from the surface colors, so map them the same way.
+function fromShadcn(t: Partial<Record<Token, string>>) {
+  const r = { ...t }
+  delete r["destructive-foreground"]
+  if (t.destructive) r["destructive-foreground"] = t.destructive
+  if (t.card) r.code = t.card
+  if (t["card-foreground"]) r["code-foreground"] = t["card-foreground"]
+  if (t.muted) r["code-highlight"] = t.muted
+  return r
 }
 export const presets = reference.presets as Record<
   string,
