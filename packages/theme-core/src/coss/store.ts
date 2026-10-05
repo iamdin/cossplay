@@ -1,37 +1,33 @@
+import pLimit from 'p-limit';
+import { z } from 'zod';
 import type { ThemeOp } from './messages';
-import { coalesces, fontsKey, newSite, readFonts, readLocalThemes, readSite, readTheme, siteKey, transition, type Edit, type LastEdit, type LocalTheme, type SiteState } from './site';
+import { coalesces, fontsKey, localThemesKey, newSite, readFonts, readLocalThemes, readSite, readTheme, siteKey, transition, type Edit, type LastEdit, type LocalTheme, type SiteState } from './site';
 
-export const LOCAL_THEMES = 'localThemes';
-export type KeyValue = { get(key: string): Promise<unknown>; set(key: string, value: unknown): Promise<void> };
-const themeName = (value: unknown) => {
-  const trimmed = typeof value === 'string' ? value.trim().slice(0, 100) : '';
-  if (!trimmed) throw Error('Theme name cannot be empty');
-  return trimmed;
-};
-const httpOrigin = (origin: unknown): string => {
-  if (typeof origin !== 'string' || !/^https?:\/\/[^/]+$/.test(origin)) throw Error('Invalid site origin');
-  return origin;
+// The subset of @wxt-dev/storage the store uses, so tests can pass an in-memory implementation.
+export type KeyValue = { getItem(key: `local:${string}`): Promise<unknown>; setItem(key: `local:${string}`, value: unknown): Promise<void> };
+const themeName = z.string('Theme name cannot be empty').trim().min(1, 'Theme name cannot be empty').transform(name => name.slice(0, 100));
+const httpOrigin = z.string('Invalid site origin').regex(/^https?:\/\/[^/]+$/, 'Invalid site origin');
+const fontStylesheet = z.object({ family: z.string().min(1), css: z.string().max(500_000) }, 'Invalid font stylesheet');
+const parse = <T>(schema: z.ZodType<T>, value: unknown): T => {
+  const result = schema.safeParse(value);
+  if (!result.success) throw Error(result.error.issues[0]?.message);
+  return result.data;
 };
 // Owns every read-modify-write of extension storage. Operations run one at a time against
 // the latest stored value, so callers send intents, never whole precomputed collections.
 export function createStore(storage: KeyValue, afterSiteWrite: () => Promise<void> = async () => {}) {
-  let queue: Promise<unknown> = Promise.resolve();
+  const serialize = pLimit(1);
   const lastEdits = new Map<string, LastEdit>();
-  function serialize<T>(task: () => Promise<T>): Promise<T> {
-    const run = queue.then(task);
-    queue = run.catch(() => {});
-    return run;
-  }
   return {
     edit(rawOrigin: string, edit: Edit, rawBaseline: unknown, key: string, now = Date.now()): Promise<SiteState> {
       return serialize(async () => {
-        const origin = httpOrigin(rawOrigin), baseline = readTheme(rawBaseline);
+        const origin = parse(httpOrigin, rawOrigin), baseline = readTheme(rawBaseline);
         if (!baseline) throw Error('Invalid baseline theme');
-        const state = readSite(await storage.get(siteKey(origin)), origin) ?? newSite(origin);
+        const state = readSite(await storage.getItem(siteKey(origin)), origin) ?? newSite(origin);
         const coalesce = coalesces(lastEdits.get(origin) ?? null, key, state, now);
         const next = readSite(transition(state, edit, baseline, coalesce), origin);
         if (!next) throw Error('Unknown edit');
-        await storage.set(siteKey(origin), next);
+        await storage.setItem(siteKey(origin), next);
         lastEdits.set(origin, { key, at: now, current: JSON.stringify(next.current) });
         await afterSiteWrite();
         return next;
@@ -39,24 +35,23 @@ export function createStore(storage: KeyValue, afterSiteWrite: () => Promise<voi
     },
     themes(op: ThemeOp, now = new Date()): Promise<LocalTheme[]> {
       return serialize(async () => {
-        let themes = readLocalThemes(await storage.get(LOCAL_THEMES));
+        let themes = readLocalThemes(await storage.getItem(localThemesKey));
         if (op.kind === 'add') {
           const theme = readTheme(op.theme);
           if (!theme) throw Error('Invalid theme');
-          themes = [...themes, { id: crypto.randomUUID(), name: themeName(op.name), theme, createdAt: now.toISOString() }];
-        } else if (op.kind === 'rename') themes = themes.map(t => t.id === op.id ? { ...t, name: themeName(op.name) } : t);
+          themes = [...themes, { id: crypto.randomUUID(), name: parse(themeName, op.name), theme, createdAt: now.toISOString() }];
+        } else if (op.kind === 'rename') themes = themes.map(t => t.id === op.id ? { ...t, name: parse(themeName, op.name) } : t);
         else if (op.kind === 'delete') themes = themes.filter(t => t.id !== op.id);
         else throw Error('Unknown theme operation');
-        await storage.set(LOCAL_THEMES, themes);
+        await storage.setItem(localThemesKey, themes);
         return themes;
       });
     },
     font(rawOrigin: string, family: unknown, css: unknown): Promise<void> {
       return serialize(async () => {
-        const origin = httpOrigin(rawOrigin);
-        if (typeof family !== 'string' || !family || typeof css !== 'string' || css.length > 500_000) throw Error('Invalid font stylesheet');
-        const fonts = readFonts(await storage.get(fontsKey(origin)));
-        await storage.set(fontsKey(origin), { ...fonts, [family]: css });
+        const origin = parse(httpOrigin, rawOrigin), font = parse(fontStylesheet, { family, css });
+        const fonts = readFonts(await storage.getItem(fontsKey(origin)));
+        await storage.setItem(fontsKey(origin), { ...fonts, [font.family]: font.css });
       });
     },
   };

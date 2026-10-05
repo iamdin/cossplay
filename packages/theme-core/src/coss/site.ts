@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { ColorFormat } from './colors';
 import { adjustTheme, clone, colorTokens, emptyOverrides, isCommon, sidebarSync, tokens, validValue, type Mode, type Overrides, type Theme, type Token } from './theme';
 export type Source = { selector: string; mode: Mode; values: Partial<Record<Token, string>>; href: string | null };
@@ -10,8 +11,10 @@ export type Snapshot = { overrides: Overrides; themeId: string; hsl: Hsl; hslBas
 // Origin-shared preferences, persisted under siteKey(origin) and written only by the worker.
 export type SiteState = { enabled: boolean; origin: string; previewMode: Mode | null; current: Snapshot; past: Snapshot[]; future: Snapshot[] };
 export type LocalTheme = { id: string; name: string; theme: Theme; createdAt: string };
-export const siteKey = (origin: string) => `site:${origin}`;
-export const fontsKey = (origin: string) => `fonts:${origin}`;
+// @wxt-dev/storage keys; the worker is their only writer.
+export const siteKey = (origin: string) => `local:site:${origin}` as const;
+export const fontsKey = (origin: string) => `local:fonts:${origin}` as const;
+export const localThemesKey = 'local:localThemes';
 const modes = ['light', 'dark'] as const;
 const neutralHsl = (): Hsl => ({ hue: 0, saturation: 1, lightness: 1 });
 export function snapshot(overrides: Overrides = emptyOverrides()): Snapshot {
@@ -82,45 +85,38 @@ export type LastEdit = { key: string; at: number; current: string };
 export const coalesces = (last: LastEdit | null, key: string, state: SiteState, now: number) =>
   !!key && last?.key === key && now - last.at < 500 && last.current === JSON.stringify(state.current);
 
-// Storage and messages are untrusted input: values end up in injected CSS. This also drops
-// fields from the legacy shape (document detection and materialized themes).
-const object = (value: unknown): Record<string, any> | null => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, any> : null;
-export function readOverrides(value: unknown): Overrides {
-  const result = emptyOverrides();
-  for (const mode of modes) for (const [token, v] of Object.entries(object(object(value)?.[mode]) ?? {}))
-    if (tokens.includes(token as Token) && typeof v === 'string' && validValue(token as Token, v)) result[mode][token as Token] = v;
-  return result;
-}
-export function readTheme(value: unknown): Theme | null {
-  const overrides = readOverrides(value);
-  return modes.every(mode => Object.keys(overrides[mode]).length === tokens.length) ? overrides as Theme : null;
-}
-function readSnapshot(value: unknown): Snapshot {
-  const raw = object(value) ?? {}, hsl = object(raw.hsl);
-  return {
-    overrides: readOverrides(raw.overrides),
-    themeId: typeof raw.themeId === 'string' ? raw.themeId : '',
-    hsl: hsl && (['hue', 'saturation', 'lightness'] as const).every(k => Number.isFinite(hsl[k])) ? { hue: hsl.hue, saturation: hsl.saturation, lightness: hsl.lightness } : neutralHsl(),
-    hslBase: readTheme(raw.hslBase),
-    sidebarSync: raw.sidebarSync === true,
-  };
-}
-export function readSite(value: unknown, origin: string): SiteState | null {
-  const raw = object(value);
-  if (!raw || raw.origin !== origin) return null;
-  const history = (list: unknown) => Array.isArray(list) ? list.slice(-80).map(readSnapshot) : [];
-  return {
-    origin, enabled: raw.enabled !== false, previewMode: raw.previewMode === 'light' || raw.previewMode === 'dark' ? raw.previewMode : null,
-    current: readSnapshot(raw.current), past: history(raw.past), future: history(raw.future),
-  };
-}
-export function readFonts(value: unknown): Record<string, string> {
-  return Object.fromEntries(Object.entries(object(value) ?? {}).filter((entry): entry is [string, string] => typeof entry[1] === 'string'));
-}
-export function readLocalThemes(value: unknown): LocalTheme[] {
-  if (!Array.isArray(value)) return [];
-  return value.flatMap(item => {
-    const theme = readTheme(item?.theme);
-    return theme && typeof item.id === 'string' && typeof item.name === 'string' ? [{ id: item.id, name: item.name, theme, createdAt: String(item.createdAt ?? '') }] : [];
-  });
-}
+// Storage and messages are untrusted input: values end up in injected CSS. Parsing keeps what is
+// valid and drops the rest, including fields from the legacy shape (document detection and materialized themes).
+const modeValues = z.record(z.string(), z.unknown()).catch({}).transform(values =>
+  Object.fromEntries(Object.entries(values).filter(([token, v]) => tokens.includes(token as Token) && typeof v === 'string' && validValue(token as Token, v))) as Partial<Record<Token, string>>);
+const overridesSchema = z.object({ light: modeValues, dark: modeValues }).catch(emptyOverrides);
+const themeSchema = overridesSchema.refine(overrides => modes.every(mode => Object.keys(overrides[mode]).length === tokens.length)).transform(overrides => overrides as Theme);
+const hslSchema = z.object({ hue: z.number(), saturation: z.number(), lightness: z.number() });
+const snapshotSchema = z.object({
+  overrides: overridesSchema,
+  themeId: z.string().catch(''),
+  hsl: hslSchema.catch(neutralHsl),
+  hslBase: themeSchema.nullable().catch(null),
+  sidebarSync: z.boolean().catch(false),
+}).catch(() => snapshot());
+const historySchema = z.array(z.unknown()).catch([]).transform(list => list.slice(-80).map(item => snapshotSchema.parse(item)));
+const siteSchema = (origin: string) => z.object({
+  origin: z.literal(origin),
+  enabled: z.boolean().catch(true),
+  previewMode: z.enum(modes).nullable().catch(null),
+  current: snapshotSchema,
+  past: historySchema,
+  future: historySchema,
+});
+const fontsSchema = z.record(z.string(), z.unknown()).catch({}).transform(fonts =>
+  Object.fromEntries(Object.entries(fonts).filter((entry): entry is [string, string] => typeof entry[1] === 'string')));
+const localThemeSchema = z.object({ id: z.string(), name: z.string(), theme: themeSchema, createdAt: z.unknown().transform(v => String(v ?? '')) });
+const localThemesSchema = z.array(z.unknown()).catch([]).transform(items => items.flatMap(item => {
+  const parsed = localThemeSchema.safeParse(item);
+  return parsed.success ? [parsed.data] : [];
+}));
+export const readOverrides = (value: unknown): Overrides => overridesSchema.parse(value);
+export const readTheme = (value: unknown): Theme | null => themeSchema.safeParse(value).data ?? null;
+export const readSite = (value: unknown, origin: string): SiteState | null => siteSchema(origin).safeParse(value).data ?? null;
+export const readFonts = (value: unknown): Record<string, string> => fontsSchema.parse(value);
+export const readLocalThemes = (value: unknown): LocalTheme[] => localThemesSchema.parse(value);

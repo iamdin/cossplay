@@ -1,20 +1,17 @@
 import { useMemo } from "react"
 import { create } from "zustand"
 import {
-  LOCAL_THEMES,
   coalesces,
-  createTarget,
+  content,
   effective,
-  importTheme,
+  localThemesKey,
   newSite,
   readLocalThemes,
   readSite,
   siteKey,
-  toContent,
-  toWorker,
   transition,
   validValue,
-  type ContentResponse,
+  worker,
   type Detection,
   type Edit,
   type Hsl,
@@ -26,11 +23,13 @@ import {
   type ThemeOp,
   type Token,
 } from "@coss-tweak/theme-core/coss"
+import { importTheme } from "@coss-tweak/theme-core/coss/import"
+import { storage } from "@wxt-dev/storage"
 
 /**
  * Side panel state for the active tab, ported from Shadify's panel.
  *  - `site`: origin preferences (overrides, history, enabled, preview mode). Shared through
- *    chrome.storage and written only by the service worker.
+ *    extension storage and written only by the service worker.
  *  - `detection`: the target document's own theme. Never persisted.
  * Edits apply optimistically; the worker re-runs them on the latest stored state and its
  * result wins once no edit is pending, so concurrent panels never overwrite each other.
@@ -55,7 +54,12 @@ export const useSiteStore = create<SiteStore>()(() => ({
 
 const set = useSiteStore.setState
 const get = useSiteStore.getState
-const target = createTarget()
+// The panel edits the active tab of its own window. Each tab load aborts the previous one,
+// and async work checks its signal before any observable update.
+let windowId: number | null = null
+let lease: { tabId: number; signal: AbortSignal } | null = null
+let loading: AbortController | null = null
+let unwatchSite: (() => void) | null = null
 let pending = 0
 let lastEdit: LastEdit | null = null
 
@@ -71,40 +75,48 @@ export function useTheme() {
 export const setError = (error: string) => set({ error })
 
 async function resync(origin: string) {
-  const stored = await chrome.storage.local.get(siteKey(origin))
-  if (pending === 0 && get().site?.origin === origin)
-    set({ site: readSite(stored[siteKey(origin)], origin) ?? newSite(origin) })
+  const stored = await storage.getItem(siteKey(origin))
+  if (pending === 0 && get().site?.origin === origin) set({ site: readSite(stored, origin) ?? newSite(origin) })
 }
 
 async function loadTab(id: number) {
-  const lease = target.begin(id)
+  loading?.abort()
+  loading = new AbortController()
+  const { signal } = loading
+  lease = { tabId: id, signal }
   try {
     const tab = await chrome.tabs.get(id)
-    if (!lease.live()) return
+    if (signal.aborted) return
     if (!tab.url?.startsWith("http")) {
       set({ status: "打开一个 HTTP(S) 网站来编辑它的主题。", site: null, detection: null })
       return
     }
     set({ status: "正在读取页面原始主题…", error: "" })
     // MV3's content script can finish loading after tabs.onUpdated reports complete.
-    let response: ContentResponse["inspect"] | undefined
+    let response: { detection: Detection } | undefined
     for (let attempt = 0; attempt < 12; attempt++) {
-      if (!lease.live()) return
+      if (signal.aborted) return
       try {
-        response = await toContent(id, { type: "inspect" })
+        response = await content.sendMessage("inspect", undefined, id)
         break
       } catch (error) {
-        if (attempt === 11 || !String(error).includes("Receiving end does not exist")) throw error
+        // tabs.sendMessage gets no response until the content script has loaded.
+        if (attempt === 11 || !String(error).includes("No response")) throw error
         await new Promise((resolve) => setTimeout(resolve, 150))
       }
     }
-    if (!lease.live() || !response) return
+    if (signal.aborted || !response) return
     const detection = response.detection
     const origin = new URL(tab.url).origin
-    const stored = await chrome.storage.local.get(siteKey(origin))
-    if (!lease.live()) return
-    const site = readSite(stored[siteKey(origin)], origin) ?? newSite(origin)
+    const stored = await storage.getItem(siteKey(origin))
+    if (signal.aborted) return
+    const site = readSite(stored, origin) ?? newSite(origin)
     lastEdit = null
+    // Another panel (or window) may change the same origin.
+    unwatchSite?.()
+    unwatchSite = storage.watch(siteKey(origin), (value) => {
+      if (pending === 0 && get().site?.origin === origin) set({ site: readSite(value, origin) ?? newSite(origin) })
+    })
     set({
       site,
       detection,
@@ -112,7 +124,7 @@ async function loadTab(id: number) {
       status: detection.detected ? "已检测到页面主题变量" : "未检测到 coss / shadcn 主题变量",
     })
   } catch (e) {
-    if (lease.live())
+    if (!signal.aborted)
       set({
         error: `${String(e)}。安装扩展后请刷新页面。`,
         status: "无法连接此页面",
@@ -126,31 +138,25 @@ async function loadTab(id: number) {
 export function connect() {
   chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     if (!tabs[0]) return
-    target.setWindow(tabs[0].windowId)
+    windowId = tabs[0].windowId
     if (tabs[0].id) loadTab(tabs[0].id)
   })
-  chrome.storage.local.get(LOCAL_THEMES).then((data) => set({ locals: readLocalThemes(data[LOCAL_THEMES]) }))
+  storage.getItem(localThemesKey).then((value) => set({ locals: readLocalThemes(value) }))
+  const unwatchThemes = storage.watch(localThemesKey, (value) => set({ locals: readLocalThemes(value) }))
   const activated = (info: chrome.tabs.TabActiveInfo) => {
-    if (target.owns(info.windowId)) loadTab(info.tabId)
+    if (info.windowId === windowId) loadTab(info.tabId)
   }
   const updated = (id: number, info: chrome.tabs.TabChangeInfo) => {
-    if (info.status === "complete" && id === target.lease?.tabId) loadTab(id)
-  }
-  // Another panel (or window) may change the same origin or the theme list.
-  const changed = (changes: Record<string, chrome.storage.StorageChange>, area: string) => {
-    if (area !== "local") return
-    if (changes[LOCAL_THEMES]) set({ locals: readLocalThemes(changes[LOCAL_THEMES].newValue) })
-    const origin = get().site?.origin
-    if (origin && changes[siteKey(origin)] && pending === 0)
-      set({ site: readSite(changes[siteKey(origin)].newValue, origin) ?? newSite(origin) })
+    if (info.status === "complete" && id === lease?.tabId) loadTab(id)
   }
   chrome.tabs.onActivated.addListener(activated)
   chrome.tabs.onUpdated.addListener(updated)
-  chrome.storage.onChanged.addListener(changed)
   return () => {
     chrome.tabs.onActivated.removeListener(activated)
     chrome.tabs.onUpdated.removeListener(updated)
-    chrome.storage.onChanged.removeListener(changed)
+    unwatchThemes()
+    unwatchSite?.()
+    loading?.abort()
   }
 }
 
@@ -164,7 +170,7 @@ export function dispatch(edit: Edit, key = "") {
   lastEdit = { key, at: now, current: JSON.stringify(next.current) }
   set({ site: next, status: "保存中…" })
   pending++
-  toWorker({ type: "edit", origin: current.origin, edit, baseline, key }).then(
+  worker.sendMessage("edit", { origin: current.origin, edit, baseline, key }).then(
     ({ state }) => {
       if (--pending || get().site?.origin !== state.origin) return
       set({ site: state, status: "已保存到本地" })
@@ -192,26 +198,26 @@ export const syncSidebar = () => dispatch({ kind: "sidebar", mode: get().mode })
 
 /** Fetches a Google font stylesheet once per origin; the content script injects it while a font token uses it. */
 export async function loadFont(family: string, weights: string[]) {
-  const lease = target.lease
+  const signal = lease?.signal
   const origin = get().site?.origin
-  if (!lease || !origin) return
+  if (!signal || !origin) return
   try {
     const wght = ["400", "700"].filter((w) => weights.includes(w))
     const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}${wght.length ? `:wght@${wght.join(";")}` : ""}&display=swap`
-    const { text: css } = await toWorker({ type: "fetch", url })
-    await toWorker({ type: "font", origin, family, css })
-    if (!lease.live()) return
+    const { text: css } = await worker.sendMessage("fetch", { url })
+    await worker.sendMessage("font", { origin, family, css })
+    if (signal.aborted) return
     const sheet = document.createElement("style")
     sheet.textContent = css
     document.head.append(sheet)
     set({ status: `已加载 ${family}；网站 CSP 可能限制字体` })
   } catch (err) {
-    if (lease.live()) set({ error: `字体加载失败：${String(err)}` })
+    if (!signal.aborted) set({ error: `字体加载失败：${String(err)}` })
   }
 }
 
 export function themeOp(op: ThemeOp) {
-  toWorker({ type: "themes", op }).then(
+  worker.sendMessage("themes", { op }).then(
     ({ themes }) => set({ locals: themes }),
     (e) => set({ error: `本地主题保存失败：${String(e)}` })
   )
@@ -219,7 +225,7 @@ export function themeOp(op: ThemeOp) {
 
 /** Imports CSS / tweakcn or registry JSON text, or fetches it from a URL (tweakcn theme links included). */
 export async function importFrom(text: string, rawUrl: string) {
-  const lease = target.lease
+  const signal = lease?.signal
   let input = text
   if (rawUrl.trim()) {
     const url = new URL(rawUrl.trim())
@@ -229,9 +235,9 @@ export async function importFrom(text: string, rawUrl: string) {
       url.pathname = `/r/themes/${encodeURIComponent(id)}.json`
       url.search = ""
     }
-    input = (await toWorker({ type: "fetch", url: url.href })).text
+    input = (await worker.sendMessage("fetch", { url: url.href })).text
   }
-  if (!lease?.live()) throw Error("目标标签页已切换，请在要编辑的网站上重试导入")
+  if (!signal || signal.aborted) throw Error("目标标签页已切换，请在要编辑的网站上重试导入")
   applyOverrides(importTheme(input))
   set({ error: "" })
 }

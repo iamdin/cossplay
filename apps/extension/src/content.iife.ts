@@ -1,4 +1,5 @@
-import { clone, cssInstaller, defaults, effective, failure, fontsKey, isColor, readFonts, readSite, siteKey, sourceFormat, tokens, toWorker, validValue, variables, type ContentRequest, type ContentResponse, type Detection, type Failure, type Mode, type SiteState, type Source, type Token } from '@coss-tweak/theme-core/coss';
+import { clone, content, cssInstaller, defaults, effective, fontsKey, isColor, readFonts, readSite, siteKey, sourceFormat, tokens, validValue, variables, worker, type Detection, type Mode, type SiteState, type Source, type Token } from '@coss-tweak/theme-core/coss';
+import { storage } from '@wxt-dev/storage';
 
 const origin = location.origin, key = siteKey(origin);
 // Origin preferences come from storage; detection belongs to this document only.
@@ -6,7 +7,7 @@ let state: SiteState | null = null, detection: Detection | null = null, applied:
 let restoring = false;
 let fonts: Record<string, string> = {};
 let fontStyle: HTMLStyleElement | null = null;
-const fallback = cssInstaller(async (css, previous) => { await toWorker({ type: 'css', css, previous }); }, () => document.getElementById('coss-tweak-loading')?.remove());
+const fallback = cssInstaller((css, previous) => worker.sendMessage('css', { css, previous }), () => document.getElementById('coss-tweak-loading')?.remove());
 let originalDark = false, originalClassPresent = false, originalTheme: string | null = null;
 let modeCaptured = false;
 const currentMode = (): Mode => document.documentElement?.classList.contains('dark') || document.documentElement?.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
@@ -112,7 +113,7 @@ async function detect(): Promise<Detection> {
   for (const value of [...Array.from(document.styleSheets), ...document.adoptedStyleSheets]) sheet(value);
   const externalReads = Promise.all(external.map(async url => {
     try {
-      const { text } = await toWorker({ type: 'fetch', url });
+      const { text } = await worker.sendMessage('fetch', { url });
       const parsed = new CSSStyleSheet(); parsed.replaceSync(text); walk(parsed.cssRules, url);
     } catch (error) { warnings.push(`Cannot read stylesheet ${url}: ${String(error)}`); }
   }));
@@ -178,9 +179,9 @@ async function detect(): Promise<Detection> {
   apply();
   return result;
 }
-const initial = chrome.storage.local.get([key, fontsKey(origin)]).then(async data => {
-  state = readSite(data[key], origin);
-  fonts = readFonts(data[fontsKey(origin)]);
+const initial = storage.getItems([key, fontsKey(origin)]).then(async ([site, font]) => {
+  state = readSite(site?.value, origin);
+  fonts = readFonts(font?.value);
   if (!document.documentElement) await new Promise<void>(resolve => {
     const observer = new MutationObserver(() => { if (document.documentElement) { observer.disconnect(); resolve(); } }); observer.observe(document, { childList: true });
   });
@@ -191,21 +192,13 @@ async function inspect() {
   await initial;
   if (!detecting) detecting = detect();
   const detected = await detecting;
-  await toWorker({ type: 'detected', detected: detected.detected });
+  await worker.sendMessage('detected', { detected: detected.detected });
   return { detection: detected };
 }
 initial.then(inspect).catch(error => console.error('coss tweak detection failed', error));
-chrome.runtime.onMessage.addListener((message: ContentRequest, _sender, respond: (response: ContentResponse['inspect'] | Failure) => void) => {
-  if (message?.type !== 'inspect') return;
-  inspect().then(respond, error => respond(failure(error)));
-  return true;
-});
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== 'local') return;
-  if (changes[key]) state = readSite(changes[key].newValue, origin);
-  if (changes[fontsKey(origin)]) fonts = readFonts(changes[fontsKey(origin)].newValue);
-  if (changes[key] || changes[fontsKey(origin)]) apply();
-});
+content.onMessage('inspect', inspect);
+storage.watch(key, value => { state = readSite(value, origin); apply(); });
+storage.watch(fontsKey(origin), value => { fonts = readFonts(value); apply(); });
 new MutationObserver(() => {
   if (restoring || !state) return;
   const parent = document.head ?? document.documentElement;

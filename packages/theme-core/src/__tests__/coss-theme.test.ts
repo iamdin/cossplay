@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { converter } from 'culori';
 import { contrast, formatColor, parseColor, sourceFormat } from '../coss/colors';
-import { adjustTheme, clone, colorTokens, contrastPairs, defaults, exportCss, exportLayout, importTheme, presetOverrides, presets, registryTheme, themeCss, tokens, validValue, variables } from '../coss/theme';
+import { adjustTheme, clone, colorTokens, contrastPairs, defaults, exportCss, exportLayout, presetOverrides, presets, registryTheme, themeCss, tokens, validValue, variables } from '../coss/theme';
+import { importTheme } from '../coss/import';
 
 function equivalent(a: string, b: string, tolerance = .002) {
   const rgb = converter('rgb');

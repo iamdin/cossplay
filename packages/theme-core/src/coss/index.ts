@@ -4,4 +4,3 @@ export * from './site';
 export * from './store';
 export * from './messages';
 export * from './installer';
-export * from './target';

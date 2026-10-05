@@ -64,36 +64,6 @@ export function presetOverrides(id: string): Overrides {
   if (!Object.hasOwn(presets, id)) throw Error('Unknown preset');
   return importOverrides(presets[id]);
 }
-// ponytail: fixed-token CSS import, not a general CSS parser; unknown declarations are ignored.
-export function parseCss(input: string): Overrides {
-  if (input.length > 2_000_000) throw Error('Theme is too large');
-  const source = input.replace(/\/\*[\s\S]*?\*\//g, '');
-  const modes: Record<Mode, Record<string, string>> = { light: {}, dark: {} };
-  const stack: string[] = [];
-  let start = 0, quote = '';
-  for (let i = 0; i < source.length; i++) {
-    const char = source[i];
-    if (quote) { if (char === quote && source[i - 1] !== '\\') quote = ''; continue; }
-    if (char === '"' || char === "'") { quote = char; continue; }
-    if (char === '{') { stack.push(source.slice(start, i).trim()); start = i + 1; }
-    if (char === ';' || char === '}') {
-      const match = /^--([\w-]+)\s*:\s*([\s\S]+)$/.exec(source.slice(start, i).trim());
-      if (match && stack.some(s => /:root|:host|\.dark|\[data-theme|@theme/.test(s))) {
-        const mode = stack.some(s => /\.dark\b|\[data-theme\s*=\s*["']?dark/.test(s)) ? 'dark' : 'light';
-        modes[mode][match[1]] = match[2].replace(/\s*!important\s*$/, '').trim();
-      }
-      if (char === '}') { if (!stack.length) throw Error('Unbalanced CSS'); stack.pop(); }
-      start = i + 1;
-    }
-  }
-  if (stack.length || quote) throw Error('Unbalanced CSS');
-  return importOverrides(modes);
-}
-export function importTheme(input: string): Overrides {
-  if (input.length > 2_000_000) throw Error('Theme is too large');
-  if (input.trim().startsWith('{')) return importOverrides(JSON.parse(input));
-  return parseCss(input);
-}
 export function adjustTheme(base: Theme, hue: number, saturation: number, lightness: number): Theme {
   const theme = clone(base);
   // HSL round trips clamp to sRGB; the neutral adjustment must keep wide-gamut oklch colors exact.

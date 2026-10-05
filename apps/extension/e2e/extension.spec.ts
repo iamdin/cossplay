@@ -52,7 +52,8 @@ test("detects coss variables and applies stored per-origin overrides", async () 
 
   const detection = await sw.evaluate(async () => {
     const [tab] = await chrome.tabs.query({ url: "http://coss.test/*" });
-    return (await chrome.tabs.sendMessage(tab.id!, { type: "inspect" })).detection;
+    // @webext-core/messaging wire format: { type, id, timestamp } in, { res } or { err } out.
+    return (await chrome.tabs.sendMessage(tab.id!, { type: "inspect", id: 0, timestamp: Date.now() })).res.detection;
   });
   expect(detection.detected).toBe(true);
   expect(detection.theme.light.border).toMatch(/0\.08\)$/);

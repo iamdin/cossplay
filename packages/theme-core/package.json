@@ -6,7 +6,8 @@
   "sideEffects": false,
   "exports": {
     ".": "./src/index.ts",
-    "./coss": "./src/coss/index.ts"
+    "./coss": "./src/coss/index.ts",
+    "./coss/import": "./src/coss/import.ts"
   },
   "scripts": {
     "check:type": "tsc",
@@ -14,7 +15,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "culori": "catalog:"
+    "@webext-core/messaging": "^4.0.0",
+    "culori": "catalog:",
+    "p-limit": "^7.3.3",
+    "postcss": "^8.5.29",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@coss-tweak/typescript": "workspace:*",

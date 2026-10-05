@@ -2,12 +2,11 @@ import assert from 'node:assert/strict';
 import { clone, defaults, presetOverrides, presets, type Theme } from '../coss/theme';
 import { effective, fontsKey, newSite, readSite, siteKey, transition, type SiteState } from '../coss/site';
 import { createStore, type KeyValue } from '../coss/store';
-import { createTarget } from '../coss/target';
 
 const origin = 'https://a.test';
 function memory(): KeyValue & { data: Map<string, unknown> } {
   const data = new Map<string, unknown>();
-  return { data, get: async key => structuredClone(data.get(key)), set: async (key, value) => { data.set(key, structuredClone(value)); } };
+  return { data, getItem: async key => structuredClone(data.get(key)), setItem: async (key, value) => { data.set(key, structuredClone(value)); } };
 }
 const baselineWith = (primary: string): Theme => { const theme = clone(defaults); theme.light.primary = primary; return theme; };
 
@@ -109,15 +108,6 @@ test('invalid edits are rejected without writing', async () => {
   assert.equal(storage.data.size, 0);
   const state: SiteState = await store.edit(origin, { kind: 'enabled', enabled: false }, defaults, '');
   assert.equal(state.enabled, false);
-});
-
-test('a stale tab load cannot update the panel after a newer load starts', () => {
-  const target = createTarget();
-  target.setWindow(1);
-  const a = target.begin(10), b = target.begin(20);
-  assert.equal(a.live(), false); assert.equal(b.live(), true);
-  assert.equal(target.lease?.tabId, 20);
-  assert.equal(target.owns(1), true); assert.equal(target.owns(2), false);
 });
 
 test('presets override only the tokens they define and keep coss-only tokens from the page', () => {

@@ -1,7 +1,8 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { colorFormatter, toHex } from "@coss-tweak/theme-core"
 
-import { cn, debounce } from "@coss-tweak/ui/lib/utils"
+import { cn } from "@coss-tweak/ui/lib/utils"
+import { debounce } from "es-toolkit"
 import {
   useColorControlFocus,
   type FocusColorId,
