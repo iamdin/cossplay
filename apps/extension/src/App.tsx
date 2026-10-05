@@ -11,7 +11,6 @@ import {
   shadows,
   tokens,
 } from "@coss-tweak/theme-core/coss"
-import { Badge } from "@coss-tweak/ui/components/badge"
 import { Button } from "@coss-tweak/ui/components/button"
 import { Input } from "@coss-tweak/ui/components/input"
 import {
@@ -107,24 +106,7 @@ export function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground text-xs">
-      <header className="flex items-center justify-between px-4 pt-4 pb-3">
-        <div>
-          <h1 className="flex items-center gap-2 font-semibold text-base tracking-tight">
-            <span className="grid size-7 place-items-center bg-primary text-primary-foreground text-sm">
-              C
-            </span>
-            coss tweak
-          </h1>
-          <p className="mt-1 pl-9 text-[11px] text-muted-foreground">
-            Theme your live coss ui website.
-          </p>
-        </div>
-        <Badge variant="outline" className="text-[9px] tracking-wider">
-          LOCAL ONLY
-        </Badge>
-      </header>
-
-      <div className="flex items-center gap-2 border-y bg-muted/50 px-4 py-2 text-[11px]">
+      <div className="flex items-center gap-2 border-b bg-muted/50 px-4 py-2 text-[11px]">
         <span
           className={cn(
             "size-1.5 shrink-0 rounded-full",
