@@ -170,8 +170,8 @@ export function variables(
           ? "0rem"
           : styles[key]
   // coss components use Tailwind's fixed `--radius-2xl: 1rem` for cards, dialogs and popovers.
-  // Scaling it with the radius keeps them in step: 1rem at coss's default 0.625rem.
-  if ("radius" in overrides) result["radius-2xl"] = "calc(var(--radius) * 1.6)"
+  // Derived like coss derives sm/md/lg/xl (a fixed offset): 1rem at coss's default 0.625rem.
+  if ("radius" in overrides) result["radius-2xl"] = "calc(var(--radius) + 6px)"
   return result
 }
 // The same shape as coss ui's globals.css, so it can replace that file's theme section.

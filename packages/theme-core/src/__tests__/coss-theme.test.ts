@@ -169,7 +169,7 @@ test("only overridden tokens are injected, in the page format", () => {
   assert.deepEqual(map, {
     primary: "#ff0000",
     radius: "0rem",
-    "radius-2xl": "calc(var(--radius) * 1.6)",
+    "radius-2xl": "calc(var(--radius) + 6px)",
   })
   assert.match(variables(styles, { info: styles.info }).info, /^oklch\(/)
 })
