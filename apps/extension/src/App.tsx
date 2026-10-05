@@ -9,7 +9,6 @@ import {
   presetOverrides,
   presets,
   shadows,
-  tokens,
 } from "@coss-tweak/theme-core/coss"
 import { Button } from "@coss-tweak/ui/components/button"
 import { Input } from "@coss-tweak/ui/components/input"
@@ -20,7 +19,16 @@ import {
   TabsTrigger,
 } from "@coss-tweak/ui/components/tabs"
 import { cn } from "@coss-tweak/ui/lib/utils"
-import { Moon, Redo2, Sun, Undo2, X } from "lucide-react"
+import {
+  Moon,
+  Power,
+  Redo2,
+  RefreshCcw,
+  RotateCcw,
+  Sun,
+  Undo2,
+  X,
+} from "lucide-react"
 import { useEffect, useState } from "react"
 import {
   ColorControl,
@@ -106,56 +114,49 @@ export function App() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground text-xs">
-      <div className="flex items-center gap-2 border-b bg-muted/50 px-4 py-2 text-[11px]">
-        <span
-          className={cn(
-            "size-1.5 shrink-0 rounded-full",
-            detected
-              ? "bg-emerald-600 ring-3 ring-emerald-600/20"
-              : "bg-muted-foreground/50"
-          )}
-        />
-        <span className="min-w-0 flex-1 truncate">
-          {site?.origin ?? "No website selected"}
-        </span>
-        <label className="flex items-center gap-1 text-muted-foreground">
-          <input
-            type="checkbox"
-            aria-label="Enable theme for this site"
-            className="accent-primary"
-            checked={site?.enabled ?? false}
-            disabled={!detected}
-            onChange={(e) =>
-              dispatch({ kind: "enabled", enabled: e.currentTarget.checked })
-            }
-          />
-          On
-        </label>
-      </div>
-
-      <div className="flex items-center gap-1 border-b px-4 py-3">
-        <fieldset
-          className="mr-auto flex bg-muted p-0.5"
-          aria-label="Preview mode"
+      <div className="sticky top-0 z-10 flex items-center gap-1 border-b bg-background px-3 py-2">
+        <select
+          aria-label="Theme preset"
+          className={cn(selectClass, "min-w-0 flex-1")}
+          disabled={!detected}
+          value={site?.current.themeId ?? ""}
+          onChange={(e) =>
+            e.currentTarget.value && applyPreset(e.currentTarget.value)
+          }
         >
-          {(["light", "dark"] as const).map((m) => (
-            <Button
-              key={m}
-              size="xs"
-              variant="ghost"
-              aria-pressed={mode === m}
-              disabled={!detected}
-              className="aria-pressed:bg-background aria-pressed:shadow-xs"
-              onClick={() => preview(m)}
-            >
-              {m === "light" ? <Sun /> : <Moon />}
-              {m === "light" ? "Light" : "Dark"}
-            </Button>
+          <option value="">Custom</option>
+          <option value="default">Default coss</option>
+          {Object.entries(presets).map(([id, preset]) => (
+            <option key={id} value={id}>
+              {preset.label}
+            </option>
           ))}
-        </fieldset>
+        </select>
         <Button
           size="icon-sm"
-          variant="outline"
+          variant="ghost"
+          aria-label="Reset preset"
+          title="Discard edits to this preset"
+          disabled={!detected || !site?.current.themeId}
+          onClick={() =>
+            site?.current.themeId && applyPreset(site.current.themeId)
+          }
+        >
+          <RefreshCcw />
+        </Button>
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          aria-label={mode === "light" ? "Preview dark" : "Preview light"}
+          title={mode === "light" ? "Preview dark" : "Preview light"}
+          disabled={!detected}
+          onClick={() => preview(mode === "light" ? "dark" : "light")}
+        >
+          {mode === "light" ? <Moon /> : <Sun />}
+        </Button>
+        <Button
+          size="icon-sm"
+          variant="ghost"
           aria-label="Undo"
           title="Undo · ⌘Z"
           disabled={!site?.past.length}
@@ -165,7 +166,7 @@ export function App() {
         </Button>
         <Button
           size="icon-sm"
-          variant="outline"
+          variant="ghost"
           aria-label="Redo"
           title="Redo · ⌘⇧Z"
           disabled={!site?.future.length}
@@ -173,8 +174,27 @@ export function App() {
         >
           <Redo2 />
         </Button>
-        <Button size="sm" variant="outline" disabled={!site} onClick={reset}>
-          Reset site
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          aria-label="Reset site"
+          title="Back to the site's own theme"
+          disabled={!site}
+          onClick={reset}
+        >
+          <RotateCcw />
+        </Button>
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          aria-label="Enable theme for this site"
+          aria-pressed={site?.enabled ?? false}
+          title={`${site?.enabled ? "Theme on" : "Theme off"} · ${site?.origin ?? ""}`}
+          className="aria-pressed:text-emerald-600"
+          disabled={!detected}
+          onClick={() => dispatch({ kind: "enabled", enabled: !site?.enabled })}
+        >
+          <Power />
         </Button>
       </div>
 
@@ -206,46 +226,10 @@ export function App() {
       ) : null}
 
       <fieldset disabled={!detected} className="flex min-w-0 flex-1 flex-col">
-        <div className="flex flex-wrap items-center gap-1.5 px-4 py-3">
-          <label
-            htmlFor="preset"
-            className="w-full text-[10px] text-muted-foreground uppercase tracking-wider"
-          >
-            Theme preset
-          </label>
-          <select
-            id="preset"
-            aria-label="Theme preset"
-            className={cn(selectClass, "flex-1")}
-            value={site?.current.themeId ?? ""}
-            onChange={(e) =>
-              e.currentTarget.value && applyPreset(e.currentTarget.value)
-            }
-          >
-            <option value="">Site theme / custom</option>
-            <option value="default">Default coss</option>
-            {Object.entries(presets).map(([id, preset]) => (
-              <option key={id} value={id}>
-                {preset.label}
-              </option>
-            ))}
-          </select>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={!site?.current.themeId}
-            onClick={() =>
-              site?.current.themeId && applyPreset(site.current.themeId)
-            }
-          >
-            Reset preset
-          </Button>
-        </div>
-
         <Tabs defaultValue="colors" className="flex-1 gap-0">
           <TabsList
             aria-label="Editor sections"
-            className="mx-3 mb-2.5 grid w-auto grid-cols-4"
+            className="mx-3 my-2 grid w-auto grid-cols-4"
           >
             <TabsTrigger value="colors" className="text-[11px]">
               Colors
@@ -592,34 +576,30 @@ export function App() {
         </Tabs>
       </fieldset>
 
-      <footer className="sticky bottom-0 z-10 border-t bg-background px-4 py-3">
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            className="flex-1"
-            disabled={!detected}
-            onClick={() => setDialog("import")}
-          >
-            Import
-          </Button>
-          <Button
-            className="flex-1"
-            disabled={!detected}
-            onClick={() => setDialog("export")}
-          >
-            Export code
-          </Button>
-        </div>
+      <footer className="sticky bottom-0 z-10 flex items-center gap-2 border-t bg-background px-3 py-2">
         <div
           role="status"
-          className="mt-2 mb-0.5 text-[10px] text-muted-foreground"
+          className="min-w-0 flex-1 truncate text-[10px] text-muted-foreground"
+          title={site?.origin}
         >
-          {status}
+          {detected ? status : (site?.origin ?? "No website selected")}
+          {!detected && site ? ` · ${status}` : ""}
         </div>
-        <small className="text-[9px] text-muted-foreground">
-          {tokens.length} tokens · {Object.keys(presets).length} presets · No
-          account needed
-        </small>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!detected}
+          onClick={() => setDialog("import")}
+        >
+          Import
+        </Button>
+        <Button
+          size="sm"
+          disabled={!detected}
+          onClick={() => setDialog("export")}
+        >
+          Export
+        </Button>
       </footer>
 
       <ImportDialog
