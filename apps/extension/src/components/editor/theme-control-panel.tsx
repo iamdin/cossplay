@@ -34,7 +34,6 @@ type ControlTab = "colors" | "typography" | "other"
 
 const FONT_SLOTS: { token: Token; label: string; category: FontCategory }[] = [
   { token: "font-sans", label: "Sans", category: "sans-serif" },
-  { token: "font-heading", label: "Heading", category: "sans-serif" },
   { token: "font-mono", label: "Mono", category: "monospace" },
 ]
 

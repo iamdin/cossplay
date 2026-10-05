@@ -14,12 +14,7 @@ import reference from "./defaults.json"
 
 export type Mode = "light" | "dark"
 export const colorTokens = reference.colors as ColorToken[]
-export const commonTokens = [
-  "radius",
-  "font-sans",
-  "font-heading",
-  "font-mono",
-] as const
+export const commonTokens = ["radius", "font-sans", "font-mono"] as const
 export type ColorToken = Exclude<
   keyof typeof reference.light,
   (typeof commonTokens)[number]
@@ -174,6 +169,9 @@ export function variables(
         : key === "radius" && Number.parseFloat(styles[key]) === 0
           ? "0rem"
           : styles[key]
+  // coss components use Tailwind's fixed `--radius-2xl: 1rem` for cards, dialogs and popovers.
+  // Scaling it with the radius keeps them in step: 1rem at coss's default 0.625rem.
+  if ("radius" in overrides) result["radius-2xl"] = "calc(var(--radius) * 1.6)"
   return result
 }
 // The same shape as coss ui's globals.css, so it can replace that file's theme section.
@@ -195,7 +193,7 @@ export function themeCss(theme: Theme, format: ColorFormat): string {
 export function exportCss(theme: Theme, format: ColorFormat) {
   const bindings = [
     "  --font-sans: var(--font-sans);",
-    "  --font-heading: var(--font-heading);",
+    "  --font-heading: var(--font-sans);",
     "  --font-mono: var(--font-mono);",
     ...colorTokens.map((key) => `  --color-${key}: var(--${key});`),
     "  --radius-sm: calc(var(--radius) - 4px);",
@@ -225,7 +223,7 @@ export function exportLayout(
   theme: Theme,
   fonts: { family: string; weights: string[] }[]
 ) {
-  const slots = (["sans", "heading", "mono"] as const).flatMap((slot) => {
+  const slots = (["sans", "mono"] as const).flatMap((slot) => {
     const family = theme.light[`font-${slot}`]
       .split(",")[0]
       .replaceAll(/['"]/g, "")
