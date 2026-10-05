@@ -1,5 +1,6 @@
 // Resolves coss ui's globals.css (:root/.dark) into concrete colors and writes src/coss/defaults.json.
-// Usage: bun scripts/sync-coss-defaults.ts [coss revision]
+// Usage: pnpm sync:defaults [coss revision]
+import module from "node:module"
 import fs from "node:fs/promises"
 import path from "node:path"
 import { converter, interpolate, parse, type Color } from "culori"
@@ -7,7 +8,7 @@ import { converter, interpolate, parse, type Color } from "culori"
 const revision = process.argv[2] ?? "bd3777acfb44921d4a90b43693a9e26b970b2ecb"
 const source = `https://raw.githubusercontent.com/cosscom/coss/${revision}/packages/ui/src/styles/globals.css`
 const css = await (await fetch(source)).text()
-const palette = await fs.readFile(Bun.resolveSync("tailwindcss/theme.css", path.join(import.meta.dir, "../../../apps/side-panel")), "utf8")
+const palette = await fs.readFile(module.createRequire(import.meta.url).resolve("tailwindcss/theme.css"), "utf8")
 
 const vars: Record<string, string> = {}
 for (const [, name, value] of palette.matchAll(/--(color-[\w-]+):\s*([^;]+);/g)) vars[name] = value.trim()
@@ -52,5 +53,5 @@ const mode = (scope: Record<string, string>) => ({
   ...fonts,
 })
 const out = { source, colors, light: mode(root), dark: mode({ ...root, ...dark }) }
-await fs.writeFile(path.join(import.meta.dir, "../src/coss/defaults.json"), `${JSON.stringify(out, null, 2)}\n`)
+await fs.writeFile(path.join(import.meta.dirname, "../src/coss/defaults.json"), `${JSON.stringify(out, null, 2)}\n`)
 console.log(`${colors.length} colors from ${source}`)

@@ -5,7 +5,8 @@ import {
   HSL_PRESETS,
 } from "../hsl-adjust";
 
-const toHsl = converter("hsl");
+const hsl = converter("hsl");
+const toHsl = (color: string) => hsl(color)!;
 
 describe("adjustColorByHsl", () => {
   it("identity (0, 1, 1) leaves the color equivalent", () => {

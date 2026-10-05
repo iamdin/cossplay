@@ -1,27 +1,28 @@
 {
-  "name": "theme-core",
+  "name": "@coss-tweak/theme-core",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "sideEffects": false,
-  "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
     "./coss": "./src/coss/index.ts"
   },
   "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "lint": "echo \"(no lint)\""
+    "check:type": "tsc",
+    "sync:defaults": "node scripts/sync-coss-defaults.ts",
+    "test": "vitest run"
   },
   "dependencies": {
-    "culori": "^4.0.1"
+    "culori": "catalog:"
   },
   "devDependencies": {
-    "@types/culori": "^4.0.0",
-    "jsdom": "^29.1.1",
-    "typescript": "~5.9.3",
-    "vitest": "^3.0.0",
-    "@types/chrome": "^0.0.304"
+    "@coss-tweak/typescript": "workspace:*",
+    "@types/chrome": "catalog:",
+    "@types/culori": "catalog:",
+    "jsdom": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
