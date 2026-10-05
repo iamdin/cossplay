@@ -3,6 +3,7 @@
 // HSL presets from a frozen tweakcn revision (scripts/sync-tweakcn.mjs). A page's detected values
 // take precedence over both.
 
+import { converter } from "culori"
 import {
   adjustColor,
   type ColorFormat,
@@ -212,15 +213,26 @@ export function importOverrides(value: unknown): Overrides {
   }
   return "info" in result.light || "info" in result.dark
     ? result
-    : { light: fromShadcn(result.light), dark: fromShadcn(result.dark) }
+    : {
+        light: fromShadcn(result.light, "light"),
+        dark: fromShadcn(result.dark, "dark"),
+      }
 }
 // shadcn/tweakcn themes have no coss-only tokens, and their destructive-foreground is text on the
-// solid color. coss uses destructive-foreground as colored text on the page and derives code
-// blocks from the surface colors, so map them the same way.
-function fromShadcn(t: Partial<Record<Token, string>>) {
+// solid color. coss uses destructive-foreground as colored text on the page (the destructive hue
+// at coss's own text lightness) and derives code blocks from the surface colors.
+function fromShadcn(t: Partial<Record<Token, string>>, mode: Mode) {
   const r = { ...t }
   delete r["destructive-foreground"]
-  if (t.destructive) r["destructive-foreground"] = t.destructive
+  if (t.destructive) {
+    const oklch = converter("oklch")
+    const { l } = oklch(parseColor(defaults[mode]["destructive-foreground"]))!
+    const { c, h } = oklch(parseColor(t.destructive))!
+    r["destructive-foreground"] = formatColor(
+      `oklch(${l} ${c} ${h ?? 0})`,
+      "oklch"
+    )
+  }
   if (t.card) r.code = t.card
   if (t["card-foreground"]) r["code-foreground"] = t["card-foreground"]
   if (t.muted) r["code-highlight"] = t.muted

@@ -86,9 +86,15 @@ test("shadcn themes map onto coss token semantics", () => {
   const { styles } = presets.catppuccin
   const overrides = presetOverrides("catppuccin")
   for (const mode of ["light", "dark"] as const) {
-    assert.equal(
-      overrides[mode]["destructive-foreground"],
-      styles[mode].destructive
+    const oklch = converter("oklch")
+    const fg = oklch(parseColor(overrides[mode]["destructive-foreground"]!))!
+    assert.ok(
+      Math.abs(
+        fg.l - oklch(parseColor(defaults[mode]["destructive-foreground"]))!.l
+      ) < 0.001
+    )
+    assert.ok(
+      Math.abs(fg.h! - oklch(parseColor(styles[mode].destructive))!.h!) < 0.5
     )
     assert.equal(overrides[mode].code, styles[mode].card)
     assert.equal(
