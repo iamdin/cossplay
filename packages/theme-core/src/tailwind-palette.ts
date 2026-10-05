@@ -1,7 +1,5 @@
 /**
- * Tailwind CSS color palette (data only), ported from tweakcn
- * `utils/registry/tailwind-colors.ts`. The `ValidTailwindShade` import was
- * dropped to keep this dependency-free.
+ * Tailwind CSS color palette (data only).
  */
 export const TAILWIND_PALETTE = {
   white: {

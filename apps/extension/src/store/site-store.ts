@@ -27,7 +27,7 @@ import { useMemo } from "react"
 import { create } from "zustand"
 
 /**
- * Side panel state for the active tab, ported from Shadify's panel.
+ * Side panel state for the active tab.
  *  - `site`: origin preferences (overrides, history, enabled, preview mode). Shared through
  *    extension storage and written only by the service worker.
  *  - `detection`: the target document's own theme. Never persisted.

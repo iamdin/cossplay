@@ -22,12 +22,8 @@ import {
 } from "@/lib/fonts"
 
 /**
- * Font picker over the static `FALLBACK_FONTS` list. Ported from tweakcn
- * `components/editor/font-picker.tsx`, but the Google Fonts API search hook,
- * infinite scroll, `next/font` loading and the in-picker category Select are
- * intentionally dropped (M2 only sets the CSS value; webfont `<link>` loading on
- * the coss page is a later follow-up). Each picker is scoped to a single
- * category (sans-serif / serif / monospace).
+ * Font picker over the static `FALLBACK_FONTS` list. Each picker is scoped to a
+ * single category (sans-serif / serif / monospace).
  */
 
 interface FontPickerProps {

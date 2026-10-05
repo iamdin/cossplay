@@ -1,8 +1,7 @@
 /**
- * Global HSL adjustments, ported from tweakcn
- * `components/editor/hsl-adjustment-controls.tsx`.
+ * Global HSL adjustments.
  *
- * `adjustColorByHsl` 字节对齐 tweakcn:culori 解析为 HSL,移位/缩放后回 hex。
+ * `adjustColorByHsl`:culori 解析为 HSL,移位/缩放后回 hex。
  * 面板用它预览 HSL 预设;主题本身的调整由 `coss/theme.ts` 的 `adjustTheme` 完成。
  */
 import { converter, formatHex, type Hsl } from "culori"
@@ -52,7 +51,7 @@ export interface HslPreset {
   lightnessScale: number
 }
 
-// Preset HSL adjustment values (ported verbatim from tweakcn)
+// Preset HSL adjustment values
 export const HSL_PRESETS: HslPreset[] = [
   // Hue Adjustments
   {

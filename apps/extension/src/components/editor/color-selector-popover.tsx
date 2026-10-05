@@ -31,11 +31,7 @@ type ColorSelectorPopoverProps = {
 }
 
 /**
- * Tailwind palette picker. Ported from tweakcn
- * `components/editor/color-selector-popover.tsx`, adapted to:
- *  - theme-core's `TAILWIND_PALETTE` + `toHex` (instead of culori directly);
- *  - local tab state (tweakcn used a persisted preferences store);
- *  - a plain trigger button + lucide `Palette` icon (no tweakcn TailwindCSS svg).
+ * Tailwind palette picker over theme-core's `TAILWIND_PALETTE`.
  */
 export function ColorSelectorPopover({
   currentColor,

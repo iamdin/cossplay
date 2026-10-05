@@ -8,8 +8,7 @@ import ControlSection from "@/components/editor/control-section"
 import { syncSidebar, useSiteStore } from "@/store/site-store"
 
 /**
- * Grouped controls for coss ui's 41 color tokens. Ported from tweakcn
- * `components/editor/colors-tab-content.tsx`, with coss's semantic (info / success /
+ * Grouped controls for coss ui's 41 color tokens, including the semantic (info / success /
  * warning) and code groups. Sidebar sync lives in the site state, so it is undoable
  * and shared with other panels.
  */

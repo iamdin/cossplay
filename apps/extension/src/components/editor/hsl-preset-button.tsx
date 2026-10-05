@@ -17,8 +17,8 @@ interface HslPresetButtonProps {
 
 /**
  * 小型 HSL 预设按钮:用一个 resolved swatch (bg + primary/secondary 双色条) 预览
- * 该预设应用到当前 checkpoint 颜色后的效果。窄面板下无 Tooltip 原语,改用原生
- * `title` 提示 label。Ported from tweakcn `components/editor/hsl-preset-button.tsx`。
+ * 该预设应用到当前 checkpoint 颜色后的效果。label 用原生
+ * `title` 提示。
  */
 export const HslPresetButton: React.FC<HslPresetButtonProps> = ({
   label,

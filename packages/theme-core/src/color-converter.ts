@@ -4,7 +4,7 @@ export type ColorFormat = "hsl" | "rgb" | "oklch" | "hex"
 
 export const formatNumber = (num?: number) => {
   if (!num) return "0"
-  // tweakcn 字节对齐:非整数保留 4 位小数（含尾零，如 0.1450），整数原样返回。
+  // 非整数保留 4 位小数（含尾零，如 0.1450），整数原样返回。
   return num % 1 === 0 ? num : num.toFixed(4)
 }
 
@@ -26,7 +26,7 @@ export const colorFormatter = (
     switch (format) {
       case "hsl": {
         const hsl = culori.converter("hsl")(color)
-        // tweakcn parity: v3 hsl emits BARE triples `H S% L%` (consumed by
+        // v3 hsl emits BARE triples `H S% L%` (consumed by
         // `hsl(var(--x))` in tailwind config); v4 wraps as `hsl(...)`.
         if (tailwindVersion === "3") {
           return `${formatNumber(hsl.h)} ${formatNumber((hsl.s ?? 0) * 100)}% ${formatNumber((hsl.l ?? 0) * 100)}%`

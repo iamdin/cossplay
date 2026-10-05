@@ -1,9 +1,5 @@
 /**
- * Static font data + pure helpers, ported from tweakcn `types/fonts.ts` and
- * `utils/fonts/index.ts`. Data only — the Google Fonts API fetch hook
- * (`/api/google-fonts`, `loadGoogleFont`, `useFontSearch`) and `next/font` are
- * intentionally dropped. The FontPicker (C2) uses this static `FALLBACK_FONTS`
- * list; Google webfont `<link>` loading reuses the content-script mechanism.
+ * Static font data + pure helpers. The FontPicker uses the `FALLBACK_FONTS` list.
  */
 
 export type FontCategory =

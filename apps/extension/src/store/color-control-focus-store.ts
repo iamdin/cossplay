@@ -1,13 +1,6 @@
 import type { ColorToken } from "@coss-tweak/theme-core/coss"
 import { create } from "zustand"
 
-/**
- * Ported from tweakcn `store/color-control-focus-store.ts`. The standalone
- * Zustand store is kept verbatim; the `useColorControlFocus` hook drops
- * tweakcn's Next URL-tab routing (the panel manages the active tab via internal
- * state — C2 will wire tab activation if needed).
- */
-
 export type FocusColorId = ColorToken
 
 interface ColorRefEntry {
