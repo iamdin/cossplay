@@ -5,12 +5,12 @@ import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/pris
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { useEditorStore } from "@/store/editor-store"
+import { useSiteStore } from "@/store/site-store"
 
 /**
  * 语法高亮 + 一键复制的只读代码视图。
  * 从 tweakcn `components/ai-elements/code-block.tsx` 移植，去除 PostHog/analytics，
- * 主题随侧栏当前明暗模式（editor-store `currentMode`）切换。
+ * 主题随侧栏当前明暗模式（site-store `mode`）切换。
  */
 
 interface CodeBlockProps {
@@ -20,7 +20,7 @@ interface CodeBlockProps {
 }
 
 export function CodeBlock({ code, language, className }: CodeBlockProps) {
-  const currentMode = useEditorStore((s) => s.themeState.currentMode)
+  const currentMode = useSiteStore((s) => s.mode)
   const [copied, setCopied] = useState(false)
 
   const copyToClipboard = async () => {

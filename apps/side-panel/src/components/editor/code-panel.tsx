@@ -1,12 +1,7 @@
 import { useState } from "react"
 import { Check, Copy, Download } from "lucide-react"
-import {
-  generateThemeCode,
-  generateTailwindConfigCode,
-  generateLayoutCode,
-  generateThemeRegistryItemFromStyles,
-  type ColorFormat,
-} from "theme-core"
+import type { ColorFormat } from "theme-core"
+import { exportCss, exportLayout, registryTheme } from "theme-core/coss"
 
 import { Button } from "@/components/ui/button"
 import { CodeBlock } from "@/components/ui/code-block"
@@ -19,12 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useEditorStore } from "@/store/editor-store"
+import { FALLBACK_FONTS } from "@/lib/fonts"
+import { useTheme } from "@/store/site-store"
 import { usePreferencesStore } from "@/store/preferences-store"
 
 // 本地导出无托管 URL，注册表始终以本地文件名引用。
 const REGISTRY_FILENAME = "theme-registry.json"
-const THEME_NAME = "custom-theme"
+const THEME_NAME = "coss-theme"
+const COLOR_FORMATS: ColorFormat[] = ["oklch", "hsl", "rgb", "hex"]
+const FONTS = FALLBACK_FONTS.map((f) => ({ family: f.family, weights: f.variants }))
 
 /** 选中包管理器对应的本地 registry 安装命令。 */
 function getLocalRegistryCommand(pm: "pnpm" | "npm" | "yarn" | "bun"): string {
@@ -45,24 +43,17 @@ export function CodePanel() {
   const [activeTab, setActiveTab] = useState("index.css")
   const [cmdCopied, setCmdCopied] = useState(false)
 
-  const styles = useEditorStore((s) => s.themeState.styles)
+  const theme = useTheme()
 
   const colorFormat = usePreferencesStore((s) => s.colorFormat)
-  const tailwindVersion = usePreferencesStore((s) => s.tailwindVersion)
   const packageManager = usePreferencesStore((s) => s.packageManager)
   const setColorFormat = usePreferencesStore((s) => s.setColorFormat)
-  const setTailwindVersion = usePreferencesStore((s) => s.setTailwindVersion)
   const setPackageManager = usePreferencesStore((s) => s.setPackageManager)
-  const getAvailableColorFormats = usePreferencesStore((s) => s.getAvailableColorFormats)
 
-  const cssCode = generateThemeCode(styles, colorFormat, tailwindVersion)
-  const configCode = generateTailwindConfigCode(styles, colorFormat)
-  const layoutCode = generateLayoutCode(styles)
-  const registryJson = JSON.stringify(
-    generateThemeRegistryItemFromStyles(THEME_NAME, styles),
-    null,
-    2
-  )
+  if (!theme) return null
+  const cssCode = exportCss(theme, colorFormat)
+  const layoutCode = exportLayout(theme, FONTS)
+  const registryJson = JSON.stringify(registryTheme(theme, THEME_NAME), null, 2)
 
   const localRegistryCommand = getLocalRegistryCommand(packageManager)
 
@@ -88,28 +79,8 @@ export function CodePanel() {
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-hidden">
-      {/* 选择器：Tailwind 版本 / 颜色格式 / 包管理器 */}
+      {/* 选择器：颜色格式 / 包管理器 */}
       <div className="flex flex-none flex-wrap items-center gap-2">
-        <Select
-          value={tailwindVersion}
-          onValueChange={(value: string | null) => {
-            if (!value) return
-            setTailwindVersion(value as "3" | "4")
-            // v4 隐藏 tailwind.config.ts；若它当前激活则切回 index.css。
-            if (value === "4" && activeTab === "tailwind.config.ts") {
-              setActiveTab("index.css")
-            }
-          }}
-        >
-          <SelectTrigger size="sm" className="w-fit">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="3">Tailwind v3</SelectItem>
-            <SelectItem value="4">Tailwind v4</SelectItem>
-          </SelectContent>
-        </Select>
-
         <Select
           value={colorFormat}
           onValueChange={(value: string | null) => value && setColorFormat(value as ColorFormat)}
@@ -118,7 +89,7 @@ export function CodePanel() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {getAvailableColorFormats().map((format) => (
+            {COLOR_FORMATS.map((format) => (
               <SelectItem key={format} value={format}>
                 {format}
               </SelectItem>
@@ -152,9 +123,6 @@ export function CodePanel() {
       >
         <TabsList variant="line" className="h-auto flex-none flex-wrap">
           <TabsTrigger value="index.css">index.css</TabsTrigger>
-          {tailwindVersion === "3" && (
-            <TabsTrigger value="tailwind.config.ts">tailwind.config.ts</TabsTrigger>
-          )}
           <TabsTrigger value="layout.tsx">layout.tsx</TabsTrigger>
           <TabsTrigger value="registry.json">registry.json</TabsTrigger>
         </TabsList>
@@ -165,15 +133,6 @@ export function CodePanel() {
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         </TabsContent>
-
-        {tailwindVersion === "3" && (
-          <TabsContent value="tailwind.config.ts" className="min-h-0 flex-1 overflow-hidden">
-            <ScrollArea className="border-input h-full rounded-none border">
-              <CodeBlock code={configCode} language="typescript" />
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-          </TabsContent>
-        )}
 
         <TabsContent value="layout.tsx" className="min-h-0 flex-1 overflow-hidden">
           <ScrollArea className="border-input h-full rounded-none border">

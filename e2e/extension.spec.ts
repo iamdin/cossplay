@@ -32,47 +32,57 @@ test("panel page renders", async () => {
   await expect(page.getByText("COSS 主题调色")).toBeVisible();
 });
 
-test("content script injects verbatim CSS string via __cossInjectCss (apply-css dumb-injector path)", async () => {
-  const page = await ctx.newPage();
-  await page.goto("data:text/html," + encodeURIComponent(
-    `<!doctype html><html><head></head><body></body></html>`
-  ));
-  await page.addScriptTag({ path: path.resolve(extPath, "dist/contentScript.js") });
-  const css = ":root{--radius:2rem}";
-  await page.evaluate((cssStr) => {
-    const w = window as unknown as { __cossInjectCss?: (css: string) => void };
-    w.__cossInjectCss?.(cssStr);
-  }, css);
-  const styleText = await page.locator("#coss-tweak").textContent();
-  expect(styleText).toBe(css);
-  const radius = await page.evaluate(() =>
-    getComputedStyle(document.documentElement).getPropertyValue("--radius").trim()
-  );
-  expect(radius).toBe("2rem");
-});
+// A coss-style page: colors declared through var(), color-mix() and --alpha() output.
+const COSS_PAGE = `<!doctype html><html><head><style>
+:root { --color-white: #fff; --color-neutral-800: oklch(26.9% 0 0); --radius: 0.625rem;
+  --background: var(--color-white); --foreground: var(--color-neutral-800); --primary: var(--color-neutral-800);
+  --border: color-mix(in oklab, #000 8%, transparent); --success: oklch(69.6% 0.17 162.48); }
+.dark { --background: color-mix(in srgb, oklch(14.5% 0 0) 96%, var(--color-white)); --primary: oklch(97% 0 0); }
+button, span { background: var(--primary); border-radius: var(--radius); }
+.\\[--radius\\:9999px\\] { --radius: 9999px; }
+</style></head><body><button id="cta">coss</button><span id="pill" class="[--radius:9999px]">pill</span></body></html>`;
 
-test("content script injects a multi-block CSS string verbatim", async () => {
+test("detects coss variables and applies stored per-origin overrides", async () => {
   const page = await ctx.newPage();
-  await page.goto("data:text/html," + encodeURIComponent(
-    `<!doctype html><html class="light"><head><style>` +
-    `:root{--primary:oklch(0.205 0 0)} .dark{--primary:oklch(0.87 0 0)}` +
-    `</style></head><body><div id="swatch">coss mock</div></body></html>`
-  ));
-  await page.addScriptTag({ path: path.resolve(extPath, "dist/contentScript.js") });
-  const css =
-    ":root {\n  --radius: 1.25rem;\n  --primary: oklch(0.6 0.2 250);\n}\n\n" +
-    ".dark {\n  --primary: oklch(0.7 0.1 250);\n}";
-  await page.evaluate((cssStr) => {
-    const w = window as unknown as { __cossInjectCss?: (css: string) => void };
-    w.__cossInjectCss?.(cssStr);
-  }, css);
-  const styleText = await page.locator("#coss-tweak").textContent();
-  expect(styleText).toBe(css);
-  // base 只进 :root，不进 .dark
-  const darkBlock = styleText!.slice(styleText!.indexOf(".dark {"));
-  expect(darkBlock).not.toContain("--radius");
-  const radius = await page.evaluate(() =>
-    getComputedStyle(document.documentElement).getPropertyValue("--radius").trim()
+  await page.route("http://coss.test/**", (route) =>
+    route.fulfill({ contentType: "text/html", body: COSS_PAGE })
   );
-  expect(radius).toBe("1.25rem");
+  await page.goto("http://coss.test/");
+  const [sw] = ctx.serviceWorkers();
+
+  const detection = await sw.evaluate(async () => {
+    const [tab] = await chrome.tabs.query({ url: "http://coss.test/*" });
+    return (await chrome.tabs.sendMessage(tab.id!, { type: "inspect" })).detection;
+  });
+  expect(detection.detected).toBe(true);
+  expect(detection.theme.light.border).toMatch(/0\.08\)$/);
+  expect(detection.theme.light.success).toBe("oklch(69.6% 0.17 162.48)");
+  expect(detection.theme.dark.primary).toBe("oklch(97% 0 0)");
+
+  await sw.evaluate(() =>
+    chrome.storage.local.set({
+      "site:http://coss.test": {
+        origin: "http://coss.test",
+        enabled: true,
+        previewMode: null,
+        current: { overrides: { light: { primary: "#ff0000", radius: "1rem" }, dark: { radius: "1rem" } } },
+        past: [],
+        future: [],
+      },
+    })
+  );
+  const cta = page.locator("#cta");
+  // Written back in the page's own format (oklch here): #ff0000 is oklch(0.628 0.258 29.23).
+  await expect(cta).toHaveCSS("background-color", /^oklch\(0\.62\d* 0\.25\d* 29\.2\d*\)$/);
+  await expect(cta).toHaveCSS("border-radius", "16px");
+  // Component-scoped arbitrary properties keep their own value.
+  await expect(page.locator("#pill")).toHaveCSS("border-radius", "9999px");
+
+  await sw.evaluate(() =>
+    chrome.storage.local.set({
+      "site:http://coss.test": { origin: "http://coss.test", enabled: false, current: {}, past: [], future: [] },
+    })
+  );
+  await expect(cta).toHaveCSS("border-radius", "10px");
+  await expect(page.locator("#coss-tweak-theme")).toHaveCount(0);
 });

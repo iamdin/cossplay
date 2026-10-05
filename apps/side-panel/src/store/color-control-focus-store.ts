@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import type { ColorToken } from "theme-core/coss"
 
 /**
  * Ported from tweakcn `store/color-control-focus-store.ts`. The standalone
@@ -7,39 +8,7 @@ import { create } from "zustand"
  * state — C2 will wire tab activation if needed).
  */
 
-export type FocusColorId =
-  | "background"
-  | "foreground"
-  | "card"
-  | "card-foreground"
-  | "popover"
-  | "popover-foreground"
-  | "primary"
-  | "primary-foreground"
-  | "secondary"
-  | "secondary-foreground"
-  | "accent"
-  | "accent-foreground"
-  | "muted"
-  | "muted-foreground"
-  | "destructive"
-  | "destructive-foreground"
-  | "border"
-  | "input"
-  | "ring"
-  | "chart-1"
-  | "chart-2"
-  | "chart-3"
-  | "chart-4"
-  | "chart-5"
-  | "sidebar"
-  | "sidebar-foreground"
-  | "sidebar-primary"
-  | "sidebar-primary-foreground"
-  | "sidebar-accent"
-  | "sidebar-accent-foreground"
-  | "sidebar-border"
-  | "sidebar-ring"
+export type FocusColorId = ColorToken
 
 interface ColorRefEntry {
   ref: HTMLElement | null

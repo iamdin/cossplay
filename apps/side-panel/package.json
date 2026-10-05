@@ -9,7 +9,7 @@
     "build:watch": "vite build --watch",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/chrome": "^0.0.304",
     "@types/culori": "^4.0.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",

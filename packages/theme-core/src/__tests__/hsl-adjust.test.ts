@@ -2,11 +2,8 @@ import { describe, it, expect } from "vitest";
 import { converter } from "culori";
 import {
   adjustColorByHsl,
-  applyHslAdjustmentsToStyles,
-  defaultHslAdjustments,
   HSL_PRESETS,
 } from "../hsl-adjust";
-import { COMMON_STYLES, defaultThemeStyles } from "../theme-model";
 
 const toHsl = converter("hsl");
 
@@ -47,43 +44,6 @@ describe("adjustColorByHsl", () => {
 
   it("returns unparseable input unchanged", () => {
     expect(adjustColorByHsl("not-a-color", 90, 2, 0.5)).toBe("not-a-color");
-  });
-});
-
-describe("applyHslAdjustmentsToStyles", () => {
-  const adj = { hueShift: 60, saturationScale: 0.8, lightnessScale: 1.1 };
-
-  it("leaves COMMON_STYLES keys unchanged", () => {
-    const result = applyHslAdjustmentsToStyles(defaultThemeStyles, adj);
-    for (const key of COMMON_STYLES) {
-      expect(result.light[key]).toBe(defaultThemeStyles.light[key]);
-      expect(result.dark[key]).toBe(defaultThemeStyles.dark[key]);
-    }
-  });
-
-  it("changes chromatic color keys for a non-identity adjustment", () => {
-    const result = applyHslAdjustmentsToStyles(defaultThemeStyles, adj);
-    // destructive / chart-* are chromatic, so HSL adjustments change them.
-    expect(result.light.destructive).not.toBe(defaultThemeStyles.light.destructive);
-    expect(result.light["chart-1"]).not.toBe(defaultThemeStyles.light["chart-1"]);
-    expect(result.dark.destructive).not.toBe(defaultThemeStyles.dark.destructive);
-  });
-
-  it("returns new object references (so a subscription would fire)", () => {
-    const result = applyHslAdjustmentsToStyles(defaultThemeStyles, adj);
-    expect(result).not.toBe(defaultThemeStyles);
-    expect(result.light).not.toBe(defaultThemeStyles.light);
-    expect(result.dark).not.toBe(defaultThemeStyles.dark);
-  });
-
-  it("identity adjustment yields a faithful copy (same as per-key identity adjust)", () => {
-    // An identity adjustment must equal applying adjustColorByHsl(.,0,1,1) to
-    // each color token — i.e. the same gamut-clipping roundtrip, no extra shift.
-    const result = applyHslAdjustmentsToStyles(defaultThemeStyles, defaultHslAdjustments);
-    for (const key of ["destructive", "chart-1", "primary", "background"] as const) {
-      const expected = adjustColorByHsl(defaultThemeStyles.light[key], 0, 1, 1);
-      expect(result.light[key]).toBe(expected);
-    }
   });
 });
 

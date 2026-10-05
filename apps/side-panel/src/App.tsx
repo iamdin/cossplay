@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react"
+import { lazy, Suspense, useEffect, useState } from "react"
 import {
   Check,
   ChevronLeft,
@@ -7,12 +7,13 @@ import {
   Code2,
   FileDown,
   MoreVertical,
+  Power,
   Redo2,
   RotateCcw,
   Shuffle,
   Undo2,
 } from "lucide-react"
-import { defaultPresets } from "theme-core"
+import { presetOverrides, presets } from "theme-core/coss"
 
 import ContrastChecker from "@/components/editor/contrast-checker"
 import ThemeControlPanel from "@/components/editor/theme-control-panel"
@@ -21,6 +22,7 @@ const CodePanelDialog = lazy(() =>
   import("@/components/editor/code-panel-dialog").then((m) => ({ default: m.CodePanelDialog })),
 )
 import { CssImportDialog } from "@/components/editor/css-import-dialog"
+import { LocalThemesDialog } from "@/components/editor/local-themes-dialog"
 import { Button } from "@/components/ui/button"
 import {
   Command,
@@ -38,10 +40,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
-import { useThemeBridge } from "@/hooks/use-theme-bridge"
-import { useEditorStore } from "@/store/editor-store"
+import { applyOverrides, connect, dispatch, preview, useSiteStore } from "@/store/site-store"
 
-const PRESET_OPTIONS = Object.entries(defaultPresets).map(([value, preset]) => ({
+const PRESET_OPTIONS = Object.entries(presets).map(([value, preset]) => ({
   value,
   label: preset.label ?? value,
 }))
@@ -49,33 +50,31 @@ const PRESET_OPTIONS = Object.entries(defaultPresets).map(([value, preset]) => (
 const PRESET_KEYS = PRESET_OPTIONS.map((p) => p.value)
 
 export function App() {
-  useThemeBridge()
+  useEffect(connect, [])
 
-  const themeState = useEditorStore((s) => s.themeState)
-  const setThemeState = useEditorStore((s) => s.setThemeState)
-  const applyThemePreset = useEditorStore((s) => s.applyThemePreset)
-  const resetToCurrentPreset = useEditorStore((s) => s.resetToCurrentPreset)
-  const undo = useEditorStore((s) => s.undo)
-  const redo = useEditorStore((s) => s.redo)
-  const canUndo = useEditorStore((s) => s.canUndo)
-  const canRedo = useEditorStore((s) => s.canRedo)
-  const hasUnsavedChanges = useEditorStore((s) => s.hasUnsavedChanges)
+  const site = useSiteStore((s) => s.site)
+  const ready = useSiteStore((s) => !!s.site && !!s.detection)
+  const mode = useSiteStore((s) => s.mode)
+  const status = useSiteStore((s) => s.status)
+  const error = useSiteStore((s) => s.error)
 
   const [codeOpen, setCodeOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
   const [contrastOpen, setContrastOpen] = useState(false)
+  const [localsOpen, setLocalsOpen] = useState(false)
   const [presetOpen, setPresetOpen] = useState(false)
 
-  const mode = themeState.currentMode
-  const currentPreset = themeState.preset ?? ""
-  const dirty = hasUnsavedChanges()
+  const currentPreset = site?.current.themeId ?? ""
+  const dirty =
+    !!site && Object.values(site.current.overrides).some((o) => Object.keys(o).length > 0)
+  const presetEdited =
+    !!currentPreset &&
+    Object.hasOwn(presets, currentPreset) &&
+    JSON.stringify(site?.current.overrides) !== JSON.stringify(presetOverrides(currentPreset))
   const currentLabel =
     PRESET_OPTIONS.find((p) => p.value === currentPreset)?.label ?? "选择预设…"
 
-  const switchMode = (m: "light" | "dark") => {
-    // currentMode-only change: the bridge subscription toggles `.dark` on the page.
-    setThemeState({ ...themeState, currentMode: m })
-  }
+  const applyThemePreset = (id: string) => applyOverrides(presetOverrides(id), id)
 
   const shufflePreset = () => {
     if (PRESET_KEYS.length === 0) return
@@ -98,11 +97,23 @@ export function App() {
         <div className="flex items-center justify-between gap-2">
           <h1 className="text-sm font-semibold">COSS 主题调色</h1>
           <div className="flex items-center gap-1">
+            <Button
+              size="icon-sm"
+              variant={site?.enabled === false ? "outline" : "ghost"}
+              disabled={!ready}
+              onClick={() => dispatch({ kind: "enabled", enabled: site?.enabled === false })}
+              aria-label={site?.enabled === false ? "在此网站启用" : "在此网站停用"}
+              aria-pressed={site?.enabled !== false}
+              title={site?.enabled === false ? "已停用，点击在此网站启用" : "已启用，点击在此网站停用"}
+            >
+              <Power className={site?.enabled === false ? "opacity-50" : ""} />
+            </Button>
             <div className="flex overflow-hidden rounded-md border">
               {(["light", "dark"] as const).map((m) => (
                 <button
                   key={m}
-                  onClick={() => switchMode(m)}
+                  disabled={!ready}
+                  onClick={() => preview(m)}
                   className={`px-2.5 py-1 text-xs transition-colors ${
                     mode === m ? "bg-primary text-primary-foreground" : "hover:bg-muted"
                   }`}
@@ -120,8 +131,11 @@ export function App() {
                 }
               />
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setContrastOpen(true)}>
+                <DropdownMenuItem disabled={!ready} onClick={() => setContrastOpen(true)}>
                   对比度检查
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled={!ready} onClick={() => setLocalsOpen(true)}>
+                  本地主题
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -133,6 +147,7 @@ export function App() {
             <Button
               size="icon-sm"
               variant="outline"
+              disabled={!ready}
               onClick={() => cyclePreset(-1)}
               aria-label="上一个预设"
             >
@@ -144,13 +159,14 @@ export function App() {
                   variant="outline"
                   size="sm"
                   role="combobox"
+                  disabled={!ready}
                   aria-expanded={presetOpen}
                   aria-label="选择预设"
                   className="min-w-0 flex-1 justify-between font-normal"
                 >
                   <span className="truncate">
                     {currentLabel}
-                    {dirty && currentPreset ? " *" : ""}
+                    {presetEdited ? " *" : ""}
                   </span>
                   <ChevronsUpDown className="opacity-50" />
                 </Button>
@@ -189,6 +205,7 @@ export function App() {
             <Button
               size="icon-sm"
               variant="outline"
+              disabled={!ready}
               onClick={() => cyclePreset(1)}
               aria-label="下一个预设"
             >
@@ -197,6 +214,7 @@ export function App() {
             <Button
               size="icon-sm"
               variant="outline"
+              disabled={!ready}
               onClick={shufflePreset}
               aria-label="随机预设"
               title="随机预设"
@@ -209,8 +227,8 @@ export function App() {
             <Button
               size="icon-sm"
               variant="outline"
-              onClick={() => undo()}
-              disabled={!canUndo()}
+              onClick={() => dispatch({ kind: "undo" })}
+              disabled={!site?.past.length}
               aria-label="撤销"
               title="撤销"
             >
@@ -219,8 +237,8 @@ export function App() {
             <Button
               size="icon-sm"
               variant="outline"
-              onClick={() => redo()}
-              disabled={!canRedo()}
+              onClick={() => dispatch({ kind: "redo" })}
+              disabled={!site?.future.length}
               aria-label="重做"
               title="重做"
             >
@@ -229,10 +247,10 @@ export function App() {
             <Button
               size="icon-sm"
               variant="outline"
-              onClick={() => resetToCurrentPreset()}
+              onClick={() => dispatch({ kind: "reset" })}
               disabled={!dirty}
               aria-label="重置"
-              title="重置"
+              title="重置为网站原主题"
             >
               <RotateCcw />
             </Button>
@@ -240,18 +258,26 @@ export function App() {
         </div>
 
         <div className="flex items-center gap-1.5">
-          <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}>
+          <Button size="sm" variant="outline" disabled={!ready} onClick={() => setImportOpen(true)}>
             <FileDown />
             导入
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setCodeOpen(true)}>
+          <Button size="sm" variant="outline" disabled={!ready} onClick={() => setCodeOpen(true)}>
             <Code2 />
             代码
           </Button>
         </div>
+        <p role="status" className="text-muted-foreground text-xs">
+          {status}
+        </p>
+        {error && (
+          <p role="alert" className="text-destructive text-xs">
+            {error}
+          </p>
+        )}
       </header>
 
-      <ThemeControlPanel />
+      {ready && <ThemeControlPanel />}
 
       {codeOpen && (
         <Suspense fallback={null}>
@@ -260,6 +286,7 @@ export function App() {
       )}
       <CssImportDialog open={importOpen} onOpenChange={setImportOpen} />
       <ContrastChecker open={contrastOpen} onOpenChange={setContrastOpen} />
+      <LocalThemesDialog open={localsOpen} onOpenChange={setLocalsOpen} />
     </div>
   )
 }

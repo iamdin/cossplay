@@ -1,13 +1,7 @@
 import { useMemo, useState } from "react"
 import { AlertTriangle, Check } from "lucide-react"
 
-import {
-  CONTRAST_CATEGORIES,
-  getContrastRatio,
-  MIN_CONTRAST_RATIO,
-  toHex,
-  type ThemeStyleProps,
-} from "theme-core"
+import { contrast, contrastPairs, formatColor } from "theme-core/coss"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -20,7 +14,9 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
-import { useEditorStore } from "@/store/editor-store"
+import { useSiteStore, useTheme } from "@/store/site-store"
+
+const MIN_CONTRAST_RATIO = 4.5
 
 type ContrastCheckerProps = {
   open: boolean
@@ -37,38 +33,35 @@ type ResolvedPair = {
 }
 
 /**
- * 对比度检查对话框。基于当前模式 (`themeState.currentMode`) 解析每对 fg/bg 颜色
- * (token 字符串 → hex via `toHex`),用 theme-core 的 `getContrastRatio` 计算 WCAG
- * 比值,并按 `MIN_CONTRAST_RATIO` 判定通过/失败。支持 All/Issues 过滤。
- * Mirrors tweakcn `components/editor/contrast-checker.tsx`,数据源用
- * theme-core `CONTRAST_CATEGORIES`(3 类 11 对)。窄面板:近全屏 + 内部滚动。
+ * 对比度检查对话框。按 coss 的用法检查当前模式下每对 fg/bg:半透明颜色先叠加到
+ * background 上再计算 WCAG 比值;info / success / warning / destructive 的 foreground
+ * 在 coss 里是页面上的文字色,所以对 background 检查。支持 All/Issues 过滤。
  */
 const ContrastChecker = ({ open, onOpenChange }: ContrastCheckerProps) => {
-  const themeState = useEditorStore((s) => s.themeState)
+  const theme = useTheme()
+  const mode = useSiteStore((s) => s.mode)
   const [filter, setFilter] = useState<"all" | "issues">("all")
 
-  const mode = themeState.currentMode
-  const styles = themeState.styles[mode] as ThemeStyleProps
-
-  // 解析每个分类下每对颜色 → resolved hex + 对比度。
   const groups = useMemo(() => {
-    return CONTRAST_CATEGORIES.map((category) => ({
-      name: category.name,
-      pairs: category.pairs.map<ResolvedPair>((pair) => {
-        const foreground = toHex(styles[pair.foregroundId] ?? "")
-        const background = toHex(styles[pair.backgroundId] ?? "")
-        const ratio = getContrastRatio(foreground, background)
-        return {
-          key: `${pair.foregroundId}__${pair.backgroundId}`,
-          label: pair.label,
-          foreground,
-          background,
-          ratio,
-          isValid: ratio >= MIN_CONTRAST_RATIO,
-        }
-      }),
-    }))
-  }, [styles])
+    if (!theme) return []
+    const styles = theme[mode]
+    return [
+      {
+        name: "coss 颜色对",
+        pairs: contrastPairs.map<ResolvedPair>((pair) => {
+          const ratio = contrast(styles[pair.foreground], styles[pair.background], formatColor(styles.background, "hex"))
+          return {
+            key: `${pair.foreground}__${pair.background}`,
+            label: pair.label,
+            foreground: formatColor(styles[pair.foreground], "hex"),
+            background: formatColor(styles[pair.background], "hex"),
+            ratio,
+            isValid: ratio >= MIN_CONTRAST_RATIO,
+          }
+        }),
+      },
+    ]
+  }, [theme, mode])
 
   const totalIssues = useMemo(
     () => groups.reduce((sum, g) => sum + g.pairs.filter((p) => !p.isValid).length, 0),

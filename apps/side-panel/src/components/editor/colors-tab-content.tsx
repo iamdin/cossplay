@@ -1,23 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { RefreshCw, Search, X } from "lucide-react"
-import type { ThemeStyleProps } from "theme-core"
+import type { ColorToken, Token } from "theme-core/coss"
 
 import ColorPicker from "@/components/editor/color-picker"
 import ControlSection from "@/components/editor/control-section"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-import type { FocusColorId } from "@/store/color-control-focus-store"
+import { syncSidebar, useSiteStore } from "@/store/site-store"
 
 /**
- * Grouped color controls for all 32 color tokens. Ported from tweakcn
- * `components/editor/colors-tab-content.tsx`, adapted to theme-core's
- * `ThemeStyleProps` and the side-panel UI primitives (the sidebar-sync header
- * action drops tweakcn's TooltipWrapper for a plain titled button).
+ * Grouped controls for coss ui's 41 color tokens. Ported from tweakcn
+ * `components/editor/colors-tab-content.tsx`, with coss's semantic (info / success /
+ * warning) and code groups. Sidebar sync lives in the site state, so it is undoable
+ * and shared with other panels.
  */
 
 type ColorEntry = {
-  key: keyof ThemeStyleProps
-  name: FocusColorId
+  key: ColorToken
   label: string
 }
 
@@ -32,161 +31,130 @@ const COLOR_GROUPS: ColorGroup[] = [
     title: "Primary",
     expanded: true,
     colors: [
-      { key: "primary", name: "primary", label: "Background" },
-      { key: "primary-foreground", name: "primary-foreground", label: "Foreground" },
+      { key: "primary", label: "Background" },
+      { key: "primary-foreground", label: "Foreground" },
     ],
   },
   {
     title: "Secondary",
     expanded: true,
     colors: [
-      { key: "secondary", name: "secondary", label: "Background" },
-      { key: "secondary-foreground", name: "secondary-foreground", label: "Foreground" },
+      { key: "secondary", label: "Background" },
+      { key: "secondary-foreground", label: "Foreground" },
     ],
   },
   {
     title: "Accent",
     colors: [
-      { key: "accent", name: "accent", label: "Background" },
-      { key: "accent-foreground", name: "accent-foreground", label: "Foreground" },
+      { key: "accent", label: "Background" },
+      { key: "accent-foreground", label: "Foreground" },
     ],
   },
   {
     title: "Base",
     colors: [
-      { key: "background", name: "background", label: "Background" },
-      { key: "foreground", name: "foreground", label: "Foreground" },
+      { key: "background", label: "Background" },
+      { key: "foreground", label: "Foreground" },
     ],
   },
   {
     title: "Card",
     colors: [
-      { key: "card", name: "card", label: "Background" },
-      { key: "card-foreground", name: "card-foreground", label: "Foreground" },
+      { key: "card", label: "Background" },
+      { key: "card-foreground", label: "Foreground" },
     ],
   },
   {
     title: "Popover",
     colors: [
-      { key: "popover", name: "popover", label: "Background" },
-      { key: "popover-foreground", name: "popover-foreground", label: "Foreground" },
+      { key: "popover", label: "Background" },
+      { key: "popover-foreground", label: "Foreground" },
     ],
   },
   {
     title: "Muted",
     colors: [
-      { key: "muted", name: "muted", label: "Background" },
-      { key: "muted-foreground", name: "muted-foreground", label: "Foreground" },
+      { key: "muted", label: "Background" },
+      { key: "muted-foreground", label: "Foreground" },
     ],
   },
   {
     title: "Destructive",
     colors: [
-      { key: "destructive", name: "destructive", label: "Background" },
-      { key: "destructive-foreground", name: "destructive-foreground", label: "Foreground" },
+      { key: "destructive", label: "Background" },
+      { key: "destructive-foreground", label: "Foreground" },
+    ],
+  },
+  {
+    title: "Info",
+    colors: [
+      { key: "info", label: "Background" },
+      { key: "info-foreground", label: "Foreground" },
+    ],
+  },
+  {
+    title: "Success",
+    colors: [
+      { key: "success", label: "Background" },
+      { key: "success-foreground", label: "Foreground" },
+    ],
+  },
+  {
+    title: "Warning",
+    colors: [
+      { key: "warning", label: "Background" },
+      { key: "warning-foreground", label: "Foreground" },
     ],
   },
   {
     title: "Border & Input",
     colors: [
-      { key: "border", name: "border", label: "Border" },
-      { key: "input", name: "input", label: "Input" },
-      { key: "ring", name: "ring", label: "Ring" },
+      { key: "border", label: "Border" },
+      { key: "input", label: "Input" },
+      { key: "ring", label: "Ring" },
     ],
   },
   {
     title: "Chart",
     colors: [
-      { key: "chart-1", name: "chart-1", label: "Chart 1" },
-      { key: "chart-2", name: "chart-2", label: "Chart 2" },
-      { key: "chart-3", name: "chart-3", label: "Chart 3" },
-      { key: "chart-4", name: "chart-4", label: "Chart 4" },
-      { key: "chart-5", name: "chart-5", label: "Chart 5" },
+      { key: "chart-1", label: "Chart 1" },
+      { key: "chart-2", label: "Chart 2" },
+      { key: "chart-3", label: "Chart 3" },
+      { key: "chart-4", label: "Chart 4" },
+      { key: "chart-5", label: "Chart 5" },
     ],
   },
   {
     title: "Sidebar",
     colors: [
-      { key: "sidebar", name: "sidebar", label: "Background" },
-      { key: "sidebar-foreground", name: "sidebar-foreground", label: "Foreground" },
-      { key: "sidebar-primary", name: "sidebar-primary", label: "Primary" },
-      { key: "sidebar-primary-foreground", name: "sidebar-primary-foreground", label: "Primary FG" },
-      { key: "sidebar-accent", name: "sidebar-accent", label: "Accent" },
-      { key: "sidebar-accent-foreground", name: "sidebar-accent-foreground", label: "Accent FG" },
-      { key: "sidebar-border", name: "sidebar-border", label: "Border" },
-      { key: "sidebar-ring", name: "sidebar-ring", label: "Ring" },
+      { key: "sidebar", label: "Background" },
+      { key: "sidebar-foreground", label: "Foreground" },
+      { key: "sidebar-primary", label: "Primary" },
+      { key: "sidebar-primary-foreground", label: "Primary FG" },
+      { key: "sidebar-accent", label: "Accent" },
+      { key: "sidebar-accent-foreground", label: "Accent FG" },
+      { key: "sidebar-border", label: "Border" },
+      { key: "sidebar-ring", label: "Ring" },
+    ],
+  },
+  {
+    title: "Code",
+    colors: [
+      { key: "code", label: "Background" },
+      { key: "code-foreground", label: "Foreground" },
+      { key: "code-highlight", label: "Highlight" },
     ],
   },
 ]
 
-// Maps sidebar color keys to their base counterparts.
-const SIDEBAR_SYNC_MAP: Partial<Record<keyof ThemeStyleProps, keyof ThemeStyleProps>> = {
-  sidebar: "background",
-  "sidebar-foreground": "foreground",
-  "sidebar-primary": "primary",
-  "sidebar-primary-foreground": "primary-foreground",
-  "sidebar-accent": "accent",
-  "sidebar-accent-foreground": "accent-foreground",
-  "sidebar-border": "border",
-  "sidebar-ring": "ring",
-}
-
-// Reverse map: base key → sidebar key.
-const BASE_TO_SIDEBAR_MAP = Object.fromEntries(
-  Object.entries(SIDEBAR_SYNC_MAP).map(([sidebar, base]) => [base, sidebar])
-) as Partial<Record<keyof ThemeStyleProps, keyof ThemeStyleProps>>
-
 interface ColorsTabContentProps {
-  currentStyles: ThemeStyleProps
-  updateStyle: <K extends keyof ThemeStyleProps>(key: K, value: ThemeStyleProps[K]) => void
-  updateStyles: (updates: Partial<ThemeStyleProps>) => void
+  currentStyles: Record<Token, string>
+  updateStyle: (key: Token, value: string) => void
 }
 
-export function ColorsTabContent({
-  currentStyles,
-  updateStyle,
-  updateStyles,
-}: ColorsTabContentProps) {
+export function ColorsTabContent({ currentStyles, updateStyle }: ColorsTabContentProps) {
   const [search, setSearch] = useState("")
-  const [sidebarSyncEnabled, setSidebarSyncEnabled] = useState(false)
-
-  const syncSidebarToBase = useCallback(() => {
-    const updates: Partial<ThemeStyleProps> = {}
-    for (const [sidebarKey, baseKey] of Object.entries(SIDEBAR_SYNC_MAP)) {
-      const baseValue = currentStyles[baseKey as keyof ThemeStyleProps]
-      if (baseValue !== undefined) {
-        ;(updates as Record<string, unknown>)[sidebarKey] = baseValue
-      }
-    }
-    updateStyles(updates)
-  }, [currentStyles, updateStyles])
-
-  const toggleSidebarSync = useCallback(() => {
-    setSidebarSyncEnabled((prev) => !prev)
-  }, [])
-
-  useEffect(() => {
-    if (sidebarSyncEnabled) {
-      syncSidebarToBase()
-    }
-    // Only run when sync is toggled on, not when syncSidebarToBase changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sidebarSyncEnabled])
-
-  const wrappedUpdateStyle = useCallback(
-    <K extends keyof ThemeStyleProps>(key: K, value: ThemeStyleProps[K]) => {
-      if (sidebarSyncEnabled && key in BASE_TO_SIDEBAR_MAP) {
-        const sidebarKey = BASE_TO_SIDEBAR_MAP[key]!
-        updateStyles({
-          [key]: value,
-          [sidebarKey]: value,
-        } as Partial<ThemeStyleProps>)
-      } else {
-        updateStyle(key, value)
-      }
-    },
-    [updateStyle, updateStyles, sidebarSyncEnabled]
-  )
+  const sidebarSyncEnabled = useSiteStore((s) => !!s.site?.current.sidebarSync)
 
   const filteredGroups = useMemo(() => {
     if (!search.trim()) return COLOR_GROUPS
@@ -198,7 +166,7 @@ export function ColorsTabContent({
       colors: group.colors.filter(
         (c) =>
           c.label.toLowerCase().includes(query) ||
-          c.name.toLowerCase().includes(query) ||
+          c.key.toLowerCase().includes(query) ||
           group.title.toLowerCase().includes(query)
       ),
     })).filter((group) => group.colors.length > 0)
@@ -241,7 +209,7 @@ export function ColorsTabContent({
                 <button
                   type="button"
                   title="Sync sidebar colors to their base counterparts"
-                  onClick={toggleSidebarSync}
+                  onClick={syncSidebar}
                   className={cn(
                     "group inline-flex h-auto items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] transition-colors",
                     sidebarSyncEnabled
@@ -259,12 +227,10 @@ export function ColorsTabContent({
           >
             {group.colors.map((color) => (
               <ColorPicker
-                key={color.name}
-                name={color.name}
-                color={currentStyles[color.key] as string}
-                onChange={(value) =>
-                  wrappedUpdateStyle(color.key, value as ThemeStyleProps[typeof color.key])
-                }
+                key={color.key}
+                name={color.key}
+                color={currentStyles[color.key]}
+                onChange={(value) => updateStyle(color.key, value)}
                 label={color.label}
               />
             ))}

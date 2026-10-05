@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { AlertCircle } from "lucide-react"
-import { parseCssInput } from "theme-core"
 
 import {
   Dialog,
@@ -11,8 +10,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useEditorStore } from "@/store/editor-store"
+import { importFrom } from "@/store/site-store"
 
 interface CssImportDialogProps {
   open: boolean
@@ -23,9 +23,10 @@ const PLACEHOLDER = `:root {
   --background: oklch(1 0 0);
   --foreground: #1a1a1a;
   --primary: hsl(220 90% 56%);
-  --secondary: rgb(244 244 245);
+  --success: rgb(16 185 129);
   /* 更多变量… */
 }
+
 .dark {
   --background: oklch(0.2 0 0);
   --foreground: #fafafa;
@@ -33,55 +34,42 @@ const PLACEHOLDER = `:root {
 }`
 
 /**
- * 导入自定义 CSS：解析 :root / .dark 中的颜色变量并合并进当前主题。
- * 移植自 tweakcn `CssImportDialog` + `handleCssImport`。
+ * 导入主题：粘贴 :root / .dark / @theme CSS 或 tweakcn / shadcn registry JSON，或填写其 URL
+ * （tweakcn 主题链接会转换为 registry URL）。只覆盖其中定义的 coss token，作为一个可撤销步骤。
  */
 export function CssImportDialog({ open, onOpenChange }: CssImportDialogProps) {
   const [cssText, setCssText] = useState("")
+  const [url, setUrl] = useState("")
   const [error, setError] = useState<string | null>(null)
 
-  const handleImport = () => {
-    if (!cssText.trim()) {
-      setError("请输入 CSS 内容")
-      return
-    }
-    // 基础校验：应包含形如 --primary: #color 的变量定义。
-    if (!cssText.includes("--") || !cssText.includes(":")) {
-      setError("CSS 格式无效，应包含类似 --primary: #color 的变量定义")
-      return
-    }
-
-    const { lightColors, darkColors } = parseCssInput(cssText)
-
-    const s = useEditorStore.getState()
-    const next = {
-      ...s.themeState,
-      styles: {
-        ...s.themeState.styles,
-        light: { ...s.themeState.styles.light, ...lightColors },
-        dark: { ...s.themeState.styles.dark, ...darkColors },
-      },
-    }
-    s.setThemeState(next)
-
+  const handleClose = () => {
     setCssText("")
+    setUrl("")
     setError(null)
     onOpenChange(false)
   }
 
-  const handleClose = () => {
-    setCssText("")
-    setError(null)
-    onOpenChange(false)
+  const handleImport = async () => {
+    if (!cssText.trim() && !url.trim()) {
+      setError("请输入 CSS / JSON 内容或 URL")
+      return
+    }
+    try {
+      await importFrom(cssText, url)
+    } catch (e) {
+      setError(`导入失败：${String(e)}`)
+      return
+    }
+    handleClose()
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90dvh] max-w-[min(92vw,560px)] flex-col gap-3">
         <DialogHeader>
-          <DialogTitle>导入自定义 CSS</DialogTitle>
+          <DialogTitle>导入主题</DialogTitle>
           <DialogDescription>
-            粘贴 CSS 以覆盖主题颜色。支持 oklch / hsl / rgb / hex，需包含 --primary、--background 等变量。
+            粘贴 CSS 或 JSON，或填写 tweakcn / registry URL。颜色支持 oklch / hsl / rgb / hex / lab，未定义的 token 保持网站原值。
           </DialogDescription>
         </DialogHeader>
 
@@ -91,6 +79,16 @@ export function CssImportDialog({ open, onOpenChange }: CssImportDialogProps) {
             <span>{error}</span>
           </div>
         )}
+
+        <Input
+          type="url"
+          placeholder="https://tweakcn.com/themes/… 或 registry JSON URL"
+          value={url}
+          onChange={(e) => {
+            setUrl(e.target.value)
+            if (error) setError(null)
+          }}
+        />
 
         <Textarea
           placeholder={PLACEHOLDER}

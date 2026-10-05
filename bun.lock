@@ -37,6 +37,7 @@
       },
       "devDependencies": {
         "@eslint/js": "^9.39.1",
+        "@types/chrome": "^0.0.304",
         "@types/culori": "^4.0.1",
         "@types/node": "^24.10.1",
         "@types/react": "^19.2.5",
@@ -71,6 +72,7 @@
         "culori": "^4.0.1",
       },
       "devDependencies": {
+        "@types/chrome": "^0.0.304",
         "@types/culori": "^4.0.0",
         "jsdom": "^29.1.1",
         "typescript": "~5.9.3",

@@ -1,86 +1,49 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useState } from "react"
 import { ChevronDown, RotateCcw } from "lucide-react"
 
-import {
-  applyHslAdjustmentsToStyles,
-  defaultHslAdjustments,
-  HSL_PRESETS,
-  toHex,
-  type HslAdjustments,
-} from "theme-core"
+import { defaultHslAdjustments, HSL_PRESETS, toHex, type HslAdjustments } from "theme-core"
 
 import { HslPresetButton } from "@/components/editor/hsl-preset-button"
 import { SliderWithInput } from "@/components/editor/slider-with-input"
 import { Button } from "@/components/ui/button"
-import { cn, debounce, isDeepEqual } from "@/lib/utils"
-import { useEditorStore } from "@/store/editor-store"
+import { cn } from "@/lib/utils"
+import { adjust, useSiteStore, useTheme } from "@/store/site-store"
 
 /**
- * 全局 HSL 调整控件。三个 SliderWithInput(Hue/Saturation/Lightness)绑定
- * `themeState.hslAdjustments`,外加 15 个预设按钮。
+ * 全局 HSL 调整控件。三个 SliderWithInput(Hue/Saturation/Lightness)绑定站点状态里的
+ * `current.hsl`,外加 15 个预设按钮。
  *
- * 非破坏式模型(对齐 tweakcn):以 `themeCheckpoint` 的 styles 为 base,每次调整
- * 都 `applyHslAdjustmentsToStyles(base, adj)` 重算,再 `setThemeState` 写回新的
- * styles 引用 —— bridge 订阅 `themeState.styles` 引用变化即可 live 推送到页面。
- * apply 走 ~10ms debounce 避免滑动时抖动。
+ * 非破坏式模型:第一次调整时把当前有效主题固定为 `hslBase`,之后每次调整都从它重算,
+ * 不会叠加;手动编辑任一 token 会清掉 `hslBase`,下次调整以编辑后的主题为基准。
+ * 滑动中的连续调整合并为一个撤销步骤。
  */
 const HslAdjustmentControls = () => {
-  const themeState = useEditorStore((s) => s.themeState)
-  const themeCheckpoint = useEditorStore((s) => s.themeCheckpoint)
-  const setThemeState = useEditorStore((s) => s.setThemeState)
-  const saveThemeCheckpoint = useEditorStore((s) => s.saveThemeCheckpoint)
+  const theme = useTheme()
+  const site = useSiteStore((s) => s.site)
+  const mode = useSiteStore((s) => s.mode)
 
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const currentAdjustments = themeState.hslAdjustments ?? defaultHslAdjustments
+  if (!theme || !site) return null
+  const hsl = site.current.hsl
+  const currentAdjustments: HslAdjustments = {
+    hueShift: hsl.hue,
+    saturationScale: hsl.saturation,
+    lightnessScale: hsl.lightness,
+  }
 
-  // 对齐 tweakcn:当 HSL 处于默认值时把 checkpoint 重钉到当前 styles —— 这样在中性 HSL 下
-  // 通过 Colors/Typography/Shadows 做的手动编辑会成为后续 HSL 调整的新基准,而非被静默还原。
-  useEffect(() => {
-    if (isDeepEqual(themeState.hslAdjustments, defaultHslAdjustments)) {
-      saveThemeCheckpoint()
-    }
-  }, [themeState.hslAdjustments, saveThemeCheckpoint])
+  const apply = (adj: HslAdjustments, continuous = false) =>
+    adjust(
+      { hue: adj.hueShift, saturation: adj.saturationScale, lightness: adj.lightnessScale },
+      continuous
+    )
+  const handleChange = (property: keyof HslAdjustments, value: number) =>
+    apply({ ...currentAdjustments, [property]: value }, true)
+  const handlePreset = (adj: HslAdjustments) => apply(adj)
+  const handleReset = () => apply({ ...defaultHslAdjustments })
 
-  // 在 debounce 回调里读最新 store 状态(idiomatic Zustand),避免 stale closure /
-  // 重建 debounce。base = checkpoint styles(非破坏式基准),回退到当前 styles。
-  const debouncedApply = useMemo(
-    () =>
-      debounce((adj: HslAdjustments) => {
-        const { themeState: latest, themeCheckpoint: checkpoint } = useEditorStore.getState()
-        const base = (checkpoint ?? latest).styles
-        const nextStyles = applyHslAdjustmentsToStyles(base, adj)
-        setThemeState({
-          ...latest,
-          styles: nextStyles,
-          hslAdjustments: adj,
-        })
-      }, 10),
-    [setThemeState]
-  )
-
-  useEffect(() => () => debouncedApply.cancel(), [debouncedApply])
-
-  const handleChange = useCallback(
-    (property: keyof HslAdjustments, value: number) => {
-      debouncedApply({ ...currentAdjustments, [property]: value })
-    },
-    [currentAdjustments, debouncedApply]
-  )
-
-  const handlePreset = useCallback(
-    (adj: HslAdjustments) => {
-      debouncedApply(adj)
-    },
-    [debouncedApply]
-  )
-
-  const handleReset = useCallback(() => {
-    debouncedApply({ ...defaultHslAdjustments })
-  }, [debouncedApply])
-
-  // 预设 swatch 的基准色(用 checkpoint 当前模式下的 background/primary/secondary)。
-  const swatchBase = (themeCheckpoint ?? themeState).styles[themeState.currentMode]
+  // 预设 swatch 的基准色(调整基准当前模式下的 background/primary/secondary)。
+  const swatchBase = (site.current.hslBase ?? theme)[mode]
   const baseBg = toHex(swatchBase.background)
   const basePrimary = toHex(swatchBase.primary)
   const baseSecondary = toHex(swatchBase.secondary)

@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "COSS UI Theme Tweak",
   "version": "0.0.1",
-  "description": "A Chrome extension for UI theme tweaking",
+  "description": "Live-edit coss ui theme variables on any website, from your side panel.",
+  "minimum_chrome_version": "116",
   "permissions": [
     "sidePanel",
     "storage",
@@ -10,7 +11,8 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://coss.com/*"
+    "http://*/*",
+    "https://*/*"
   ],
   "side_panel": {
     "default_path": "dist/side-panel/index.html"
@@ -22,8 +24,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://coss.com/ui",
-        "https://coss.com/ui/*"
+        "http://*/*",
+        "https://*/*"
       ],
       "js": [
         "dist/contentScript.js"

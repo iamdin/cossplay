@@ -1,5 +1,4 @@
-import type { ThemePreset, ThemeStyles, ThemeStyleProps } from "./theme-model";
-import { defaultThemeStyles } from "./theme-model";
+import type { ThemePreset } from "./theme-model";
 
 export const defaultPresets: Record<string, ThemePreset> = {
   "modern-minimal": {
@@ -3596,21 +3595,3 @@ export const defaultPresets: Record<string, ThemePreset> = {
     },
   },
 };
-
-/**
- * Merge a preset's partial light/dark onto `defaults`, returning a full
- * `ThemeStyles`. Ported from tweakcn `utils/theme-preset-helper.ts`
- * (`getPresetThemeStyles` / `mergePresetWithDefaults`): dark mode inherits the
- * preset's LIGHT overrides first, then its dark overrides on top.
- */
-export function presetToThemeStyles(
-  preset: ThemePreset,
-  defaults: ThemeStyles = defaultThemeStyles
-): ThemeStyles {
-  const presetLight = (preset.styles?.light ?? {}) as Partial<ThemeStyleProps>;
-  const presetDark = (preset.styles?.dark ?? {}) as Partial<ThemeStyleProps>;
-  return {
-    light: { ...defaults.light, ...presetLight },
-    dark: { ...defaults.dark, ...presetLight, ...presetDark },
-  };
-}
