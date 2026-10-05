@@ -3,6 +3,7 @@ import {
   effective,
   fontsKey,
   newSite,
+  readLocalThemes,
   readSite,
   type SiteState,
   siteKey,
@@ -298,4 +299,12 @@ test("presets override only the tokens they define and keep coss-only tokens fro
   assert.equal(theme.light.info, "#0000ff")
   assert.equal(theme.light.primary, overrides.light.primary)
   assert.equal(transition(state, { kind: "undo" }, page).current.themeId, "")
+})
+
+test("local themes without createdAt are kept", () => {
+  const themes = readLocalThemes([{ id: "a", name: "A", theme: defaults }])
+  assert.deepEqual(
+    themes.map((t) => [t.id, t.createdAt]),
+    [["a", ""]]
+  )
 })

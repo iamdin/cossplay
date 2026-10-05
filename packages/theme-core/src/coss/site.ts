@@ -272,7 +272,10 @@ const localThemeSchema = z.object({
   id: z.string(),
   name: z.string(),
   theme: themeSchema,
-  createdAt: z.unknown().transform((v) => String(v ?? "")),
+  createdAt: z
+    .unknown()
+    .optional()
+    .transform((v) => String(v ?? "")),
 })
 const localThemesSchema = z
   .array(z.unknown())
