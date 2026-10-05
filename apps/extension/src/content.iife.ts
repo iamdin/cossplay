@@ -391,7 +391,7 @@ const initial = storage
   })
   .catch((error) => {
     document.getElementById("coss-tweak-loading")?.remove()
-    console.error("coss tweak restore failed", error)
+    console.error("Cossmetic restore failed", error)
   })
 let detecting: Promise<Detection> | null = null
 async function inspect() {
@@ -403,7 +403,7 @@ async function inspect() {
 }
 initial
   .then(inspect)
-  .catch((error) => console.error("coss tweak detection failed", error))
+  .catch((error) => console.error("Cossmetic detection failed", error))
 content.onMessage("inspect", inspect)
 storage.watch(key, (value) => {
   state = readSite(value, origin)

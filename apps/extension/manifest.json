@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "COSS UI Theme Tweak",
+  "name": "Cossmetic",
   "description": "Live-edit coss ui theme variables on any website, from your side panel.",
   "minimum_chrome_version": "116",
   "permissions": ["sidePanel", "storage", "tabs", "scripting"],

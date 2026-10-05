@@ -51,12 +51,12 @@ jobs:
       - name: Package extension
         run: |
           cd apps/extension/dist
-          zip -r ../coss-ui-theme-tweak-${RELEASE_TAG}.zip .
+          zip -r ../cossmetic-${RELEASE_TAG}.zip .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: ${{ env.RELEASE_TAG }}
-          files: apps/extension/coss-ui-theme-tweak-${{ env.RELEASE_TAG }}.zip
+          files: apps/extension/cossmetic-${{ env.RELEASE_TAG }}.zip
           generate_release_notes: true
