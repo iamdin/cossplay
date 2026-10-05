@@ -206,7 +206,7 @@ export const coalesces = (
   last.current === JSON.stringify(state.current)
 
 // Storage and messages are untrusted input: values end up in injected CSS. Parsing keeps what is
-// valid and drops the rest, including fields from the legacy shape (document detection and materialized themes).
+// valid and drops the rest.
 const modeValues = z
   .record(z.string(), z.unknown())
   .catch({})
