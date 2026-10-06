@@ -1,6 +1,39 @@
 import { createFileRoute } from "@tanstack/react-router"
+import styles from "../styles.css?url"
 
-export const Route = createFileRoute("/")({ component: Landing })
+export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Cossplay — live themes for coss ui sites" },
+      {
+        name: "description",
+        content:
+          "A Chrome side panel that live-edits the theme of any coss ui website: 42 tweakcn presets, colors, fonts, radius and contrast checks, exported as Tailwind CSS.",
+      },
+      { property: "og:title", content: "Cossplay" },
+      {
+        property: "og:description",
+        content:
+          "Live-edit the theme of any coss ui website from Chrome's side panel.",
+      },
+      { property: "og:image", content: "/screenshot.webp" },
+    ],
+    links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap",
+      },
+      { rel: "stylesheet", href: styles },
+    ],
+  }),
+  component: Landing,
+})
 
 const features = [
   {
@@ -51,7 +84,7 @@ const formats = [
 ]
 
 const addToChrome = (
-  <span className="btn primary soon" aria-disabled="true">
+  <span className="btn soon" aria-disabled="true">
     Add to Chrome <small>Coming soon</small>
   </span>
 )
@@ -68,6 +101,7 @@ function Landing() {
           <a href="#features">Features</a>
           <a href="#how">How it works</a>
           <a href="#export">Export</a>
+          <a href="/editor">Editor</a>
         </div>
       </nav>
 
@@ -83,10 +117,10 @@ function Landing() {
           export the result as Tailwind CSS.
         </p>
         <div className="ctas">
-          {addToChrome}
-          <a className="btn" href="#how">
-            See how it works
+          <a className="btn primary" href="/editor">
+            Open the editor
           </a>
+          {addToChrome}
         </div>
         <div className="shot">
           <img
@@ -165,7 +199,12 @@ function Landing() {
           Cossplay is free and runs entirely in your browser. Chrome Web Store
           listing coming soon.
         </p>
-        {addToChrome}
+        <div className="ctas">
+          <a className="btn primary" href="/editor">
+            Open the editor
+          </a>
+          {addToChrome}
+        </div>
       </div>
 
       <footer>

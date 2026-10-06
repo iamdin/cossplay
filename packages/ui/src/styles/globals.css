@@ -1,9 +1,5 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/jetbrains-mono";
-
-@source "../components";
+@import "./base.css";
 
 @custom-variant dark (&:is(.dark *));
 

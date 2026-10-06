@@ -36,12 +36,11 @@ import {
   NumericControl,
   Section,
   selectClass,
-} from "@/components/controls"
-import { ExportDialog, ImportDialog } from "@/components/dialogs"
+} from "./controls"
+import { ExportDialog, ImportDialog } from "./dialogs"
 import {
   adjust,
   applyOverrides,
-  connect,
   dispatch,
   fontTokens,
   loadFont,
@@ -51,9 +50,9 @@ import {
   syncSidebar,
   themeOp,
   updateToken,
-  useSiteStore,
+  usePanelStore,
   useTheme,
-} from "@/store/site-store"
+} from "./store"
 
 const hslControls = [
   { key: "hue", label: "Hue shift", min: -180, max: 180, step: 1 },
@@ -69,14 +68,14 @@ const shadowTokens = [
 ] as const
 const muted = "text-[10px] leading-relaxed text-muted-foreground"
 
-export function App() {
-  useEffect(connect, [])
-  const site = useSiteStore((s) => s.site)
-  const detection = useSiteStore((s) => s.detection)
-  const mode = useSiteStore((s) => s.mode)
-  const status = useSiteStore((s) => s.status)
-  const error = useSiteStore((s) => s.error)
-  const locals = useSiteStore((s) => s.locals)
+/** The editing controls. `liveSite` adds the extension's per-site controls (on/off, back to the site's theme). */
+export function Panel({ liveSite = false }: { liveSite?: boolean }) {
+  const site = usePanelStore((s) => s.site)
+  const detection = usePanelStore((s) => s.detection)
+  const mode = usePanelStore((s) => s.mode)
+  const status = usePanelStore((s) => s.status)
+  const error = usePanelStore((s) => s.error)
+  const locals = usePanelStore((s) => s.locals)
   const theme = useTheme() ?? defaults
   const styles = theme[mode]
   const detected = !!detection?.detected
@@ -113,7 +112,7 @@ export function App() {
     `${group} ${key}`.toLowerCase().includes(search.toLowerCase())
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground text-xs">
+    <div className="flex h-full flex-col overflow-hidden bg-background text-foreground text-xs">
       <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
         <select
           aria-label="Theme preset"
@@ -177,25 +176,33 @@ export function App() {
         <Button
           size="icon-sm"
           variant="ghost"
-          aria-label="Reset site"
-          title="Back to the site's own theme"
+          aria-label={liveSite ? "Reset site" : "Reset theme"}
+          title={
+            liveSite
+              ? "Back to the site's own theme"
+              : "Back to coss ui's theme"
+          }
           disabled={!site}
           onClick={reset}
         >
           <RotateCcw />
         </Button>
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          aria-label="Enable theme for this site"
-          aria-pressed={site?.enabled ?? false}
-          title={`${site?.enabled ? "Theme on" : "Theme off"} · ${site?.origin ?? ""}`}
-          className="aria-pressed:text-emerald-600"
-          disabled={!detected}
-          onClick={() => dispatch({ kind: "enabled", enabled: !site?.enabled })}
-        >
-          <Power />
-        </Button>
+        {liveSite && (
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            aria-label="Enable theme for this site"
+            aria-pressed={site?.enabled ?? false}
+            title={`${site?.enabled ? "Theme on" : "Theme off"} · ${site?.origin ?? ""}`}
+            className="aria-pressed:text-emerald-600"
+            disabled={!detected}
+            onClick={() =>
+              dispatch({ kind: "enabled", enabled: !site?.enabled })
+            }
+          >
+            <Power />
+          </Button>
+        )}
       </div>
 
       {error && (
@@ -620,5 +627,3 @@ export function App() {
     </div>
   )
 }
-
-export default App
