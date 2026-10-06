@@ -82,10 +82,10 @@ const groups: [string, [string, ComponentType][]][] = [
 
 export function Components() {
   return (
-    <div className="space-y-10 p-6">
+    <div className="space-y-8 px-4 pt-2 pb-6">
       {groups.map(([group, items]) => (
         <section key={group}>
-          <h2 className="mb-3 font-medium text-muted-foreground text-sm">
+          <h2 className="mb-3 font-medium text-muted-foreground text-xs uppercase tracking-wide">
             {group}
           </h2>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-4">

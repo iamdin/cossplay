@@ -1,5 +1,5 @@
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
+import { Label } from "@cossplay/ui/components/label"
+import { Switch } from "@cossplay/ui/components/switch"
 
 export default function Particle() {
   return (

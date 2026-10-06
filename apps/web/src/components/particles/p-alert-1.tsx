@@ -1,4 +1,8 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@cossplay/ui/components/alert"
 
 export default function Particle() {
   return (

@@ -4,6 +4,7 @@ import {
   contrast,
   contrastPairs,
   defaults,
+  effective,
   groups,
   hslPresets,
   presetOverrides,
@@ -12,6 +13,13 @@ import {
 } from "@cossplay/core/coss"
 import { Button } from "@cossplay/ui/components/button"
 import { Input } from "@cossplay/ui/components/input"
+import {
+  Select,
+  SelectItem,
+  SelectPopup,
+  SelectTrigger,
+  SelectValue,
+} from "@cossplay/ui/components/select"
 import {
   Tabs,
   TabsContent,
@@ -30,13 +38,7 @@ import {
   X,
 } from "lucide-react"
 import { useEffect, useState } from "react"
-import {
-  ColorControl,
-  FontControl,
-  NumericControl,
-  Section,
-  selectClass,
-} from "./controls"
+import { ColorControl, FontControl, NumericControl, Section } from "./controls"
 import { ExportDialog, ImportDialog } from "./dialogs"
 import {
   adjust,
@@ -66,25 +68,31 @@ const shadowTokens = [
   "shadow-offset-x",
   "shadow-offset-y",
 ] as const
+const formatItems: { value: ColorFormat; label: string }[] = [
+  { value: "hex", label: "HEX" },
+  { value: "oklch", label: "OKLCH" },
+  { value: "hsl", label: "HSL" },
+  { value: "rgb", label: "RGB" },
+]
 const muted = "text-[10px] leading-relaxed text-muted-foreground"
 
-/** The editing controls. `liveSite` adds the extension's per-site controls (on/off, back to the site's theme). */
-export function Panel({ liveSite = false }: { liveSite?: boolean }) {
+function usePanel() {
   const site = usePanelStore((s) => s.site)
   const detection = usePanelStore((s) => s.detection)
   const mode = usePanelStore((s) => s.mode)
-  const status = usePanelStore((s) => s.status)
-  const error = usePanelStore((s) => s.error)
-  const locals = usePanelStore((s) => s.locals)
-  const theme = useTheme() ?? defaults
-  const styles = theme[mode]
-  const detected = !!detection?.detected
-  const [format, setFormat] = useState<ColorFormat>("hex")
-  const [search, setSearch] = useState("")
-  const [issuesOnly, setIssuesOnly] = useState(false)
-  const [name, setName] = useState("")
-  const [dialog, setDialog] = useState<"import" | "export" | null>(null)
+  return { site, detection, mode, detected: !!detection?.detected }
+}
 
+function applyPreset(id: string) {
+  try {
+    applyOverrides(presetOverrides(id), id)
+  } catch (e) {
+    setError(String(e))
+  }
+}
+
+/** ⌘Z / ⌘⇧Z outside text fields. */
+export function useUndoShortcuts() {
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
       if (
@@ -100,111 +108,169 @@ export function Panel({ liveSite = false }: { liveSite?: boolean }) {
     document.addEventListener("keydown", keydown)
     return () => document.removeEventListener("keydown", keydown)
   }, [])
+}
 
-  const applyPreset = (id: string) => {
-    try {
-      applyOverrides(presetOverrides(id), id)
-    } catch (e) {
-      setError(String(e))
-    }
+const swatchTokens = ["primary", "secondary", "accent", "border"] as const
+const presetItems = [
+  { value: "default", label: "Default coss" },
+  ...Object.entries(presets).map(([value, { label }]) => ({ value, label })),
+]
+const presetSwatches = new Map<string, string[]>()
+function swatchesOf(id: string) {
+  let colors = presetSwatches.get(id)
+  if (!colors) {
+    const light = effective(defaults, presetOverrides(id)).light
+    colors = swatchTokens.map((token) => light[token])
+    presetSwatches.set(id, colors)
   }
-  const matches = (group: string, key: string) =>
-    `${group} ${key}`.toLowerCase().includes(search.toLowerCase())
+  return colors
+}
 
+function Swatches({ colors }: { colors: string[] }) {
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-background text-foreground text-xs">
-      <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
-        <select
-          aria-label="Theme preset"
-          className={cn(selectClass, "min-w-0 flex-1")}
-          disabled={!detected}
-          value={site?.current.themeId ?? ""}
-          onChange={(e) =>
-            e.currentTarget.value && applyPreset(e.currentTarget.value)
-          }
-        >
-          <option value="">Custom</option>
-          <option value="default">Default coss</option>
-          {Object.entries(presets).map(([id, preset]) => (
-            <option key={id} value={id}>
-              {preset.label}
-            </option>
-          ))}
-        </select>
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          aria-label="Reset preset"
-          title="Discard edits to this preset"
-          disabled={!detected || !site?.current.themeId}
-          onClick={() =>
-            site?.current.themeId && applyPreset(site.current.themeId)
-          }
-        >
-          <RefreshCcw />
-        </Button>
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          aria-label={mode === "light" ? "Preview dark" : "Preview light"}
-          title={mode === "light" ? "Preview dark" : "Preview light"}
-          disabled={!detected}
-          onClick={() => preview(mode === "light" ? "dark" : "light")}
-        >
-          {mode === "light" ? <Moon /> : <Sun />}
-        </Button>
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          aria-label="Undo"
-          title="Undo · ⌘Z"
-          disabled={!site?.past.length}
-          onClick={() => dispatch({ kind: "undo" })}
-        >
-          <Undo2 />
-        </Button>
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          aria-label="Redo"
-          title="Redo · ⌘⇧Z"
-          disabled={!site?.future.length}
-          onClick={() => dispatch({ kind: "redo" })}
-        >
-          <Redo2 />
-        </Button>
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          aria-label={liveSite ? "Reset site" : "Reset theme"}
-          title={
-            liveSite
-              ? "Back to the site's own theme"
-              : "Back to coss ui's theme"
-          }
-          disabled={!site}
-          onClick={reset}
-        >
-          <RotateCcw />
-        </Button>
-        {liveSite && (
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            aria-label="Enable theme for this site"
-            aria-pressed={site?.enabled ?? false}
-            title={`${site?.enabled ? "Theme on" : "Theme off"} · ${site?.origin ?? ""}`}
-            className="aria-pressed:text-emerald-600"
-            disabled={!detected}
-            onClick={() =>
-              dispatch({ kind: "enabled", enabled: !site?.enabled })
-            }
-          >
-            <Power />
-          </Button>
-        )}
-      </div>
+    <span className="flex shrink-0 gap-0.5">
+      {colors.map((color, i) => (
+        <span
+          // biome-ignore lint/suspicious/noArrayIndexKey: fixed token order
+          key={i}
+          className="size-3 rounded-sm border border-black/10"
+          style={{ background: color }}
+        />
+      ))}
+    </span>
+  )
+}
 
+/** Preset picker and "discard edits to this preset". */
+export function PresetSelect() {
+  const { site, mode, detected } = usePanel()
+  const theme = useTheme()
+  const themeId = site?.current.themeId ?? ""
+  const overrides = site?.current.overrides
+  const edited =
+    !!overrides &&
+    Object.keys(overrides.light).length + Object.keys(overrides.dark).length > 0
+  return (
+    <>
+      <Select
+        items={[
+          {
+            value: "",
+            label: edited ? "Custom" : "Choose a preset",
+          },
+          ...presetItems,
+        ]}
+        value={themeId}
+        disabled={!detected}
+        onValueChange={(id) => id && applyPreset(id)}
+      >
+        <SelectTrigger
+          size="sm"
+          aria-label="Theme preset"
+          className="min-w-0 flex-1 text-sm"
+        >
+          {theme && (
+            <Swatches colors={swatchTokens.map((t) => theme[mode][t])} />
+          )}
+          <SelectValue />
+        </SelectTrigger>
+        <SelectPopup alignItemWithTrigger={false} className="ui-chrome">
+          {presetItems.map(({ value, label }) => (
+            <SelectItem key={value} value={value}>
+              <span className="flex items-center gap-2">
+                <Swatches colors={swatchesOf(value)} />
+                {label}
+              </span>
+            </SelectItem>
+          ))}
+        </SelectPopup>
+      </Select>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Reset preset"
+        title="Discard edits to this preset"
+        disabled={!detected || !site?.current.themeId}
+        onClick={() =>
+          site?.current.themeId && applyPreset(site.current.themeId)
+        }
+      >
+        <RefreshCcw />
+      </Button>
+    </>
+  )
+}
+
+/** Light/dark preview, undo/redo and reset; `liveSite` adds the per-site on/off switch. */
+export function HistoryActions({ liveSite = false }: { liveSite?: boolean }) {
+  const { site, mode, detected } = usePanel()
+  return (
+    <>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label={mode === "light" ? "Preview dark" : "Preview light"}
+        title={mode === "light" ? "Preview dark" : "Preview light"}
+        disabled={!detected}
+        onClick={() => preview(mode === "light" ? "dark" : "light")}
+      >
+        {mode === "light" ? <Moon /> : <Sun />}
+      </Button>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Undo"
+        title="Undo · ⌘Z"
+        disabled={!site?.past.length}
+        onClick={() => dispatch({ kind: "undo" })}
+      >
+        <Undo2 />
+      </Button>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Redo"
+        title="Redo · ⌘⇧Z"
+        disabled={!site?.future.length}
+        onClick={() => dispatch({ kind: "redo" })}
+      >
+        <Redo2 />
+      </Button>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label={liveSite ? "Reset site" : "Reset theme"}
+        title={
+          liveSite ? "Back to the site's own theme" : "Back to coss ui's theme"
+        }
+        disabled={!site}
+        onClick={reset}
+      >
+        <RotateCcw />
+      </Button>
+      {liveSite && (
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          aria-label="Enable theme for this site"
+          aria-pressed={site?.enabled ?? false}
+          title={`${site?.enabled ? "Theme on" : "Theme off"} · ${site?.origin ?? ""}`}
+          className="aria-pressed:text-emerald-600"
+          disabled={!detected}
+          onClick={() => dispatch({ kind: "enabled", enabled: !site?.enabled })}
+        >
+          <Power />
+        </Button>
+      )}
+    </>
+  )
+}
+
+export function PanelAlerts() {
+  const error = usePanelStore((s) => s.error)
+  const detection = usePanelStore((s) => s.detection)
+  return (
+    <>
       {error && (
         <div
           role="alert"
@@ -231,246 +297,286 @@ export function Panel({ liveSite = false }: { liveSite?: boolean }) {
           ))}
         </details>
       ) : null}
+    </>
+  )
+}
 
-      <fieldset
-        disabled={!detected}
-        className="flex min-h-0 min-w-0 flex-1 flex-col"
-      >
-        <Tabs defaultValue="colors" className="min-h-0 flex-1 gap-0">
-          <TabsList
-            aria-label="Editor sections"
-            className="mx-2 my-1.5 grid w-auto shrink-0 grid-cols-4"
-          >
-            <TabsTrigger value="colors" className="text-[11px]">
-              Colors
-            </TabsTrigger>
-            <TabsTrigger value="typography" className="text-[11px]">
-              Typography
-            </TabsTrigger>
-            <TabsTrigger value="other" className="text-[11px]">
-              Other
-            </TabsTrigger>
-            <TabsTrigger value="themes" className="text-[11px]">
-              My themes
-            </TabsTrigger>
-          </TabsList>
+/** The Colors / Typography / Other / My themes tabs. */
+export function PanelSections() {
+  const { site, mode, detected } = usePanel()
+  const locals = usePanelStore((s) => s.locals)
+  const theme = useTheme() ?? defaults
+  const styles = theme[mode]
+  const [format, setFormat] = useState<ColorFormat>("hex")
+  const [search, setSearch] = useState("")
+  const [issuesOnly, setIssuesOnly] = useState(false)
+  const [name, setName] = useState("")
+  const matches = (group: string, key: string) =>
+    `${group} ${key}`.toLowerCase().includes(search.toLowerCase())
+  return (
+    <fieldset
+      disabled={!detected}
+      className="flex min-h-0 min-w-0 flex-1 flex-col"
+    >
+      <Tabs defaultValue="colors" className="min-h-0 flex-1 gap-0">
+        <TabsList
+          aria-label="Editor sections"
+          className="mx-2 my-1.5 grid w-auto shrink-0 grid-cols-4"
+        >
+          <TabsTrigger value="colors" className="text-[11px]">
+            Colors
+          </TabsTrigger>
+          <TabsTrigger value="typography" className="text-[11px]">
+            Typography
+          </TabsTrigger>
+          <TabsTrigger value="other" className="text-[11px]">
+            Other
+          </TabsTrigger>
+          <TabsTrigger value="themes" className="text-[11px]">
+            My themes
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent
-            value="colors"
-            className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
-          >
-            <div className="mb-3 flex items-center gap-2">
-              <Input
-                aria-label="Search colors"
-                placeholder="Search colors…"
-                value={search}
-                onChange={(e) => setSearch(e.currentTarget.value)}
-              />
-              <select
+        <TabsContent
+          value="colors"
+          className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
+        >
+          <div className="mb-3 flex items-center gap-2">
+            <Input
+              className="text-sm"
+              size="sm"
+              aria-label="Search colors"
+              placeholder="Search colors…"
+              value={search}
+              onChange={(e) => setSearch(e.currentTarget.value)}
+            />
+            <Select
+              items={formatItems}
+              value={format}
+              onValueChange={(value) => value && setFormat(value)}
+            >
+              <SelectTrigger
+                size="sm"
                 aria-label="Color format"
-                className={cn(selectClass, "w-20 font-semibold text-[10px]")}
-                value={format}
-                onChange={(e) =>
-                  setFormat(e.currentTarget.value as ColorFormat)
-                }
+                className="w-24 min-w-0 text-sm"
               >
-                <option value="hex">HEX</option>
-                <option value="oklch">OKLCH</option>
-                <option value="hsl">HSL</option>
-                <option value="rgb">RGB</option>
-              </select>
-            </div>
-            {Object.entries(groups).map(([group, keys]) => {
-              const filtered = keys.filter((k) => !search || matches(group, k))
+                <SelectValue />
+              </SelectTrigger>
+              <SelectPopup className="ui-chrome">
+                {formatItems.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectPopup>
+            </Select>
+          </div>
+          {Object.entries(groups).map(([group, keys]) => {
+            const filtered = keys.filter((k) => !search || matches(group, k))
+            return (
+              filtered.length > 0 && (
+                <Section
+                  key={`${group}-${!!search}`}
+                  label={group}
+                  count={filtered.length}
+                  open={
+                    !!search || group === "Primary" || group === "Secondary"
+                  }
+                >
+                  {group === "Sidebar" && (
+                    <label className="flex items-center gap-1.5 px-2 py-2 text-[10px] text-muted-foreground">
+                      <input
+                        type="checkbox"
+                        aria-label="Sync sidebar colors"
+                        className="accent-primary"
+                        checked={site?.current.sidebarSync ?? false}
+                        onChange={syncSidebar}
+                      />
+                      Sync sidebar to base colors
+                    </label>
+                  )}
+                  {filtered.map((token) => (
+                    <ColorControl
+                      key={token}
+                      token={token}
+                      value={styles[token]}
+                      format={format}
+                      onChange={(value) => updateToken(token, value)}
+                    />
+                  ))}
+                </Section>
+              )
+            )
+          })}
+          {search &&
+            !Object.entries(groups).some(([g, keys]) =>
+              keys.some((k) => matches(g, k))
+            ) && <p className={muted}>No matching colors.</p>}
+          <Section label="Contrast checker" count="WCAG">
+            <p className={cn(muted, "mx-2 my-2")}>
+              AA normal text ≥ 4.5:1 · large text ≥ 3:1 · AAA ≥ 7:1
+            </p>
+            <label className="flex items-center gap-1.5 px-2 py-2 text-[10px] text-muted-foreground">
+              <input
+                type="checkbox"
+                aria-label="Show contrast issues only"
+                className="accent-primary"
+                checked={issuesOnly}
+                onChange={(e) => setIssuesOnly(e.currentTarget.checked)}
+              />
+              Show issues only
+            </label>
+            {contrastPairs.map(({ label, foreground, background }) => {
+              const ratio = contrast(
+                styles[foreground],
+                styles[background],
+                mode === "dark" ? "#000" : "#fff"
+              )
+              if (issuesOnly && ratio >= 4.5) return null
               return (
-                filtered.length > 0 && (
-                  <Section
-                    key={`${group}-${!!search}`}
-                    label={group}
-                    count={filtered.length}
-                    open={
-                      !!search || group === "Primary" || group === "Secondary"
+                <div
+                  key={label}
+                  className="flex justify-between px-2 py-1.5 text-[10px]"
+                >
+                  <span>{label}</span>
+                  <output
+                    className={
+                      ratio < 4.5
+                        ? "text-destructive"
+                        : "text-emerald-700 dark:text-emerald-400"
                     }
                   >
-                    {group === "Sidebar" && (
-                      <label className="flex items-center gap-1.5 px-2 py-2 text-[10px] text-muted-foreground">
-                        <input
-                          type="checkbox"
-                          aria-label="Sync sidebar colors"
-                          className="accent-primary"
-                          checked={site?.current.sidebarSync ?? false}
-                          onChange={syncSidebar}
-                        />
-                        Sync sidebar to base colors
-                      </label>
-                    )}
-                    {filtered.map((token) => (
-                      <ColorControl
-                        key={token}
-                        token={token}
-                        value={styles[token]}
-                        format={format}
-                        onChange={(value) => updateToken(token, value)}
-                      />
-                    ))}
-                  </Section>
-                )
+                    {ratio.toFixed(2)}:1 ·{" "}
+                    {ratio < 4.5
+                      ? "AA fail"
+                      : ratio < 7
+                        ? "AA pass"
+                        : "AAA pass"}
+                  </output>
+                </div>
               )
             })}
-            {search &&
-              !Object.entries(groups).some(([g, keys]) =>
-                keys.some((k) => matches(g, k))
-              ) && <p className={muted}>No matching colors.</p>}
-            <Section label="Contrast checker" count="WCAG">
-              <p className={cn(muted, "mx-2 my-2")}>
-                AA normal text ≥ 4.5:1 · large text ≥ 3:1 · AAA ≥ 7:1
-              </p>
-              <label className="flex items-center gap-1.5 px-2 py-2 text-[10px] text-muted-foreground">
-                <input
-                  type="checkbox"
-                  aria-label="Show contrast issues only"
-                  className="accent-primary"
-                  checked={issuesOnly}
-                  onChange={(e) => setIssuesOnly(e.currentTarget.checked)}
-                />
-                Show issues only
-              </label>
-              {contrastPairs.map(({ label, foreground, background }) => {
-                const ratio = contrast(
-                  styles[foreground],
-                  styles[background],
-                  mode === "dark" ? "#000" : "#fff"
-                )
-                if (issuesOnly && ratio >= 4.5) return null
-                return (
-                  <div
-                    key={label}
-                    className="flex justify-between px-2 py-1.5 text-[10px]"
-                  >
-                    <span>{label}</span>
-                    <output
-                      className={
-                        ratio < 4.5
-                          ? "text-destructive"
-                          : "text-emerald-700 dark:text-emerald-400"
-                      }
-                    >
-                      {ratio.toFixed(2)}:1 ·{" "}
-                      {ratio < 4.5
-                        ? "AA fail"
-                        : ratio < 7
-                          ? "AA pass"
-                          : "AAA pass"}
-                    </output>
-                  </div>
-                )
-              })}
-            </Section>
-          </TabsContent>
+          </Section>
+        </TabsContent>
 
-          <TabsContent
-            value="typography"
-            className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
-          >
-            <p className={cn(muted, "mb-3")}>
-              Typography and geometry are shared between light and dark, like
-              tweakcn. Custom fonts need to be installed or loaded.
-            </p>
-            <section className="mb-2 border bg-card p-2">
-              <h2 className="pb-3 font-semibold text-xs">Font family</h2>
-              {fontTokens.map((token) => (
-                <FontControl
-                  key={token}
-                  token={token}
-                  value={styles[token]}
-                  onChange={(v) => updateToken(token, v)}
-                  onLoad={loadFont}
-                />
-              ))}
-            </section>
-            <section className="mb-2 border bg-card p-2">
-              <h2 className="pb-3 font-semibold text-xs">Letter spacing</h2>
-              <NumericControl
-                token="letter-spacing"
-                value={styles["letter-spacing"]}
-                onChange={(v) => updateToken("letter-spacing", v)}
+        <TabsContent
+          value="typography"
+          className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
+        >
+          <p className={cn(muted, "mb-3")}>
+            Typography and geometry are shared between light and dark, like
+            tweakcn. Custom fonts need to be installed or loaded.
+          </p>
+          <section className="mb-2 border bg-card p-2">
+            <h2 className="pb-3 font-semibold text-xs">Font family</h2>
+            {fontTokens.map((token) => (
+              <FontControl
+                key={token}
+                token={token}
+                value={styles[token]}
+                onChange={(v) => updateToken(token, v)}
+                onLoad={loadFont}
               />
-            </section>
-          </TabsContent>
+            ))}
+          </section>
+          <section className="mb-2 border bg-card p-2">
+            <h2 className="pb-3 font-semibold text-xs">Letter spacing</h2>
+            <NumericControl
+              token="letter-spacing"
+              value={styles["letter-spacing"]}
+              onChange={(v) => updateToken("letter-spacing", v)}
+            />
+          </section>
+        </TabsContent>
 
-          <TabsContent
-            value="other"
-            className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
-          >
-            <Section label="HSL adjustments" open>
-              <p className={cn(muted, "mx-2 my-2")}>
-                Adjust all colors in both modes from one checkpoint.
-              </p>
-              <div className="mx-2 my-2 flex flex-wrap gap-1">
-                {hslPresets.map((p) => (
-                  <Button
-                    key={p.label}
-                    size="xs"
-                    variant="outline"
-                    onClick={() =>
-                      adjust({
-                        hue: p.hueShift,
-                        saturation: p.saturationScale,
-                        lightness: p.lightnessScale,
-                      })
-                    }
-                  >
-                    {p.label}
-                  </Button>
-                ))}
+        <TabsContent
+          value="other"
+          className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
+        >
+          <Section label="HSL adjustments" open>
+            <p className={cn(muted, "mx-2 my-2")}>
+              Adjust all colors in both modes from one checkpoint.
+            </p>
+            <div className="mx-2 my-2 flex flex-wrap gap-1">
+              {hslPresets.map((p) => (
                 <Button
+                  key={p.label}
                   size="xs"
                   variant="outline"
                   onClick={() =>
-                    adjust({ hue: 0, saturation: 1, lightness: 1 })
+                    adjust({
+                      hue: p.hueShift,
+                      saturation: p.saturationScale,
+                      lightness: p.lightnessScale,
+                    })
                   }
                 >
-                  Reset HSL
+                  {p.label}
                 </Button>
-              </div>
-              {hslControls.map((c) => (
-                <label
-                  key={c.key}
-                  className="m-2 block text-[11px] text-muted-foreground"
-                >
-                  {c.label}
-                  <div className="flex items-center gap-2.5">
-                    <input
-                      type="range"
-                      aria-label={c.label}
-                      className="h-5 min-w-0 flex-1 accent-primary"
-                      min={c.min}
-                      max={c.max}
-                      step={c.step}
-                      value={
-                        site?.current.hsl[c.key] ?? (c.key === "hue" ? 0 : 1)
-                      }
-                      onChange={(e) =>
-                        site &&
-                        adjust(
-                          {
-                            ...site.current.hsl,
-                            [c.key]: Number(e.currentTarget.value),
-                          },
-                          true
-                        )
-                      }
-                    />
-                    <output className="min-w-8 text-right text-foreground">
-                      {site?.current.hsl[c.key]}
-                    </output>
-                  </div>
-                </label>
               ))}
-            </Section>
-            <section className="mb-2 border bg-card p-2">
-              <h2 className="pb-3 font-semibold text-xs">Radius & spacing</h2>
-              {(["radius", "spacing"] as const).map((token) => (
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() => adjust({ hue: 0, saturation: 1, lightness: 1 })}
+              >
+                Reset HSL
+              </Button>
+            </div>
+            {hslControls.map((c) => (
+              <label
+                key={c.key}
+                className="m-2 block text-[11px] text-muted-foreground"
+              >
+                {c.label}
+                <div className="flex items-center gap-2.5">
+                  <input
+                    type="range"
+                    aria-label={c.label}
+                    className="h-5 min-w-0 flex-1 accent-primary"
+                    min={c.min}
+                    max={c.max}
+                    step={c.step}
+                    value={
+                      site?.current.hsl[c.key] ?? (c.key === "hue" ? 0 : 1)
+                    }
+                    onChange={(e) =>
+                      site &&
+                      adjust(
+                        {
+                          ...site.current.hsl,
+                          [c.key]: Number(e.currentTarget.value),
+                        },
+                        true
+                      )
+                    }
+                  />
+                  <output className="min-w-8 text-right text-foreground">
+                    {site?.current.hsl[c.key]}
+                  </output>
+                </div>
+              </label>
+            ))}
+          </Section>
+          <section className="mb-2 border bg-card p-2">
+            <h2 className="pb-3 font-semibold text-xs">Radius & spacing</h2>
+            {(["radius", "spacing"] as const).map((token) => (
+              <NumericControl
+                key={token}
+                token={token}
+                value={styles[token]}
+                onChange={(v) => updateToken(token, v)}
+              />
+            ))}
+          </section>
+          <Section label="Shadows" open>
+            <ColorControl
+              token="shadow-color"
+              value={styles["shadow-color"]}
+              format={format}
+              onChange={(v) => updateToken("shadow-color", v)}
+            />
+            <div className="p-2">
+              {shadowTokens.map((token) => (
                 <NumericControl
                   key={token}
                   token={token}
@@ -478,143 +584,127 @@ export function Panel({ liveSite = false }: { liveSite?: boolean }) {
                   onChange={(v) => updateToken(token, v)}
                 />
               ))}
-            </section>
-            <Section label="Shadows" open>
-              <ColorControl
-                token="shadow-color"
-                value={styles["shadow-color"]}
-                format={format}
-                onChange={(v) => updateToken("shadow-color", v)}
-              />
-              <div className="p-2">
-                {shadowTokens.map((token) => (
-                  <NumericControl
-                    key={token}
-                    token={token}
-                    value={styles[token]}
-                    onChange={(v) => updateToken(token, v)}
-                  />
-                ))}
-              </div>
-              <div className="flex justify-around gap-2 px-2 py-4">
-                {["2xs", "sm", "md", "xl"].map((size) => (
-                  <div
-                    key={size}
-                    className="bg-background px-1.5 py-3 text-[8px]"
-                    style={{ boxShadow: shadows(styles)[`shadow-${size}`] }}
-                  >
-                    shadow-{size}
-                  </div>
-                ))}
-              </div>
-            </Section>
-          </TabsContent>
+            </div>
+            <div className="flex justify-around gap-2 px-2 py-4">
+              {["2xs", "sm", "md", "xl"].map((size) => (
+                <div
+                  key={size}
+                  className="bg-background px-1.5 py-3 text-[8px]"
+                  style={{ boxShadow: shadows(styles)[`shadow-${size}`] }}
+                >
+                  shadow-{size}
+                </div>
+              ))}
+            </div>
+          </Section>
+        </TabsContent>
 
-          <TabsContent
-            value="themes"
-            className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
-          >
-            <section className="mb-2 border bg-card p-2">
-              <h2 className="pb-1 font-semibold text-xs">Save locally</h2>
-              <p className={cn(muted, "mb-2")}>
-                No account. Themes stay in this browser.
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  aria-label="Local theme name"
-                  placeholder="Theme name"
-                  maxLength={100}
-                  value={name}
-                  onChange={(e) => setName(e.currentTarget.value)}
-                />
+        <TabsContent
+          value="themes"
+          className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
+        >
+          <section className="mb-2 border bg-card p-2">
+            <h2 className="pb-1 font-semibold text-xs">Save locally</h2>
+            <p className={cn(muted, "mb-2")}>
+              No account. Themes stay in this browser.
+            </p>
+            <div className="flex gap-2">
+              <Input
+                className="text-sm"
+                size="sm"
+                aria-label="Local theme name"
+                placeholder="Theme name"
+                maxLength={100}
+                value={name}
+                onChange={(e) => setName(e.currentTarget.value)}
+              />
+              <Button
+                onClick={() => {
+                  if (!name.trim()) return setError("Enter a theme name")
+                  themeOp({
+                    kind: "add",
+                    name: name.trim(),
+                    theme: clone(theme),
+                  })
+                  setName("")
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          </section>
+          {locals.map((local) => (
+            <section
+              key={`${local.id}:${local.name}`}
+              className="mb-2 border bg-card p-2"
+            >
+              <Input
+                className="text-sm"
+                size="sm"
+                aria-label={`Rename ${local.name}`}
+                maxLength={100}
+                defaultValue={local.name}
+                onBlur={(e) => {
+                  const n = e.currentTarget.value.trim()
+                  if (!n) {
+                    e.currentTarget.value = local.name
+                    return setError("Theme name cannot be empty")
+                  }
+                  if (n !== local.name)
+                    themeOp({ kind: "rename", id: local.id, name: n })
+                }}
+              />
+              <div className="mt-2 flex gap-1.5">
                 <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => applyOverrides(clone(local.theme))}
+                >
+                  Apply
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
                   onClick={() => {
-                    if (!name.trim()) return setError("Enter a theme name")
-                    themeOp({
-                      kind: "add",
-                      name: name.trim(),
-                      theme: clone(theme),
-                    })
-                    setName("")
+                    if (confirm(`Delete “${local.name}”?`))
+                      themeOp({ kind: "delete", id: local.id })
                   }}
                 >
-                  Save
+                  Delete
                 </Button>
               </div>
             </section>
-            {locals.map((local) => (
-              <section
-                key={`${local.id}:${local.name}`}
-                className="mb-2 border bg-card p-2"
-              >
-                <Input
-                  aria-label={`Rename ${local.name}`}
-                  maxLength={100}
-                  defaultValue={local.name}
-                  onBlur={(e) => {
-                    const n = e.currentTarget.value.trim()
-                    if (!n) {
-                      e.currentTarget.value = local.name
-                      return setError("Theme name cannot be empty")
-                    }
-                    if (n !== local.name)
-                      themeOp({ kind: "rename", id: local.id, name: n })
-                  }}
-                />
-                <div className="mt-2 flex gap-1.5">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => applyOverrides(clone(local.theme))}
-                  >
-                    Apply
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => {
-                      if (confirm(`Delete “${local.name}”?`))
-                        themeOp({ kind: "delete", id: local.id })
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </section>
-            ))}
-            {!locals.length && (
-              <p className={muted}>Your saved themes will appear here.</p>
-            )}
-          </TabsContent>
-        </Tabs>
-      </fieldset>
+          ))}
+          {!locals.length && (
+            <p className={muted}>Your saved themes will appear here.</p>
+          )}
+        </TabsContent>
+      </Tabs>
+    </fieldset>
+  )
+}
 
-      <footer className="flex shrink-0 items-center gap-2 border-t px-2 py-1.5">
-        <div
-          role="status"
-          className="min-w-0 flex-1 truncate text-[10px] text-muted-foreground"
-          title={site?.origin}
-        >
-          {detected ? status : (site?.origin ?? "No website selected")}
-          {!detected && site ? ` · ${status}` : ""}
-        </div>
-        <Button
-          size="sm"
-          variant="outline"
-          disabled={!detected}
-          onClick={() => setDialog("import")}
-        >
-          Import
-        </Button>
-        <Button
-          size="sm"
-          disabled={!detected}
-          onClick={() => setDialog("export")}
-        >
-          Export
-        </Button>
-      </footer>
-
+export function ImportExport() {
+  const { detected } = usePanel()
+  const theme = useTheme() ?? defaults
+  const [dialog, setDialog] = useState<"import" | "export" | null>(null)
+  return (
+    <>
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={!detected}
+        onClick={() => setDialog("import")}
+      >
+        Import
+      </Button>
+      <Button
+        size="sm"
+        disabled={!detected}
+        onClick={() => setDialog("export")}
+      >
+        Export
+      </Button>
       <ImportDialog
         open={dialog === "import"}
         onOpenChange={(open) => setDialog(open ? "import" : null)}
@@ -624,6 +714,38 @@ export function Panel({ liveSite = false }: { liveSite?: boolean }) {
         onOpenChange={(open) => setDialog(open ? "export" : null)}
         theme={theme}
       />
+    </>
+  )
+}
+
+/** The editing controls as one column (the extension's side panel). */
+export function Panel({ liveSite = false }: { liveSite?: boolean }) {
+  const { site, detected } = usePanel()
+  const status = usePanelStore((s) => s.status)
+  useUndoShortcuts()
+  return (
+    <div className="flex h-full flex-col overflow-hidden bg-background text-foreground text-xs">
+      <div className="shrink-0 border-b px-2 py-1.5">
+        <div className="flex items-center gap-1">
+          <PresetSelect />
+        </div>
+        <div className="mt-1 flex items-center justify-end gap-1">
+          <HistoryActions liveSite={liveSite} />
+        </div>
+      </div>
+      <PanelAlerts />
+      <PanelSections />
+      <footer className="flex shrink-0 items-center gap-2 border-t px-2 py-1.5">
+        <div
+          role="status"
+          className="min-w-0 flex-1 truncate text-[10px] text-muted-foreground"
+          title={site?.origin}
+        >
+          {detected ? status : (site?.origin ?? "No website selected")}
+          {!detected && site ? ` · ${status}` : ""}
+        </div>
+        <ImportExport />
+      </footer>
     </div>
   )
 }

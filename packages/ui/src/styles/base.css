@@ -1,6 +1,0 @@
-/* Everything the components need except Tailwind itself and theme values. */
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/jetbrains-mono";
-
-@source "../components";

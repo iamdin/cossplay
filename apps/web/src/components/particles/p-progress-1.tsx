@@ -1,7 +1,7 @@
 "use client"
 
+import { Progress } from "@cossplay/ui/components/progress"
 import { useEffect, useState } from "react"
-import { Progress } from "@/components/ui/progress"
 
 export default function Particle() {
   const [value, setValue] = useState(20)

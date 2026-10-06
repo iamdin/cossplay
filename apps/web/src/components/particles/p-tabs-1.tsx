@@ -1,4 +1,9 @@
-import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs"
+import {
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@cossplay/ui/components/tabs"
 
 export default function Particle() {
   return (

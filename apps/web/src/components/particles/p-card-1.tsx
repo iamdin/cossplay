@@ -1,5 +1,4 @@
-import { CircleAlertIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@cossplay/ui/components/button"
 import {
   Card,
   CardDescription,
@@ -7,17 +6,18 @@ import {
   CardHeader,
   CardPanel,
   CardTitle,
-} from "@/components/ui/card"
-import { Field, FieldLabel } from "@/components/ui/field"
-import { Form } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@cossplay/ui/components/card"
+import { Field, FieldLabel } from "@cossplay/ui/components/field"
+import { Form } from "@cossplay/ui/components/form"
+import { Input } from "@cossplay/ui/components/input"
 import {
   Select,
   SelectItem,
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@cossplay/ui/components/select"
+import { CircleAlertIcon } from "lucide-react"
 
 const frameworkOptions = [
   { label: "Next.js", value: "next" },

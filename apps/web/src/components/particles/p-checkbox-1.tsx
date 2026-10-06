@@ -1,5 +1,5 @@
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
+import { Checkbox } from "@cossplay/ui/components/checkbox"
+import { Label } from "@cossplay/ui/components/label"
 
 export default function Particle() {
   return (

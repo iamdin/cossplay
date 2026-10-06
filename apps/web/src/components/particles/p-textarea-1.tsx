@@ -1,4 +1,4 @@
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@cossplay/ui/components/textarea"
 
 export default function Particle() {
   return <Textarea placeholder="Type your message here" />

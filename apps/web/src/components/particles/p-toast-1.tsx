@@ -1,7 +1,7 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { toastManager } from "@/components/ui/toast"
+import { Button } from "@cossplay/ui/components/button"
+import { toastManager } from "@cossplay/ui/components/toast"
 
 export default function Particle() {
   return (

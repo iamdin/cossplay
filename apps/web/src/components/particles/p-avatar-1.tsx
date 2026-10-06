@@ -1,4 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@cossplay/ui/components/avatar"
 
 export default function Particle() {
   return (
