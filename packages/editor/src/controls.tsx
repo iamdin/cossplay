@@ -11,8 +11,8 @@ import { Input } from "@cossplay/ui/components/input"
 import { cn } from "@cossplay/ui/lib/utils"
 import { converter } from "culori"
 import { type ReactNode, useEffect, useRef, useState } from "react"
-import fonts from "@/data/fonts.json"
-import { familyOf } from "@/store/site-store"
+import fonts from "./fonts.json"
+import { familyOf } from "./store"
 
 export const title = (key: string) =>
   key.replaceAll("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())

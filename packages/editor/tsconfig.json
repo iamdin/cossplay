@@ -1,0 +1,4 @@
+{
+  "extends": "@cossplay/typescript/react-app.json",
+  "include": ["src"]
+}

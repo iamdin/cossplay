@@ -15,14 +15,14 @@ import {
 import { Input } from "@cossplay/ui/components/input"
 import { Textarea } from "@cossplay/ui/components/textarea"
 import { useState } from "react"
-import { selectClass } from "@/components/controls"
-import fonts from "@/data/fonts.json"
-import { importFrom, setError, useSiteStore } from "@/store/site-store"
+import { selectClass } from "./controls"
+import fonts from "./fonts.json"
+import { importFrom, setError, usePanelStore } from "./store"
 
 type DialogProps = { open: boolean; onOpenChange: (open: boolean) => void }
 
 function DialogError() {
-  const error = useSiteStore((s) => s.error)
+  const error = usePanelStore((s) => s.error)
   return error ? (
     <p
       role="alert"
@@ -139,7 +139,7 @@ export function ExportDialog({
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(output)
-      useSiteStore.setState({ status: "Copied to clipboard" })
+      usePanelStore.setState({ status: "Copied to clipboard" })
     } catch (e) {
       setError(`Copy failed: ${String(e)}`)
     }
