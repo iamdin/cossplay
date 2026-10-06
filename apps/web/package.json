@@ -6,8 +6,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "check:type": "tsc",
-    "deploy": "vercel deploy --prod"
+    "check:type": "tsc"
   },
   "dependencies": {
     "@tanstack/react-router": "^1.170.41",
@@ -21,7 +20,6 @@
     "@types/react-dom": "catalog:react19",
     "@vitejs/plugin-react": "^5.1.1",
     "typescript": "catalog:",
-    "vercel": "^62.4.0",
     "vite": "catalog:"
   }
 }
