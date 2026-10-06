@@ -3,9 +3,11 @@
   "private": true,
   "scripts": {
     "preview": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "vercel deploy --prod",
+    "deploy:workers": "wrangler deploy"
   },
   "devDependencies": {
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.0.0",
+    "vercel": "^62.4.0"
   }
 }
