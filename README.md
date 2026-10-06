@@ -37,7 +37,7 @@ From the repository root:
 - `pnpm dev`: CRXJS dev mode with HMR
 - `pnpm build`: build the extension into `apps/extension/dist`
 - `pnpm check:type`, `pnpm format`, `pnpm lint` (append `:fix` to fix)
-- `pnpm test`: theme-core unit tests
+- `pnpm test`: core unit tests
 - `pnpm test:e2e`: build, then run the Playwright tests
 
 ## Layout
@@ -47,8 +47,8 @@ pnpm + Turborepo monorepo:
 - `apps/extension`: the MV3 extension (Vite + CRXJS): side panel (React), content script, service worker
 - `apps/landing`: the static landing page, deployed to Vercel (`pnpm --filter @cossplay/landing deploy`); `deploy:workers` targets Cloudflare Workers
 - `packages/ui`: shadcn components, `cn` and `globals.css` for the panel
-- `packages/theme-core`: shared logic. `@cossplay/theme-core/coss` holds tokens, site state and history, worker storage and the message protocol; `/coss/import` is the panel-only CSS / JSON importer
-- `packages/theme-core/scripts`: `sync:defaults` regenerates coss defaults from the coss registry style; `sync:tweakcn` regenerates tweakcn defaults, presets and HSL presets from a frozen tweakcn clone
+- `packages/core`: shared logic. `@cossplay/core/coss` holds tokens, site state and history, worker storage and the message protocol; `/coss/import` is the panel-only CSS / JSON importer
+- `packages/core/scripts`: `sync:defaults` regenerates coss defaults from the coss registry style; `sync:tweakcn` regenerates tweakcn defaults, presets and HSL presets from a frozen tweakcn clone
 - `tooling/typescript`: shared tsconfig
 
 ## Credits

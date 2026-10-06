@@ -9,7 +9,7 @@ import {
   presetOverrides,
   presets,
   shadows,
-} from "@cossplay/theme-core/coss"
+} from "@cossplay/core/coss"
 import { Button } from "@cossplay/ui/components/button"
 import { Input } from "@cossplay/ui/components/input"
 import {

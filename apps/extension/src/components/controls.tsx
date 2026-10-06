@@ -5,7 +5,7 @@ import {
   parseColor,
   type Token,
   validValue,
-} from "@cossplay/theme-core/coss"
+} from "@cossplay/core/coss"
 import { Button } from "@cossplay/ui/components/button"
 import { Input } from "@cossplay/ui/components/input"
 import { cn } from "@cossplay/ui/lib/utils"

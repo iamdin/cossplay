@@ -4,7 +4,7 @@ import {
   exportLayout,
   registryTheme,
   type Theme,
-} from "@cossplay/theme-core/coss"
+} from "@cossplay/core/coss"
 import { Button } from "@cossplay/ui/components/button"
 import {
   Dialog,

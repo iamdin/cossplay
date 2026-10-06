@@ -1,4 +1,4 @@
-import { createStore, readSite, worker } from "@cossplay/theme-core/coss"
+import { createStore, readSite, worker } from "@cossplay/core/coss"
 import { storage } from "@wxt-dev/storage"
 
 chrome.sidePanel

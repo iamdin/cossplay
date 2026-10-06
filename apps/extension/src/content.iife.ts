@@ -19,7 +19,7 @@ import {
   validValue,
   variables,
   worker,
-} from "@cossplay/theme-core/coss"
+} from "@cossplay/core/coss"
 import { storage } from "@wxt-dev/storage"
 
 const origin = location.origin,

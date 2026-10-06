@@ -20,8 +20,8 @@ import {
   transition,
   validValue,
   worker,
-} from "@cossplay/theme-core/coss"
-import { importTheme } from "@cossplay/theme-core/coss/import"
+} from "@cossplay/core/coss"
+import { importTheme } from "@cossplay/core/coss/import"
 import { storage } from "@wxt-dev/storage"
 import { useMemo } from "react"
 import { create } from "zustand"
