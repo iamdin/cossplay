@@ -369,7 +369,7 @@ export function FontControl({
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectPopup>
+          <SelectPopup className="ui-chrome">
             {categories.map((c) => (
               <SelectItem key={c} value={c}>
                 {title(c)}

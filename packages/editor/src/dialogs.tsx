@@ -54,7 +54,7 @@ export function ImportDialog({ open, onOpenChange }: DialogProps) {
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPopup>
+      <DialogPopup className="ui-chrome">
         <DialogHeader>
           <DialogTitle>Import theme</DialogTitle>
         </DialogHeader>
@@ -172,7 +172,7 @@ export function ExportDialog({
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPopup className="max-w-2xl">
+      <DialogPopup className="ui-chrome max-w-2xl">
         <DialogHeader>
           <DialogTitle>Export theme</DialogTitle>
         </DialogHeader>
@@ -186,7 +186,7 @@ export function ExportDialog({
             <SelectTrigger className="text-sm" aria-label="Export format">
               <SelectValue />
             </SelectTrigger>
-            <SelectPopup>
+            <SelectPopup className="ui-chrome">
               {exportItems.map(({ value, label }) => (
                 <SelectItem key={value} value={value}>
                   {label}

@@ -174,7 +174,7 @@ export function PresetSelect() {
           )}
           <SelectValue />
         </SelectTrigger>
-        <SelectPopup alignItemWithTrigger={false}>
+        <SelectPopup alignItemWithTrigger={false} className="ui-chrome">
           {presetItems.map(({ value, label }) => (
             <SelectItem key={value} value={value}>
               <span className="flex items-center gap-2">
@@ -362,7 +362,7 @@ export function PanelSections() {
               >
                 <SelectValue />
               </SelectTrigger>
-              <SelectPopup>
+              <SelectPopup className="ui-chrome">
                 {formatItems.map(({ value, label }) => (
                   <SelectItem key={value} value={value}>
                     {label}

@@ -1,7 +1,7 @@
 /* coss ui's theme (from the @coss/style registry item) and component styles. */
 @import "tailwindcss";
-@import "@fontsource-variable/jetbrains-mono";
-@import "@fontsource-variable/inter";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 
 @source "../components";
 
@@ -9,10 +9,17 @@
 
 /* Not inline, so font utilities read the variables the panel overrides. */
 @theme {
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
   --font-serif: ui-serif, Georgia, serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+}
+
+/* App chrome keeps Geist when a previewed theme overrides the font tokens. */
+.ui-chrome {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+  font-family: var(--font-sans);
 }
 
 @theme inline {

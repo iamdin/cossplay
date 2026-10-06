@@ -35,7 +35,7 @@ export const Route = createFileRoute("/editor")({
   component: Editor,
 })
 
-const bar = "flex h-14 shrink-0 items-center gap-1 border-b px-3"
+const bar = "ui-chrome flex h-14 shrink-0 items-center gap-1 border-b px-3"
 
 // Laid out like tweakcn's editor: site header, controls on the left, actions and preview on the right.
 function Editor() {
@@ -45,7 +45,7 @@ function Editor() {
   return (
     <ToastProvider>
       <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
-        <header className="flex h-14 shrink-0 items-center justify-between border-b px-4">
+        <header className="ui-chrome flex h-14 shrink-0 items-center justify-between border-b px-4">
           <a href="/" className="flex items-center gap-2 font-semibold">
             <span className="grid size-6 place-items-center rounded-md bg-foreground">
               <span className="size-2.5 rounded-full border-2 border-background" />
@@ -60,7 +60,7 @@ function Editor() {
           </a>
         </header>
         <div className="flex min-h-0 flex-1">
-          <aside className="flex w-[30%] min-w-80 max-w-md shrink-0 flex-col border-r text-xs">
+          <aside className="ui-chrome flex w-[30%] min-w-80 max-w-md shrink-0 flex-col border-r text-xs">
             <div className={bar}>
               <PresetSelect />
             </div>
@@ -83,7 +83,7 @@ function Editor() {
               defaultValue="components"
               className="flex min-h-0 flex-1 flex-col gap-0"
             >
-              <div className="shrink-0 px-4 pt-3 pb-1">
+              <div className="ui-chrome shrink-0 px-4 pt-3 pb-1">
                 <TabsList aria-label="Preview">
                   <TabsTab value="components">Components</TabsTab>
                   <TabsTab value="typography">Typography</TabsTab>
