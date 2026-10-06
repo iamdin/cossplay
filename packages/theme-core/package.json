@@ -1,5 +1,5 @@
 {
-  "name": "@coss-tweak/theme-core",
+  "name": "@cossplay/theme-core",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -22,7 +22,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@coss-tweak/typescript": "workspace:*",
+    "@cossplay/typescript": "workspace:*",
     "@types/chrome": "catalog:",
     "@types/culori": "catalog:",
     "jsdom": "catalog:",

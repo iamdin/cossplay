@@ -1,4 +1,4 @@
-# Cossmetic
+# Cossplay
 
 A Chrome extension that live-edits the theme variables of any website built with [coss ui](https://coss.com/ui) (or shadcn-style variables) from a docked side panel. It has the same editing model as [Shadify](https://github.com/oxwen11/shadify), on coss ui's token set.
 
@@ -45,9 +45,9 @@ From the repository root:
 pnpm + Turborepo monorepo:
 
 - `apps/extension`: the MV3 extension (Vite + CRXJS): side panel (React), content script, service worker
-- `apps/landing`: the static landing page, deployed as a Cloudflare Worker with static assets (`pnpm --filter @coss-tweak/landing deploy`)
+- `apps/landing`: the static landing page, deployed as a Cloudflare Worker with static assets (`pnpm --filter @cossplay/landing deploy`)
 - `packages/ui`: shadcn components, `cn` and `globals.css` for the panel
-- `packages/theme-core`: shared logic. `@coss-tweak/theme-core/coss` holds tokens, site state and history, worker storage and the message protocol; `/coss/import` is the panel-only CSS / JSON importer
+- `packages/theme-core`: shared logic. `@cossplay/theme-core/coss` holds tokens, site state and history, worker storage and the message protocol; `/coss/import` is the panel-only CSS / JSON importer
 - `packages/theme-core/scripts`: `sync:defaults` regenerates coss defaults from the coss registry style; `sync:tweakcn` regenerates tweakcn defaults, presets and HSL presets from a frozen tweakcn clone
 - `tooling/typescript`: shared tsconfig
 

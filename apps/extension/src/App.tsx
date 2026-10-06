@@ -9,16 +9,16 @@ import {
   presetOverrides,
   presets,
   shadows,
-} from "@coss-tweak/theme-core/coss"
-import { Button } from "@coss-tweak/ui/components/button"
-import { Input } from "@coss-tweak/ui/components/input"
+} from "@cossplay/theme-core/coss"
+import { Button } from "@cossplay/ui/components/button"
+import { Input } from "@cossplay/ui/components/input"
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@coss-tweak/ui/components/tabs"
-import { cn } from "@coss-tweak/ui/lib/utils"
+} from "@cossplay/ui/components/tabs"
+import { cn } from "@cossplay/ui/lib/utils"
 import {
   Moon,
   Power,

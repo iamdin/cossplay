@@ -1,5 +1,5 @@
 {
-  "name": "@coss-tweak/landing",
+  "name": "@cossplay/landing",
   "private": true,
   "scripts": {
     "preview": "wrangler dev",

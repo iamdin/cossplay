@@ -1,5 +1,5 @@
 {
-  "extends": "@coss-tweak/typescript/react-app.json",
+  "extends": "@cossplay/typescript/react-app.json",
   "compilerOptions": {
     "types": ["vite/client", "chrome", "node"],
     "paths": {

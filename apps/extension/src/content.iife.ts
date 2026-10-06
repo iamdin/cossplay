@@ -19,7 +19,7 @@ import {
   validValue,
   variables,
   worker,
-} from "@coss-tweak/theme-core/coss"
+} from "@cossplay/theme-core/coss"
 import { storage } from "@wxt-dev/storage"
 
 const origin = location.origin,
@@ -33,7 +33,7 @@ let fonts: Record<string, string> = {}
 let fontStyle: HTMLStyleElement | null = null
 const fallback = cssInstaller(
   (css, previous) => worker.sendMessage("css", { css, previous }),
-  () => document.getElementById("coss-tweak-loading")?.remove()
+  () => document.getElementById("cossplay-loading")?.remove()
 )
 let originalDark = false,
   originalClassPresent = false,
@@ -65,7 +65,7 @@ function apply() {
     fontStyle = null
     fallback.install("")
     restoreMode()
-    document.getElementById("coss-tweak-loading")?.remove()
+    document.getElementById("cossplay-loading")?.remove()
     return
   }
   if (state.previewMode) {
@@ -134,7 +134,7 @@ function apply() {
   if (rules.length) {
     if (!applied) {
       applied = document.createElement("style")
-      applied.id = "coss-tweak-theme"
+      applied.id = "cossplay-theme"
     }
     const text = rules.join("\n")
     if (applied.textContent !== text) applied.textContent = text
@@ -160,7 +160,7 @@ function apply() {
   )
   if (activeFonts.length) {
     fontStyle ??= document.createElement("style")
-    fontStyle.id = "coss-tweak-fonts"
+    fontStyle.id = "cossplay-fonts"
     const fontCss = activeFonts.map(([, css]) => css).join("\n")
     if (fontStyle.textContent !== fontCss) fontStyle.textContent = fontCss
     if (!fontStyle.isConnected)
@@ -171,7 +171,7 @@ function apply() {
   }
   // USER-origin !important variables survive later author rules regardless of specificity.
   fallback.install(rules.join("\n"))
-  if (!rules.length) document.getElementById("coss-tweak-loading")?.remove()
+  if (!rules.length) document.getElementById("cossplay-loading")?.remove()
 }
 const ready = new Promise<void>((resolve) => {
   if (document.readyState !== "loading") resolve()
@@ -242,7 +242,7 @@ async function detect(): Promise<Detection> {
       seen.has(value) ||
       value.ownerNode === applied ||
       (value.ownerNode instanceof HTMLElement &&
-        value.ownerNode.id.startsWith("coss-tweak-"))
+        value.ownerNode.id.startsWith("cossplay-"))
     )
       return
     seen.add(value)
@@ -284,7 +284,7 @@ async function detect(): Promise<Detection> {
   if (fallback.active() && detection) return { ...detection, sources, warnings }
   // Detection changes modes synchronously; do not leave native components mid-transition.
   const measuring = document.createElement("style")
-  measuring.id = "coss-tweak-measuring"
+  measuring.id = "cossplay-measuring"
   measuring.textContent =
     "*, *::before, *::after { transition: none !important; }"
   ;(document.head ?? root).append(measuring)
@@ -296,7 +296,7 @@ async function detect(): Promise<Detection> {
       ? "dark"
       : "light"
     : currentMode()
-  const probe = document.createElement("coss-tweak-probe")
+  const probe = document.createElement("cossplay-probe")
   root.append(probe)
   const result: Detection = {
     detected: false,
@@ -390,8 +390,8 @@ const initial = storage
     apply()
   })
   .catch((error) => {
-    document.getElementById("coss-tweak-loading")?.remove()
-    console.error("Cossmetic restore failed", error)
+    document.getElementById("cossplay-loading")?.remove()
+    console.error("Cossplay restore failed", error)
   })
 let detecting: Promise<Detection> | null = null
 async function inspect() {
@@ -403,7 +403,7 @@ async function inspect() {
 }
 initial
   .then(inspect)
-  .catch((error) => console.error("Cossmetic detection failed", error))
+  .catch((error) => console.error("Cossplay detection failed", error))
 content.onMessage("inspect", inspect)
 storage.watch(key, (value) => {
   state = readSite(value, origin)

@@ -5,10 +5,10 @@ import {
   parseColor,
   type Token,
   validValue,
-} from "@coss-tweak/theme-core/coss"
-import { Button } from "@coss-tweak/ui/components/button"
-import { Input } from "@coss-tweak/ui/components/input"
-import { cn } from "@coss-tweak/ui/lib/utils"
+} from "@cossplay/theme-core/coss"
+import { Button } from "@cossplay/ui/components/button"
+import { Input } from "@cossplay/ui/components/input"
+import { cn } from "@cossplay/ui/lib/utils"
 import { converter } from "culori"
 import { type ReactNode, useEffect, useRef, useState } from "react"
 import fonts from "@/data/fonts.json"

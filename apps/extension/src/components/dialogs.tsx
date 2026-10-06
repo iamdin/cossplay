@@ -4,16 +4,16 @@ import {
   exportLayout,
   registryTheme,
   type Theme,
-} from "@coss-tweak/theme-core/coss"
-import { Button } from "@coss-tweak/ui/components/button"
+} from "@cossplay/theme-core/coss"
+import { Button } from "@cossplay/ui/components/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@coss-tweak/ui/components/dialog"
-import { Input } from "@coss-tweak/ui/components/input"
-import { Textarea } from "@coss-tweak/ui/components/textarea"
+} from "@cossplay/ui/components/dialog"
+import { Input } from "@cossplay/ui/components/input"
+import { Textarea } from "@cossplay/ui/components/textarea"
 import { useState } from "react"
 import { selectClass } from "@/components/controls"
 import fonts from "@/data/fonts.json"

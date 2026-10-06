@@ -72,10 +72,10 @@ importers:
 
   apps/extension:
     dependencies:
-      '@coss-tweak/theme-core':
+      '@cossplay/theme-core':
         specifier: workspace:*
         version: link:../../packages/theme-core
-      '@coss-tweak/ui':
+      '@cossplay/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@wxt-dev/storage':
@@ -97,7 +97,7 @@ importers:
         specifier: ^5.0.3
         version: 5.0.15(@types/react@19.3.0)(react@19.3.0)(use-sync-external-store@1.7.0(react@19.3.0))
     devDependencies:
-      '@coss-tweak/typescript':
+      '@cossplay/typescript':
         specifier: workspace:*
         version: link:../../tooling/typescript
       '@crxjs/vite-plugin':
@@ -161,7 +161,7 @@ importers:
         specifier: ^4.6.5
         version: 4.6.5
     devDependencies:
-      '@coss-tweak/typescript':
+      '@cossplay/typescript':
         specifier: workspace:*
         version: link:../../tooling/typescript
       '@types/chrome':
@@ -213,7 +213,7 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
     devDependencies:
-      '@coss-tweak/typescript':
+      '@cossplay/typescript':
         specifier: workspace:*
         version: link:../../tooling/typescript
       '@types/react':
