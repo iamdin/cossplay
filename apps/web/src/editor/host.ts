@@ -65,8 +65,12 @@ export function connect() {
     if (!site || !detection) return
     const { overrides } = site.current
     const theme = effective(detection.theme, overrides)
-    // Only overrides are written, so untouched tokens keep coss ui's own values.
-    style.textContent = `${css(":root", variables(theme.light, overrides.light))}\n${css(".dark", variables(theme.dark, overrides.dark))}`
+    // Only the shown mode's overrides, like the extension: untouched tokens keep coss ui's own
+    // values, and `:root:root` outranks both `:root` and `.dark` in editor.css.
+    style.textContent = css(
+      ":root:root",
+      variables(theme[mode], overrides[mode])
+    )
   }
   const unsubscribe = usePanelStore.subscribe(apply)
   document.head.append(style)
