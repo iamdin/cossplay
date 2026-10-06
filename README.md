@@ -45,7 +45,7 @@ From the repository root:
 pnpm + Turborepo monorepo:
 
 - `apps/extension`: the MV3 extension (Vite + CRXJS): side panel (React), content script, service worker
-- `apps/landing`: the static landing page, deployed to Vercel (`pnpm --filter @cossplay/landing deploy`); `deploy:workers` targets Cloudflare Workers
+- `apps/web`: the website (TanStack Start, prerendered to static files in `dist/client`), deployed to Vercel from Git with Root Directory `apps/web`
 - `packages/ui`: shadcn components, `cn` and `globals.css` for the panel
 - `packages/core`: shared logic. `@cossplay/core/coss` holds tokens, site state and history, worker storage and the message protocol; `/coss/import` is the panel-only CSS / JSON importer
 - `packages/core/scripts`: `sync:defaults` regenerates coss defaults from the coss registry style; `sync:tweakcn` regenerates tweakcn defaults, presets and HSL presets from a frozen tweakcn clone
