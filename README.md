@@ -44,9 +44,10 @@ From the repository root:
 
 pnpm + Turborepo monorepo:
 
-- `apps/extension`: the MV3 extension (Vite + CRXJS): side panel (React), content script, service worker
-- `apps/web`: the website (TanStack Start, prerendered to static files in `dist/client`), deployed to Vercel from Git with Root Directory `apps/web`
-- `packages/ui`: shadcn components, `cn` and `globals.css` for the panel
+- `apps/extension`: the MV3 extension (Vite + CRXJS): side panel host, content script, service worker
+- `apps/web`: the website (TanStack Start, prerendered to static files in `dist/client`), deployed to Vercel from Git with Root Directory `apps/web`. `/` is the landing page; `/editor` is the browser theme editor, previewing coss ui particles installed from the `@coss` registry into `src/components`
+- `packages/editor`: the panel (controls, dialogs, store) shared by the extension and the editor; each sets a `Host` for storage, fetching and fonts
+- `packages/ui`: shadcn components, `cn`, `globals.css` (the extension panel) and `base.css` (component styles without theme values) for the panel
 - `packages/core`: shared logic. `@cossplay/core/coss` holds tokens, site state and history, worker storage and the message protocol; `/coss/import` is the panel-only CSS / JSON importer
 - `packages/core/scripts`: `sync:defaults` regenerates coss defaults from the coss registry style; `sync:tweakcn` regenerates tweakcn defaults, presets and HSL presets from a frozen tweakcn clone
 - `tooling/typescript`: shared tsconfig
