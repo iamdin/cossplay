@@ -1,4 +1,4 @@
-import { createStore, readSite, worker } from "@coss-tweak/theme-core/coss"
+import { createStore, readSite, worker } from "@cossplay/core/coss"
 import { storage } from "@wxt-dev/storage"
 
 chrome.sidePanel
@@ -44,7 +44,7 @@ async function syncEarlyScripts() {
   const existing = await chrome.scripting.getRegisteredContentScripts()
   const origins = [...new Set(desired)].sort()
   const scripts = origins.map((origin) => ({
-    id: `coss-tweak-${Array.from(new TextEncoder().encode(origin))
+    id: `cossplay-${Array.from(new TextEncoder().encode(origin))
       .map((n) => n.toString(16).padStart(2, "0"))
       .join("")}`,
     matches: [`${origin}/*`],
@@ -54,7 +54,7 @@ async function syncEarlyScripts() {
   }))
   const ids = new Set(scripts.map((s) => s.id))
   const obsolete = existing
-    .filter((s) => s.id.startsWith("coss-tweak-") && !ids.has(s.id))
+    .filter((s) => s.id.startsWith("cossplay-") && !ids.has(s.id))
     .map((s) => s.id)
   if (obsolete.length)
     await chrome.scripting.unregisterContentScripts({ ids: obsolete })
@@ -114,8 +114,8 @@ worker.onMessage("detected", async ({ data, sender }) => {
   await chrome.action.setTitle({
     tabId,
     title: detected
-      ? "coss tweak — 已检测主题变量"
-      : "coss tweak — 未检测到主题变量",
+      ? "Cossplay — theme variables detected"
+      : "Cossplay — no theme variables detected",
   })
   await chrome.action.setBadgeBackgroundColor({
     tabId,

@@ -29,7 +29,7 @@ test.afterAll(async () => {
 test("panel page renders", async () => {
   const page = await ctx.newPage()
   await page.goto(`chrome-extension://${extId}/sidepanel.html`)
-  await expect(page.getByText("COSS 主题调色")).toBeVisible()
+  await expect(page.getByRole("tab", { name: "Colors" })).toBeVisible()
 })
 
 // A coss-style page: colors declared through var(), color-mix() and --alpha() output.
@@ -105,5 +105,5 @@ test("detects coss variables and applies stored per-origin overrides", async () 
     })
   )
   await expect(cta).toHaveCSS("border-radius", "10px")
-  await expect(page.locator("#coss-tweak-theme")).toHaveCount(0)
+  await expect(page.locator("#cossplay-theme")).toHaveCount(0)
 })

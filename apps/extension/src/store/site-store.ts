@@ -20,11 +20,12 @@ import {
   transition,
   validValue,
   worker,
-} from "@coss-tweak/theme-core/coss"
-import { importTheme } from "@coss-tweak/theme-core/coss/import"
+} from "@cossplay/core/coss"
+import { importTheme } from "@cossplay/core/coss/import"
 import { storage } from "@wxt-dev/storage"
 import { useMemo } from "react"
 import { create } from "zustand"
+import fonts from "@/data/fonts.json"
 
 /**
  * Side panel state for the active tab.
@@ -47,7 +48,7 @@ export const useSiteStore = create<SiteStore>()(() => ({
   site: null,
   detection: null,
   mode: "light",
-  status: "正在连接当前标签页…",
+  status: "Connecting to this tab…",
   error: "",
   locals: [],
 }))
@@ -62,6 +63,16 @@ let loading: AbortController | null = null
 let unwatchSite: (() => void) | null = null
 let pending = 0
 let lastEdit: LastEdit | null = null
+
+export const fontTokens = ["font-sans", "font-serif", "font-mono"] as const
+export const familyOf = (stack: string) =>
+  stack.split(",")[0].replaceAll(/['"]/g, "").trim()
+const currentTheme = () => {
+  const { site, detection } = get()
+  return site && detection
+    ? effective(detection.theme, site.current.overrides)
+    : null
+}
 
 export function useTheme() {
   const site = useSiteStore((s) => s.site)
@@ -93,13 +104,13 @@ async function loadTab(id: number) {
     if (signal.aborted) return
     if (!tab.url?.startsWith("http")) {
       set({
-        status: "打开一个 HTTP(S) 网站来编辑它的主题。",
+        status: "Open an HTTP(S) website to edit its theme.",
         site: null,
         detection: null,
       })
       return
     }
-    set({ status: "正在读取页面原始主题…", error: "" })
+    set({ status: "Reading the original theme…", error: "" })
     // MV3's content script can finish loading after tabs.onUpdated reports complete.
     let response: { detection: Detection } | undefined
     for (let attempt = 0; attempt < 12; attempt++) {
@@ -132,14 +143,14 @@ async function loadTab(id: number) {
       detection,
       mode: site.previewMode ?? detection.mode,
       status: detection.detected
-        ? "已检测到页面主题变量"
-        : "未检测到 coss / shadcn 主题变量",
+        ? "Original theme detected"
+        : "No coss variables detected",
     })
   } catch (e) {
     if (!signal.aborted)
       set({
-        error: `${String(e)}。安装扩展后请刷新页面。`,
-        status: "无法连接此页面",
+        error: `${String(e)}. Reload the page after installing the extension.`,
+        status: "Cannot connect to this page",
         site: null,
         detection: null,
       })
@@ -189,17 +200,17 @@ export function dispatch(edit: Edit, key = "") {
     coalesces(lastEdit, key, current, now)
   )
   lastEdit = { key, at: now, current: JSON.stringify(next.current) }
-  set({ site: next, status: "保存中…" })
+  set({ site: next, status: "Saving…" })
   pending++
   worker
     .sendMessage("edit", { origin: current.origin, edit, baseline, key })
     .then(
       ({ state }) => {
         if (--pending || get().site?.origin !== state.origin) return
-        set({ site: state, status: "已保存到本地" })
+        set({ site: state, status: "Saved locally" })
       },
       (e) => {
-        set({ error: `保存失败：${String(e)}`, status: "未保存" })
+        set({ error: `Could not save: ${String(e)}`, status: "Not saved" })
         if (--pending === 0) resync(current.origin).catch(console.error)
       }
     )
@@ -212,6 +223,11 @@ export function updateToken(token: Token, value: string) {
 }
 export const applyOverrides = (overrides: Overrides, themeId = "") =>
   dispatch({ kind: "theme", overrides, themeId })
+export function reset() {
+  const detection = get().detection
+  if (detection) set({ mode: detection.mode })
+  dispatch({ kind: "reset" })
+}
 export function preview(mode: Mode) {
   set({ mode })
   dispatch({ kind: "preview", mode })
@@ -221,12 +237,19 @@ export const adjust = (hsl: Hsl, continuous = false) =>
 export const syncSidebar = () => dispatch({ kind: "sidebar", mode: get().mode })
 
 /** Fetches a Google font stylesheet once per origin; the content script injects it while a font token uses it. */
-export async function loadFont(family: string, weights: string[]) {
+export async function loadFont(family: string) {
   const signal = lease?.signal
   const origin = get().site?.origin
-  if (!signal || !origin) return
+  const theme = currentTheme()
+  const metadata = fonts.find((f) => f.family === family)
+  if (!signal || !origin || !theme || !metadata) return
+  // A font the page already declares must become an override for the content script to load it.
+  const mode = get().mode
+  for (const token of fontTokens)
+    if (familyOf(theme[mode][token]).toLowerCase() === family.toLowerCase())
+      updateToken(token, theme[mode][token])
   try {
-    const wght = ["400", "700"].filter((w) => weights.includes(w))
+    const wght = ["400", "700"].filter((w) => metadata.weights.includes(w))
     const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}${wght.length ? `:wght@${wght.join(";")}` : ""}&display=swap`
     const { text: css } = await worker.sendMessage("fetch", { url })
     await worker.sendMessage("font", { origin, family, css })
@@ -234,16 +257,16 @@ export async function loadFont(family: string, weights: string[]) {
     const sheet = document.createElement("style")
     sheet.textContent = css
     document.head.append(sheet)
-    set({ status: `已加载 ${family}；网站 CSP 可能限制字体` })
+    set({ status: `Loaded ${family}; site CSP may restrict fonts` })
   } catch (err) {
-    if (!signal.aborted) set({ error: `字体加载失败：${String(err)}` })
+    if (!signal.aborted) set({ error: `Font loading failed: ${String(err)}` })
   }
 }
 
 export function themeOp(op: ThemeOp) {
   worker.sendMessage("themes", { op }).then(
     ({ themes }) => set({ locals: themes }),
-    (e) => set({ error: `本地主题保存失败：${String(e)}` })
+    (e) => set({ error: `Could not save local theme: ${String(e)}` })
   )
 }
 
@@ -261,14 +284,16 @@ export async function importFrom(text: string, rawUrl: string) {
         url.searchParams.get("theme") ??
         url.pathname.split("/").filter(Boolean).at(-1)
       if (!id || id === "editor")
-        throw Error("请使用 tweakcn 主题 registry URL 或带 ID 的主题链接")
+        throw Error(
+          "Use a tweakcn theme registry URL or a theme link with an ID"
+        )
       url.pathname = `/r/themes/${encodeURIComponent(id)}.json`
       url.search = ""
     }
     input = (await worker.sendMessage("fetch", { url: url.href })).text
   }
   if (!signal || signal.aborted)
-    throw Error("目标标签页已切换，请在要编辑的网站上重试导入")
+    throw Error("Target tab changed; retry the import on the selected website")
   applyOverrides(importTheme(input))
   set({ error: "" })
 }

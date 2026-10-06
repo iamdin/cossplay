@@ -12,11 +12,11 @@
   },
   "iconLibrary": "hugeicons",
   "aliases": {
-    "components": "@coss-tweak/ui/components",
-    "utils": "@coss-tweak/ui/lib/utils",
-    "ui": "@coss-tweak/ui/components",
-    "lib": "@coss-tweak/ui/lib",
-    "hooks": "@coss-tweak/ui/hooks"
+    "components": "@cossplay/ui/components",
+    "utils": "@cossplay/ui/lib/utils",
+    "ui": "@cossplay/ui/components",
+    "lib": "@cossplay/ui/lib",
+    "hooks": "@cossplay/ui/hooks"
   },
   "menuColor": "default",
   "menuAccent": "subtle",
