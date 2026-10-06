@@ -3,7 +3,7 @@ import {
   AccordionItem,
   AccordionPanel,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@cossplay/ui/components/accordion"
 
 export default function Particle() {
   const items = [

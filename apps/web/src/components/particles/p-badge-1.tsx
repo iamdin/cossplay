@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@cossplay/ui/components/badge"
 
 export default function Particle() {
   return <Badge>Badge</Badge>

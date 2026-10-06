@@ -4,7 +4,7 @@ import {
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@cossplay/ui/components/select"
 
 const items = [
   { label: "Next.js", value: "next" },

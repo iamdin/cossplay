@@ -8,7 +8,13 @@ import {
 } from "@cossplay/core/coss"
 import { Button } from "@cossplay/ui/components/button"
 import { Input } from "@cossplay/ui/components/input"
-import { cn } from "@cossplay/ui/lib/utils"
+import {
+  Select,
+  SelectItem,
+  SelectPopup,
+  SelectTrigger,
+  SelectValue,
+} from "@cossplay/ui/components/select"
 import { converter } from "culori"
 import { ChevronRight, SlidersHorizontal } from "lucide-react"
 import { type ReactNode, useEffect, useRef, useState } from "react"
@@ -17,9 +23,6 @@ import { familyOf } from "./store"
 
 export const title = (key: string) =>
   key.replaceAll("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())
-
-export const selectClass =
-  "h-8 min-w-0 border border-input bg-background px-2 text-xs outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 dark:bg-input/30"
 
 /** Collapsible group, labelled by a small chip like tweakcn's. */
 export function Section({
@@ -140,7 +143,8 @@ export function ColorControl({
           data-token={token}
           aria-label={`${name} value`}
           aria-invalid={!validValue(token, draft)}
-          className="h-7 w-36 shrink-0 bg-muted/40 px-1.5 font-mono text-[10px]"
+          size="sm"
+          className="w-36 shrink-0 font-mono text-xs sm:text-xs"
           spellCheck={false}
           value={draft}
           onFocus={focus}
@@ -279,7 +283,8 @@ export function NumericControl({
           data-token={token}
           aria-label={`${name} value`}
           aria-invalid={!validValue(token, normalize(draft))}
-          className="h-7 w-20 px-1.5 text-right font-mono text-[11px]"
+          size="sm"
+          className="w-20 font-mono text-xs sm:text-xs [&_input]:text-right"
           value={draft}
           onFocus={focus}
           onChange={(e) => {
@@ -352,25 +357,35 @@ export function FontControl({
         >
           {name}
         </label>
-        <select
-          aria-label={`${name} font category`}
-          className={cn(selectClass, "h-7 text-[11px]")}
+        <Select
+          items={categories.map((c) => ({ value: c, label: title(c) }))}
           value={category}
-          onChange={(e) => setCategory(e.currentTarget.value)}
+          onValueChange={(value) => value && setCategory(value)}
         >
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {title(c)}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger
+            size="sm"
+            aria-label={`${name} font category`}
+            className="w-32 min-w-0 text-sm"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPopup>
+            {categories.map((c) => (
+              <SelectItem key={c} value={c}>
+                {title(c)}
+              </SelectItem>
+            ))}
+          </SelectPopup>
+        </Select>
       </div>
       <Input
+        className="text-sm"
         id={`value-${token}`}
         data-token={token}
         aria-label={`${name} value`}
         aria-invalid={!validValue(token, draft)}
         list={`fonts-${token}`}
+        size="sm"
         value={draft}
         onFocus={() => {
           focus()

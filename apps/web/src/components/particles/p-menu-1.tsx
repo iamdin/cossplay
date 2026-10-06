@@ -1,11 +1,4 @@
-import {
-  PauseIcon,
-  PlayIcon,
-  SkipBackIcon,
-  SkipForwardIcon,
-  TrashIcon,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@cossplay/ui/components/button"
 import {
   Menu,
   MenuCheckboxItem,
@@ -21,7 +14,14 @@ import {
   MenuSubPopup,
   MenuSubTrigger,
   MenuTrigger,
-} from "@/components/ui/menu"
+} from "@cossplay/ui/components/menu"
+import {
+  PauseIcon,
+  PlayIcon,
+  SkipBackIcon,
+  SkipForwardIcon,
+  TrashIcon,
+} from "lucide-react"
 
 export default function Particle() {
   return (

@@ -1,5 +1,9 @@
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipPopup, TooltipTrigger } from "@/components/ui/tooltip"
+import { Button } from "@cossplay/ui/components/button"
+import {
+  Tooltip,
+  TooltipPopup,
+  TooltipTrigger,
+} from "@cossplay/ui/components/tooltip"
 
 export default function Particle() {
   return (

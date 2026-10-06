@@ -5,7 +5,7 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "src/styles/editor.css",
+    "css": "../../packages/ui/src/styles/globals.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""
@@ -13,10 +13,10 @@
   "iconLibrary": "lucide",
   "aliases": {
     "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "utils": "@cossplay/ui/lib/utils",
+    "ui": "@cossplay/ui/components",
+    "lib": "@cossplay/ui/lib",
+    "hooks": "@cossplay/ui/hooks"
   },
   "registries": {
     "@coss": "https://coss.com/ui/r/{name}.json"

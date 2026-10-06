@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@cossplay/ui/components/button"
 import {
   Dialog,
   DialogClose,
@@ -9,10 +9,10 @@ import {
   DialogPopup,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Field, FieldLabel } from "@/components/ui/field"
-import { Form } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@cossplay/ui/components/dialog"
+import { Field, FieldLabel } from "@cossplay/ui/components/field"
+import { Form } from "@cossplay/ui/components/form"
+import { Input } from "@cossplay/ui/components/input"
 
 export default function Particle() {
   return (

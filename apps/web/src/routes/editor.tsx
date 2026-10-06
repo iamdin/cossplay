@@ -7,10 +7,15 @@ import {
   useUndoShortcuts,
 } from "@cossplay/editor/panel"
 import { usePanelStore } from "@cossplay/editor/store"
+import {
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@cossplay/ui/components/tabs"
+import { ToastProvider } from "@cossplay/ui/components/toast"
 import { createFileRoute } from "@tanstack/react-router"
 import { useEffect } from "react"
-import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs"
-import { ToastProvider } from "@/components/ui/toast"
 import { Components, Typography } from "@/editor/gallery"
 import { connect } from "@/editor/host"
 import styles from "@/styles/editor.css?url"

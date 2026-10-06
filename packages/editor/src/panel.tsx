@@ -4,6 +4,7 @@ import {
   contrast,
   contrastPairs,
   defaults,
+  effective,
   groups,
   hslPresets,
   presetOverrides,
@@ -12,6 +13,13 @@ import {
 } from "@cossplay/core/coss"
 import { Button } from "@cossplay/ui/components/button"
 import { Input } from "@cossplay/ui/components/input"
+import {
+  Select,
+  SelectItem,
+  SelectPopup,
+  SelectTrigger,
+  SelectValue,
+} from "@cossplay/ui/components/select"
 import {
   Tabs,
   TabsContent,
@@ -30,13 +38,7 @@ import {
   X,
 } from "lucide-react"
 import { useEffect, useState } from "react"
-import {
-  ColorControl,
-  FontControl,
-  NumericControl,
-  Section,
-  selectClass,
-} from "./controls"
+import { ColorControl, FontControl, NumericControl, Section } from "./controls"
 import { ExportDialog, ImportDialog } from "./dialogs"
 import {
   adjust,
@@ -66,6 +68,12 @@ const shadowTokens = [
   "shadow-offset-x",
   "shadow-offset-y",
 ] as const
+const formatItems: { value: ColorFormat; label: string }[] = [
+  { value: "hex", label: "HEX" },
+  { value: "oklch", label: "OKLCH" },
+  { value: "hsl", label: "HSL" },
+  { value: "rgb", label: "RGB" },
+]
 const muted = "text-[10px] leading-relaxed text-muted-foreground"
 
 function usePanel() {
@@ -102,28 +110,81 @@ export function useUndoShortcuts() {
   }, [])
 }
 
+const swatchTokens = ["primary", "secondary", "accent", "border"] as const
+const presetItems = [
+  { value: "default", label: "Default coss" },
+  ...Object.entries(presets).map(([value, { label }]) => ({ value, label })),
+]
+const presetSwatches = new Map<string, string[]>()
+function swatchesOf(id: string) {
+  let colors = presetSwatches.get(id)
+  if (!colors) {
+    const light = effective(defaults, presetOverrides(id)).light
+    colors = swatchTokens.map((token) => light[token])
+    presetSwatches.set(id, colors)
+  }
+  return colors
+}
+
+function Swatches({ colors }: { colors: string[] }) {
+  return (
+    <span className="flex shrink-0 gap-0.5">
+      {colors.map((color, i) => (
+        <span
+          // biome-ignore lint/suspicious/noArrayIndexKey: fixed token order
+          key={i}
+          className="size-3 rounded-sm border border-black/10"
+          style={{ background: color }}
+        />
+      ))}
+    </span>
+  )
+}
+
 /** Preset picker and "discard edits to this preset". */
 export function PresetSelect() {
-  const { site, detected } = usePanel()
+  const { site, mode, detected } = usePanel()
+  const theme = useTheme()
+  const themeId = site?.current.themeId ?? ""
+  const overrides = site?.current.overrides
+  const edited =
+    !!overrides &&
+    Object.keys(overrides.light).length + Object.keys(overrides.dark).length > 0
   return (
     <>
-      <select
-        aria-label="Theme preset"
-        className={cn(selectClass, "min-w-0 flex-1")}
+      <Select
+        items={[
+          {
+            value: "",
+            label: edited ? "Custom" : "Choose a preset",
+          },
+          ...presetItems,
+        ]}
+        value={themeId}
         disabled={!detected}
-        value={site?.current.themeId ?? ""}
-        onChange={(e) =>
-          e.currentTarget.value && applyPreset(e.currentTarget.value)
-        }
+        onValueChange={(id) => id && applyPreset(id)}
       >
-        <option value="">Custom</option>
-        <option value="default">Default coss</option>
-        {Object.entries(presets).map(([id, preset]) => (
-          <option key={id} value={id}>
-            {preset.label}
-          </option>
-        ))}
-      </select>
+        <SelectTrigger
+          size="sm"
+          aria-label="Theme preset"
+          className="min-w-0 flex-1 text-sm"
+        >
+          {theme && (
+            <Swatches colors={swatchTokens.map((t) => theme[mode][t])} />
+          )}
+          <SelectValue />
+        </SelectTrigger>
+        <SelectPopup alignItemWithTrigger={false}>
+          {presetItems.map(({ value, label }) => (
+            <SelectItem key={value} value={value}>
+              <span className="flex items-center gap-2">
+                <Swatches colors={swatchesOf(value)} />
+                {label}
+              </span>
+            </SelectItem>
+          ))}
+        </SelectPopup>
+      </Select>
       <Button
         size="icon-sm"
         variant="ghost"
@@ -282,22 +343,33 @@ export function PanelSections() {
         >
           <div className="mb-3 flex items-center gap-2">
             <Input
+              className="text-sm"
+              size="sm"
               aria-label="Search colors"
               placeholder="Search colors…"
               value={search}
               onChange={(e) => setSearch(e.currentTarget.value)}
             />
-            <select
-              aria-label="Color format"
-              className={cn(selectClass, "w-20 font-semibold text-[10px]")}
+            <Select
+              items={formatItems}
               value={format}
-              onChange={(e) => setFormat(e.currentTarget.value as ColorFormat)}
+              onValueChange={(value) => value && setFormat(value)}
             >
-              <option value="hex">HEX</option>
-              <option value="oklch">OKLCH</option>
-              <option value="hsl">HSL</option>
-              <option value="rgb">RGB</option>
-            </select>
+              <SelectTrigger
+                size="sm"
+                aria-label="Color format"
+                className="w-24 min-w-0 text-sm"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectPopup>
+                {formatItems.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectPopup>
+            </Select>
           </div>
           {Object.entries(groups).map(([group, keys]) => {
             const filtered = keys.filter((k) => !search || matches(group, k))
@@ -538,6 +610,8 @@ export function PanelSections() {
             </p>
             <div className="flex gap-2">
               <Input
+                className="text-sm"
+                size="sm"
                 aria-label="Local theme name"
                 placeholder="Theme name"
                 maxLength={100}
@@ -565,6 +639,8 @@ export function PanelSections() {
               className="mb-2 border bg-card p-2"
             >
               <Input
+                className="text-sm"
+                size="sm"
                 aria-label={`Rename ${local.name}`}
                 maxLength={100}
                 defaultValue={local.name}
@@ -649,9 +725,13 @@ export function Panel({ liveSite = false }: { liveSite?: boolean }) {
   useUndoShortcuts()
   return (
     <div className="flex h-full flex-col overflow-hidden bg-background text-foreground text-xs">
-      <div className="flex shrink-0 items-center gap-1 border-b px-2 py-1.5">
-        <PresetSelect />
-        <HistoryActions liveSite={liveSite} />
+      <div className="shrink-0 border-b px-2 py-1.5">
+        <div className="flex items-center gap-1">
+          <PresetSelect />
+        </div>
+        <div className="mt-1 flex items-center justify-end gap-1">
+          <HistoryActions liveSite={liveSite} />
+        </div>
       </div>
       <PanelAlerts />
       <PanelSections />

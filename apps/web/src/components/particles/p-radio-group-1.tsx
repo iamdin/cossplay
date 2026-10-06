@@ -1,5 +1,5 @@
-import { Label } from "@/components/ui/label"
-import { Radio, RadioGroup } from "@/components/ui/radio-group"
+import { Label } from "@cossplay/ui/components/label"
+import { Radio, RadioGroup } from "@cossplay/ui/components/radio-group"
 
 export default function Particle() {
   return (
