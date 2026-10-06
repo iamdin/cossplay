@@ -34,8 +34,8 @@ Open `chrome://extensions`, enable Developer mode, choose **Load unpacked** and 
 
 From the repository root:
 
-- `pnpm dev`: CRXJS dev mode with HMR
-- `pnpm build`: build the extension into `apps/extension/dist`
+- `pnpm dev`: CRXJS dev mode with HMR for the extension, plus the web dev server
+- `pnpm build`: build the extension into `apps/extension/dist` and the website into `apps/web/dist/client`
 - `pnpm check:type`, `pnpm format`, `pnpm lint` (append `:fix` to fix)
 - `pnpm test`: core unit tests
 - `pnpm test:e2e`: build, then run the Playwright tests
