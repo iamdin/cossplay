@@ -10,6 +10,7 @@ import { Button } from "@cossplay/ui/components/button"
 import { Input } from "@cossplay/ui/components/input"
 import { cn } from "@cossplay/ui/lib/utils"
 import { converter } from "culori"
+import { ChevronRight, SlidersHorizontal } from "lucide-react"
 import { type ReactNode, useEffect, useRef, useState } from "react"
 import fonts from "./fonts.json"
 import { familyOf } from "./store"
@@ -20,7 +21,7 @@ export const title = (key: string) =>
 export const selectClass =
   "h-8 min-w-0 border border-input bg-background px-2 text-xs outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 dark:bg-input/30"
 
-/** Collapsible card section. */
+/** Collapsible group, labelled by a small chip like tweakcn's. */
 export function Section({
   label,
   count,
@@ -33,22 +34,15 @@ export function Section({
   children: ReactNode
 }) {
   return (
-    <details
-      className="group mb-2 overflow-hidden border bg-card text-card-foreground"
-      open={open}
-    >
-      <summary className="flex cursor-pointer select-none items-center gap-1.5 px-2 py-2 font-medium text-xs group-open:border-b [&::-webkit-details-marker]:hidden">
-        <span className="w-2 text-muted-foreground transition-transform group-open:rotate-90">
-          ›
-        </span>
+    <details className="group mb-1.5" open={open}>
+      <summary className="inline-flex cursor-pointer select-none items-center gap-1 rounded-md border px-1.5 py-0.5 font-medium text-[10px] text-muted-foreground uppercase tracking-wide hover:text-foreground [&::-webkit-details-marker]:hidden">
+        <ChevronRight className="size-3 transition-transform group-open:rotate-90" />
         {label}
         {count !== undefined && (
-          <span className="ml-auto font-normal text-[10px] text-muted-foreground">
-            {count}
-          </span>
+          <span className="font-normal normal-case opacity-70">{count}</span>
         )}
       </summary>
-      {children}
+      <div className="pt-1.5">{children}</div>
     </details>
   )
 }
@@ -86,6 +80,7 @@ export function ColorControl({
   const shown = formatColor(value, format)
   const { draft, setDraft, focus, blur } = useDraft(shown)
   const [copyStatus, setCopyStatus] = useState("")
+  const [expanded, setExpanded] = useState(false)
   const parsed = parseColor(value)!
   const hsl = converter("hsl")(parsed)!
   const oklch = converter("oklch")(parsed)!
@@ -120,18 +115,12 @@ export function ColorControl({
   }
   const name = title(token)
   return (
-    <div className="border-b px-2 py-2 last:border-b-0" data-control={token}>
+    <div className="py-1" data-control={token}>
       <div className="flex items-center gap-2">
-        <label
-          htmlFor={`value-${token}`}
-          className="min-w-20 flex-1 text-[11px] text-muted-foreground"
-        >
-          {name}
-        </label>
         <input
           type="color"
           aria-label={`${name} picker`}
-          className="size-7 shrink-0 cursor-pointer border bg-background p-0.5"
+          className="size-7 shrink-0 cursor-pointer rounded-md border bg-background p-0.5"
           value={formatColor(value, "hex").slice(0, 7)}
           onChange={(e) => {
             const c = converter("rgb")(e.currentTarget.value)!
@@ -140,12 +129,18 @@ export function ColorControl({
             )
           }}
         />
+        <label
+          htmlFor={`value-${token}`}
+          className="min-w-0 flex-1 truncate text-[11px]"
+        >
+          {name}
+        </label>
         <Input
           id={`value-${token}`}
           data-token={token}
           aria-label={`${name} value`}
           aria-invalid={!validValue(token, draft)}
-          className="h-7 w-32 shrink-0 bg-muted/40 px-1.5 font-mono text-[10px]"
+          className="h-7 w-36 shrink-0 bg-muted/40 px-1.5 font-mono text-[10px]"
           spellCheck={false}
           value={draft}
           onFocus={focus}
@@ -159,14 +154,21 @@ export function ColorControl({
             setDraft(shown)
           }}
         />
-      </div>
-      <details className="pt-1 text-[10px] text-muted-foreground">
-        <summary
-          className="cursor-pointer text-[9px]"
+        <Button
+          size="icon-xs"
+          variant="ghost"
           aria-label={`${name} channels`}
+          aria-expanded={expanded}
+          title="Channels & opacity"
+          onClick={() => setExpanded(!expanded)}
         >
-          Channels & opacity
-        </summary>
+          <SlidersHorizontal />
+        </Button>
+      </div>
+      <div
+        hidden={!expanded}
+        className="mt-1 ml-9 text-[10px] text-muted-foreground"
+      >
         {channels.map((c, i) => (
           <label key={c.name} className="mt-1 flex items-center gap-1.5">
             <span className="w-16">{c.name}</span>
@@ -226,7 +228,7 @@ export function ColorControl({
           </Button>
           <span role="status">{copyStatus}</span>
         </div>
-      </details>
+      </div>
     </div>
   )
 }
