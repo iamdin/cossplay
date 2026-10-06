@@ -23,7 +23,7 @@ export function cssInstaller(
       } catch (error) {
         // Allow an identical later request to retry unless a newer one is already queued.
         if (requested === css) requested = installed
-        console.error("coss tweak CSS injection failed", error)
+        console.error("Cossplay CSS injection failed", error)
       }
       settled()
     })

@@ -1,4 +1,4 @@
-# coss tweak
+# Cossplay
 
 A Chrome extension that live-edits the theme variables of any website built with [coss ui](https://coss.com/ui) (or shadcn-style variables) from a docked side panel. It has the same editing model as [Shadify](https://github.com/oxwen11/shadify), on coss ui's token set.
 
@@ -34,10 +34,10 @@ Open `chrome://extensions`, enable Developer mode, choose **Load unpacked** and 
 
 From the repository root:
 
-- `pnpm dev`: CRXJS dev mode with HMR
-- `pnpm build`: build the extension into `apps/extension/dist`
+- `pnpm dev`: CRXJS dev mode with HMR for the extension, plus the web dev server
+- `pnpm build`: build the extension into `apps/extension/dist` and the website into `apps/web/dist/client`
 - `pnpm check:type`, `pnpm format`, `pnpm lint` (append `:fix` to fix)
-- `pnpm test`: theme-core unit tests
+- `pnpm test`: core unit tests
 - `pnpm test:e2e`: build, then run the Playwright tests
 
 ## Layout
@@ -45,9 +45,10 @@ From the repository root:
 pnpm + Turborepo monorepo:
 
 - `apps/extension`: the MV3 extension (Vite + CRXJS): side panel (React), content script, service worker
+- `apps/web`: the website (TanStack Start, prerendered to static files in `dist/client`), deployed to Vercel from Git with Root Directory `apps/web`
 - `packages/ui`: shadcn components, `cn` and `globals.css` for the panel
-- `packages/theme-core`: shared logic. `@coss-tweak/theme-core/coss` holds tokens, site state and history, worker storage and the message protocol; `/coss/import` is the panel-only CSS / JSON importer
-- `packages/theme-core/scripts`: `sync:defaults` regenerates coss defaults from the coss registry style; `sync:tweakcn` regenerates tweakcn defaults, presets and HSL presets from a frozen tweakcn clone
+- `packages/core`: shared logic. `@cossplay/core/coss` holds tokens, site state and history, worker storage and the message protocol; `/coss/import` is the panel-only CSS / JSON importer
+- `packages/core/scripts`: `sync:defaults` regenerates coss defaults from the coss registry style; `sync:tweakcn` regenerates tweakcn defaults, presets and HSL presets from a frozen tweakcn clone
 - `tooling/typescript`: shared tsconfig
 
 ## Credits

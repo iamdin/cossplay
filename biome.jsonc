@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!**/public", "!**/*.json.tmp"]
+    "includes": ["**", "!**/public", "!**/*.json.tmp", "!**/routeTree.gen.ts"]
   },
   "assist": {
     "actions": {
