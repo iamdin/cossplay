@@ -4,6 +4,7 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router"
+import { Analytics } from "@vercel/analytics/react"
 import type { ReactNode } from "react"
 
 const icon =
@@ -29,6 +30,7 @@ function RootDocument({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <Analytics />
         <Scripts />
       </body>
     </html>
