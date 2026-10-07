@@ -130,8 +130,19 @@ export function updateToken(token: Token, value: string) {
   if (validValue(token, value))
     dispatch({ kind: "token", mode, token, value }, `${mode}:${token}`)
 }
-export const applyOverrides = (overrides: Overrides, themeId = "") =>
+/** Applies a whole theme (preset or import) and loads its Google fonts. */
+export function applyOverrides(overrides: Overrides, themeId = "") {
   dispatch({ kind: "theme", overrides, themeId })
+  const families = new Set(
+    [overrides.light, overrides.dark].flatMap((values) =>
+      fontTokens.flatMap((token) => {
+        const value = values[token]
+        return value ? [familyOf(value)] : []
+      })
+    )
+  )
+  for (const family of families) fetchFont(family)
+}
 export function reset() {
   const detection = get().detection
   if (detection) set({ mode: detection.mode })
@@ -145,28 +156,42 @@ export const adjust = (hsl: Hsl, continuous = false) =>
   dispatch({ kind: "hsl", hsl }, continuous ? "hsl" : "")
 export const syncSidebar = () => dispatch({ kind: "sidebar", mode: get().mode })
 
-/** Fetches a Google font stylesheet once per origin and loads it into the panel too. */
+/** Loads a Google font the user picked, also when the page already declares it. */
 export async function loadFont(family: string) {
-  const origin = get().site?.origin
   const theme = currentTheme()
-  const metadata = fonts.find((f) => f.family === family)
-  if (!host || !origin || !theme || !metadata) return
+  if (!theme) return
   // A font the page already declares must become an override for the host to load it.
   const mode = get().mode
   for (const token of fontTokens)
     if (familyOf(theme[mode][token]).toLowerCase() === family.toLowerCase())
       updateToken(token, theme[mode][token])
+  await fetchFont(family)
+}
+
+const fetched = new Set<string>()
+/** Fetches a Google font stylesheet once per origin, stores it for the host and loads it here. */
+async function fetchFont(family: string) {
+  const origin = get().site?.origin
+  const metadata = fonts.find(
+    (f) => f.family.toLowerCase() === family.toLowerCase()
+  )
+  if (!host || !origin || !metadata) return
+  const key = `${origin} ${metadata.family}`
+  if (fetched.has(key)) return
+  fetched.add(key)
   try {
     const wght = ["400", "700"].filter((w) => metadata.weights.includes(w))
-    const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}${wght.length ? `:wght@${wght.join(";")}` : ""}&display=swap`
+    const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(metadata.family)}${wght.length ? `:wght@${wght.join(";")}` : ""}&display=swap`
     const css = await host.fetchText(url)
-    await host.font(origin, family, css)
-    if (get().site?.origin !== origin) return
+    await host.font(origin, metadata.family, css)
+    // The panel moved to another origin; load it here again when it comes back.
+    if (get().site?.origin !== origin) return void fetched.delete(key)
     const sheet = document.createElement("style")
     sheet.textContent = css
     document.head.append(sheet)
-    set({ status: `Loaded ${family}` })
+    set({ status: `Loaded ${metadata.family}` })
   } catch (err) {
+    fetched.delete(key)
     if (get().site?.origin === origin)
       set({ error: `Font loading failed: ${String(err)}` })
   }
