@@ -33,3 +33,6 @@ playwright-report
 # TypeScript
 *.tsbuildinfo
 .vercel
+
+# Chrome Web Store package
+apps/extension/*.zip

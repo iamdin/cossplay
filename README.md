@@ -32,6 +32,8 @@ pnpm build
 
 Open `chrome://extensions`, enable Developer mode, choose **Load unpacked** and select `apps/extension/dist`. Visit a coss ui site (for example `https://coss.com/ui`) and click the extension icon to open the side panel.
 
+For the Chrome Web Store package, listing text and images, see [`docs/store/listing.md`](docs/store/listing.md).
+
 ## Development
 
 From the repository root:
