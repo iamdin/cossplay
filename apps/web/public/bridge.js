@@ -9,17 +9,21 @@
   if (window.parent === window || window.__cossplayBridge) return
   window.__cossplayBridge = true
 
+  // Vercel preview domains are left out: anyone can name a project "<x>-kyriedin".
   const trusted = (origin) =>
     origin === "https://cossplay.vercel.app" ||
-    /^https:\/\/[a-z0-9-]+-kyriedin\.vercel\.app$/.test(origin) ||
     /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
 
   // coss ui declares these on :root; --info, --success and --warning are beyond shadcn/ui's set.
+  // The bridge's own theme declares them too, so it is switched off while probing.
   const usesCoss = () => {
+    if (style.sheet) style.sheet.disabled = true
     const root = getComputedStyle(document.documentElement)
-    return ["--background", "--primary", "--info", "--success", "--warning"].every(
+    const found = ["--background", "--primary", "--info", "--success", "--warning"].every(
       (name) => root.getPropertyValue(name).trim() !== ""
     )
+    if (style.sheet) style.sheet.disabled = false
+    return found
   }
 
   const style = document.createElement("style")
