@@ -16,6 +16,7 @@ import {
 import { ToastProvider } from "@cossplay/ui/components/toast"
 import { createFileRoute } from "@tanstack/react-router"
 import { useEffect } from "react"
+import { CustomPreview } from "@/editor/custom"
 import { Components, Typography } from "@/editor/gallery"
 import { connect } from "@/editor/host"
 import styles from "@/styles/editor.css?url"
@@ -87,6 +88,7 @@ function Editor() {
                 <TabsList aria-label="Preview">
                   <TabsTab value="components">Components</TabsTab>
                   <TabsTab value="typography">Typography</TabsTab>
+                  <TabsTab value="custom">Custom</TabsTab>
                 </TabsList>
               </div>
               <TabsPanel
@@ -100,6 +102,9 @@ function Editor() {
                 className="m-4 mt-2 min-h-0 flex-1 overflow-y-auto rounded-xl border"
               >
                 <Typography />
+              </TabsPanel>
+              <TabsPanel value="custom" className="min-h-0 flex-1">
+                <CustomPreview />
               </TabsPanel>
             </Tabs>
           </main>
