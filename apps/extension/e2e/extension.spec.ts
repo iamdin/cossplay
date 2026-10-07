@@ -1,7 +1,13 @@
 import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
-import { type BrowserContext, chromium, expect, test } from "@playwright/test"
+import {
+  type BrowserContext,
+  chromium,
+  expect,
+  type Page,
+  test,
+} from "@playwright/test"
 
 const extPath = path.resolve(import.meta.dirname, "../dist")
 let ctx: BrowserContext
@@ -161,5 +167,101 @@ test("inspect mode reports the picked token over the inspector port", async () =
   await expect.poll(state).toEqual({
     picks: ["primary-foreground"],
     disconnected: true,
+  })
+})
+
+// The side panel at its docked width, driving a real tab. Only the docking is stood in for:
+// the panel's "active tab of its window" query returns the site's tab.
+test.describe("side panel", () => {
+  let site: Page
+  let panel: Page
+  const errors: string[] = []
+  const primary = () =>
+    site.evaluate(() =>
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--primary")
+        .trim()
+    )
+
+  test.beforeAll(async () => {
+    site = await ctx.newPage()
+    await site.route("http://panel.test/**", (route) =>
+      route.fulfill({
+        contentType: "text/html",
+        body: COSS_PAGE.replace(
+          '<button id="cta">',
+          '<button id="cta" class="bg-primary text-primary-foreground">'
+        ),
+      })
+    )
+    await site.goto("http://panel.test/")
+    panel = await ctx.newPage()
+    await panel.setViewportSize({ width: 400, height: 900 })
+    await panel.addInitScript(() => {
+      const query = chrome.tabs.query.bind(chrome.tabs)
+      chrome.tabs.query = ((info: chrome.tabs.QueryInfo) =>
+        query(
+          info.active && info.currentWindow
+            ? { url: "http://panel.test/*" }
+            : info
+        )) as typeof chrome.tabs.query
+    })
+    panel.on("pageerror", (e) => errors.push(e.message))
+    panel.on("console", (m) => {
+      if (m.type() === "error") errors.push(m.text())
+    })
+    await panel.goto(`chrome-extension://${extId}/sidepanel.html`)
+  })
+  test.afterEach(() => expect(errors).toEqual([]))
+
+  test("preset picker and Tailwind palette theme the site", async () => {
+    const trigger = panel.getByLabel("Theme preset")
+    await expect(trigger).toBeEnabled({ timeout: 10_000 })
+    const initial = await primary()
+    await trigger.click()
+    await panel.getByPlaceholder("Search presets…").fill("doom")
+    await panel.getByRole("option", { name: "Doom 64" }).click()
+    await expect(trigger).toContainText("Doom 64")
+    await expect.poll(primary).not.toBe(initial)
+    const preset = await primary()
+
+    await panel
+      .getByRole("button", { name: "Primary Tailwind colors", exact: true })
+      .click()
+    const red = panel.getByRole("button", { name: "red-500", exact: true })
+    // The palette fits the panel.
+    await expect
+      .poll(async () => {
+        const box = await red.boundingBox()
+        return box ? box.x + box.width : Number.POSITIVE_INFINITY
+      })
+      .toBeLessThanOrEqual(400)
+    await red.click()
+    await panel.keyboard.press("Escape")
+    await expect(trigger).toHaveText("Custom")
+    await expect.poll(primary).not.toBe(preset)
+
+    await panel.getByRole("button", { name: "Next preset" }).click()
+    await expect(trigger).not.toHaveText("Custom")
+  })
+
+  test("an inspector pick on the site focuses the panel's control", async () => {
+    const search = panel.getByLabel("Search colors")
+    await search.fill("chart")
+    const toggle = panel.getByRole("button", { name: "Inspect" })
+    await toggle.click()
+    await expect(toggle).toHaveAttribute("aria-pressed", "true")
+    const card = site.locator("cossplay-inspector .card")
+    await expect(async () => {
+      await site.locator("#cta").hover({ position: { x: 2, y: 2 } })
+      await expect(card).toBeVisible({ timeout: 500 })
+    }).toPass()
+    await card.getByTitle("Edit primary", { exact: true }).click()
+    await expect(panel.locator('input[data-token="primary"]')).toBeFocused()
+    await expect(search).toHaveValue("")
+
+    await site.keyboard.press("Escape")
+    await expect(site.locator("cossplay-inspector")).toHaveCount(0)
+    await expect(toggle).toHaveAttribute("aria-pressed", "false")
   })
 })
