@@ -130,7 +130,7 @@ export function updateToken(token: Token, value: string) {
   if (validValue(token, value))
     dispatch({ kind: "token", mode, token, value }, `${mode}:${token}`)
 }
-/** Applies a whole theme (preset, import, saved theme) and loads its Google fonts. */
+/** Applies a whole theme (preset or import) and loads its Google fonts. */
 export function applyOverrides(overrides: Overrides, themeId = "") {
   dispatch({ kind: "theme", overrides, themeId })
   const families = new Set(
@@ -184,7 +184,8 @@ async function fetchFont(family: string) {
     const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(metadata.family)}${wght.length ? `:wght@${wght.join(";")}` : ""}&display=swap`
     const css = await host.fetchText(url)
     await host.font(origin, metadata.family, css)
-    if (get().site?.origin !== origin) return
+    // The panel moved to another origin; load it here again when it comes back.
+    if (get().site?.origin !== origin) return void fetched.delete(key)
     const sheet = document.createElement("style")
     sheet.textContent = css
     document.head.append(sheet)
