@@ -31,6 +31,7 @@ import { Cards } from "@/editor/cards"
 import { Dashboard } from "@/editor/dashboard"
 import { Components, Typography } from "@/editor/gallery"
 import { connect } from "@/editor/host"
+import { PreviewInspector } from "@/editor/inspect"
 import { Mail } from "@/editor/mail"
 import { Marketing } from "@/editor/marketing"
 import { Palette } from "@/editor/palette"
@@ -158,6 +159,7 @@ function Editor() {
               >
                 {status}
               </span>
+              <PreviewInspector />
               <HistoryActions />
               <span className="mx-2 h-5 w-px bg-border" />
               <ImportExport />

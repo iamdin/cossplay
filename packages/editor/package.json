@@ -6,6 +6,7 @@
   "exports": {
     "./panel": "./src/panel.tsx",
     "./store": "./src/store.ts",
+    "./inspect": "./src/inspect.tsx",
     "./panel.css": "./src/panel.css"
   },
   "scripts": {

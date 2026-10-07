@@ -1,25 +1,6 @@
 import { defaults, groups } from "@cossplay/core/coss"
+import { focusControl } from "@cossplay/editor/inspect"
 import { usePanelStore, useTheme } from "@cossplay/editor/store"
-
-/** Shows the panel's Colors tab, opens the token's section and focuses its value field. */
-function focusToken(token: string) {
-  const find = () =>
-    document.querySelector<HTMLInputElement>(`input[data-token="${token}"]`)
-  if (!find())
-    document
-      .querySelector<HTMLElement>(
-        '[aria-label="Editor sections"] [role="tab"]:first-child'
-      )
-      ?.click()
-  requestAnimationFrame(() => {
-    const input = find()
-    if (!input) return
-    const section = input.closest("details")
-    if (section) section.open = true
-    input.scrollIntoView({ block: "center", behavior: "smooth" })
-    input.focus({ preventScroll: true })
-  })
-}
 
 // Every color token of the shown mode, grouped like the panel; a swatch jumps to its control.
 export function Palette() {
@@ -38,7 +19,7 @@ export function Palette() {
                 key={token}
                 type="button"
                 title={`Edit ${token}`}
-                onClick={() => focusToken(token)}
+                onClick={() => focusControl(token)}
                 className="cursor-pointer overflow-hidden rounded-lg border bg-card text-left text-card-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <span
