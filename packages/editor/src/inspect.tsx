@@ -1,13 +1,22 @@
 import type { Token } from "@cossplay/core/coss"
 import { Toggle } from "@cossplay/ui/components/toggle"
 import { SquareDashedMousePointer } from "lucide-react"
-import type { Ref } from "react"
+import { type Ref, useEffect } from "react"
 import { fontTokens, usePanelStore } from "./store"
 
 /** Turns inspect mode on and off; the host decides what gets inspected. */
 export function InspectToggle({ ref }: { ref?: Ref<HTMLButtonElement> }) {
   const inspecting = usePanelStore((s) => s.inspecting)
   const detected = usePanelStore((s) => !!s.detection?.detected)
+  // Escape in the panel ends it too; the extension's site tab is a separate document.
+  useEffect(() => {
+    if (!inspecting) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") usePanelStore.setState({ inspecting: false })
+    }
+    addEventListener("keydown", onKey)
+    return () => removeEventListener("keydown", onKey)
+  }, [inspecting])
   return (
     <Toggle
       ref={ref}

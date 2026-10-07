@@ -263,5 +263,12 @@ test.describe("side panel", () => {
     await site.keyboard.press("Escape")
     await expect(site.locator("cossplay-inspector")).toHaveCount(0)
     await expect(toggle).toHaveAttribute("aria-pressed", "false")
+
+    // Escape in the panel ends it as well.
+    await toggle.click()
+    await expect(site.locator("cossplay-inspector")).toHaveCount(1)
+    await panel.keyboard.press("Escape")
+    await expect(toggle).toHaveAttribute("aria-pressed", "false")
+    await expect(site.locator("cossplay-inspector")).toHaveCount(0)
   })
 })
