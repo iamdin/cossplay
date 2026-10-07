@@ -9,6 +9,11 @@ import {
 import { Button } from "@cossplay/ui/components/button"
 import { Input } from "@cossplay/ui/components/input"
 import {
+  Popover,
+  PopoverPopup,
+  PopoverTrigger,
+} from "@cossplay/ui/components/popover"
+import {
   Select,
   SelectItem,
   SelectPopup,
@@ -16,10 +21,11 @@ import {
   SelectValue,
 } from "@cossplay/ui/components/select"
 import { converter } from "culori"
-import { ChevronRight, SlidersHorizontal } from "lucide-react"
+import { ChevronRight, Palette, SlidersHorizontal } from "lucide-react"
 import { type ReactNode, useEffect, useRef, useState } from "react"
 import fonts from "./fonts.json"
 import { familyOf } from "./store"
+import tailwindColors from "./tailwind-colors.json"
 
 export const title = (key: string) =>
   key.replaceAll("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())
@@ -67,6 +73,45 @@ function useDraft(value: string) {
       focused.current = false
     },
   }
+}
+
+/** Tailwind v4's palette, one row per color. */
+function TailwindPalette({
+  value,
+  onPick,
+}: {
+  value: string
+  onPick: (value: string) => void
+}) {
+  const current = formatColor(value, "hex")
+  const swatch = (label: string, color: string) => (
+    <button
+      key={label}
+      type="button"
+      aria-label={label}
+      title={label}
+      data-selected={formatColor(color, "hex") === current || undefined}
+      className="size-4 rounded-sm border border-black/10 outline-offset-1 hover:scale-125 data-selected:outline-2 data-selected:outline-ring"
+      style={{ background: color }}
+      onClick={() => onPick(color)}
+    />
+  )
+  return (
+    <div className="grid gap-1 text-[10px] text-muted-foreground">
+      <div className="flex gap-1">
+        {swatch("black", "#000000")}
+        {swatch("white", "#ffffff")}
+      </div>
+      {Object.entries(tailwindColors).map(([color, shades]) => (
+        <div key={color} className="flex items-center gap-1">
+          <span className="w-12 truncate">{color}</span>
+          {Object.entries(shades).map(([shade, v]) =>
+            swatch(`${color}-${shade}`, v)
+          )}
+        </div>
+      ))}
+    </div>
+  )
 }
 
 export function ColorControl({
@@ -158,6 +203,23 @@ export function ColorControl({
             setDraft(shown)
           }}
         />
+        <Popover>
+          <PopoverTrigger
+            render={
+              <Button
+                size="icon-xs"
+                variant="ghost"
+                aria-label={`${name} Tailwind colors`}
+                title="Tailwind colors"
+              />
+            }
+          >
+            <Palette />
+          </PopoverTrigger>
+          <PopoverPopup align="end" className="ui-chrome">
+            <TailwindPalette value={value} onPick={onChange} />
+          </PopoverPopup>
+        </Popover>
         <Button
           size="icon-xs"
           variant="ghost"
