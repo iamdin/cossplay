@@ -83,7 +83,7 @@ function TailwindPalette({
   value: string
   onPick: (value: string) => void
 }) {
-  const current = formatColor(value, "hex")
+  const current = formatColor(value, "hex").slice(0, 7)
   const swatch = (label: string, color: string) => (
     <button
       key={label}
@@ -99,8 +99,8 @@ function TailwindPalette({
   return (
     <div className="grid gap-1 text-[10px] text-muted-foreground">
       <div className="flex gap-1">
-        {swatch("black", "#000000")}
-        {swatch("white", "#ffffff")}
+        {swatch("black", "rgb(0 0 0)")}
+        {swatch("white", "rgb(255 255 255)")}
       </div>
       {Object.entries(tailwindColors).map(([color, shades]) => (
         <div key={color} className="flex items-center gap-1">
@@ -217,7 +217,15 @@ export function ColorControl({
             <Palette />
           </PopoverTrigger>
           <PopoverPopup align="end" className="ui-chrome">
-            <TailwindPalette value={value} onPick={onChange} />
+            <TailwindPalette
+              value={value}
+              onPick={(color) =>
+                // Keeps the token's opacity, as the picker and sliders do.
+                onChange(
+                  alpha < 1 ? color.replace(/\)$/, ` / ${alpha})`) : color
+                )
+              }
+            />
           </PopoverPopup>
         </Popover>
         <Button

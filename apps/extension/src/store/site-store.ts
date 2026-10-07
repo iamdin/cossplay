@@ -46,9 +46,13 @@ function inspect(on: boolean) {
   if (!on || tabId === null) return
   const port = chrome.tabs.connect(tabId, { name: inspectorPort })
   port.onMessage.addListener(({ token }: InspectorPick) => focusControl(token))
-  // The tab ended it (Escape) or went away.
+  // The tab ended it (Escape), went away, or has no content script to connect to.
   port.onDisconnect.addListener(() => {
-    if (inspector === port) set({ inspecting: false })
+    const error = chrome.runtime.lastError?.message
+    if (inspector !== port) return
+    set({ inspecting: false })
+    if (error)
+      set({ error: `Inspect is unavailable here; reload the page. (${error})` })
   })
   inspector = port
 }

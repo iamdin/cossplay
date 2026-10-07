@@ -81,6 +81,15 @@ function Editor() {
   const [full, setFull] = useState(false)
   const [width, setWidth] = useState<number>()
   useEffect(() => {
+    if (!full) return
+    // Escape leaves fullscreen unless something open (a dialog, a menu, inspect) took it.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !e.defaultPrevented) setFull(false)
+    }
+    addEventListener("keydown", onKey)
+    return () => removeEventListener("keydown", onKey)
+  }, [full])
+  useEffect(() => {
     try {
       const saved = Number(localStorage.getItem(widthKey))
       if (saved) setWidth(saved)
@@ -119,7 +128,10 @@ function Editor() {
               "ui-chrome flex min-w-80 shrink-0 flex-col text-xs",
               !width && "w-[30%] max-w-md"
             )}
-            style={width ? { width } : undefined}
+            // max-width re-clamps a width saved on a wider window.
+            style={width ? { width, maxWidth: "60vw" } : undefined}
+            // A control focused from fullscreen (an inspector pick) must be seen.
+            onFocus={() => setFull(false)}
           >
             <div className={bar}>
               <PresetSelect />
@@ -216,6 +228,8 @@ function Editor() {
                 <TabsPanel
                   key={value}
                   value={value}
+                  // The custom preview's frame keeps the user's app state across tab switches.
+                  keepMounted={value === "custom"}
                   className={
                     value === "custom"
                       ? "min-h-0 flex-1"
