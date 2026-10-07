@@ -23,3 +23,6 @@ jobs:
       - run: pnpm run check:type
       - run: pnpm run test
       - run: pnpm run build
+      - run: pnpm --filter @cossplay/extension exec playwright install --with-deps chromium
+      # The extension loads only in headed Chromium, so it runs on a virtual display.
+      - run: xvfb-run -a pnpm run test:e2e
