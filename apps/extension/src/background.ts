@@ -133,10 +133,6 @@ worker.onMessage("edit", async ({ data, sender }) => {
     ),
   }
 })
-worker.onMessage("themes", async ({ data, sender }) => {
-  trusted(sender)
-  return { themes: await store.themes(data.op) }
-})
 worker.onMessage("font", async ({ data, sender }) => {
   trusted(sender)
   await store.font(data.origin, data.family, data.css)

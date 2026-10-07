@@ -5,11 +5,9 @@ import {
   effective,
   type Hsl,
   type LastEdit,
-  type LocalTheme,
   type Mode,
   type Overrides,
   type SiteState,
-  type ThemeOp,
   type Token,
   transition,
   validValue,
@@ -30,7 +28,6 @@ export type Host = {
   ): Promise<SiteState>
   /** The stored state, to recover after a failed save. */
   load(origin: string): Promise<SiteState>
-  themes(op: ThemeOp): Promise<LocalTheme[]>
   font(origin: string, family: string, css: string): Promise<void>
   fetchText(url: string): Promise<string>
 }
@@ -47,7 +44,6 @@ interface PanelStore {
   mode: Mode
   status: string
   error: string
-  locals: LocalTheme[]
 }
 
 export const usePanelStore = create<PanelStore>()(() => ({
@@ -56,7 +52,6 @@ export const usePanelStore = create<PanelStore>()(() => ({
   mode: "light",
   status: "",
   error: "",
-  locals: [],
 }))
 
 const set = usePanelStore.setState
@@ -195,13 +190,6 @@ async function fetchFont(family: string) {
     if (get().site?.origin === origin)
       set({ error: `Font loading failed: ${String(err)}` })
   }
-}
-
-export function themeOp(op: ThemeOp) {
-  host?.themes(op).then(
-    (themes) => set({ locals: themes }),
-    (e) => set({ error: `Could not save local theme: ${String(e)}` })
-  )
 }
 
 /** Imports CSS / tweakcn or registry JSON text, or fetches it from a URL (tweakcn theme links included). */

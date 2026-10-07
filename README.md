@@ -17,7 +17,7 @@ A Chrome extension that live-edits the theme variables of any website built with
 | History | Undo / redo for every edit, ⌘Z / ⌘⇧Z. |
 | Import | Registry or tweakcn URL, pasted CSS / JSON, or a CSS / JSON file. |
 | Export | Tailwind v4 OKLCH CSS (coss `globals.css` shape), Tailwind v3 HSL CSS, registry JSON, light / dark token JSON, Tailwind v3 config, Next.js font layout; copy or download. |
-| Per-site state | Saved per origin with an on/off switch; restored before first paint on reload. Local themes can be saved, renamed, applied and deleted. |
+| Per-site state | Saved per origin with an on/off switch; restored before first paint on reload. |
 
 Only edited tokens are injected: untouched variables keep following the site, and component-scoped variables such as `[--radius:9999px]` are left alone. Shadows only change where the site's CSS reads the shadow variables; coss ui's own components compile their shadows to fixed values.
 

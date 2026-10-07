@@ -48,16 +48,9 @@ export type SiteState = {
   past: Snapshot[]
   future: Snapshot[]
 }
-export type LocalTheme = {
-  id: string
-  name: string
-  theme: Theme
-  createdAt: string
-}
 // @wxt-dev/storage keys; the worker is their only writer.
 export const siteKey = (origin: string) => `local:site:${origin}` as const
 export const fontsKey = (origin: string) => `local:fonts:${origin}` as const
-export const localThemesKey = "local:localThemes"
 const modes = ["light", "dark"] as const
 const neutralHsl = (): Hsl => ({ hue: 0, saturation: 1, lightness: 1 })
 export function snapshot(overrides: Overrides = emptyOverrides()): Snapshot {
@@ -268,24 +261,6 @@ const fontsSchema = z
       )
     )
   )
-const localThemeSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  theme: themeSchema,
-  createdAt: z
-    .unknown()
-    .optional()
-    .transform((v) => String(v ?? "")),
-})
-const localThemesSchema = z
-  .array(z.unknown())
-  .catch([])
-  .transform((items) =>
-    items.flatMap((item) => {
-      const parsed = localThemeSchema.safeParse(item)
-      return parsed.success ? [parsed.data] : []
-    })
-  )
 export const readOverrides = (value: unknown): Overrides =>
   overridesSchema.parse(value)
 export const readTheme = (value: unknown): Theme | null =>
@@ -294,5 +269,3 @@ export const readSite = (value: unknown, origin: string): SiteState | null =>
   siteSchema(origin).safeParse(value).data ?? null
 export const readFonts = (value: unknown): Record<string, string> =>
   fontsSchema.parse(value)
-export const readLocalThemes = (value: unknown): LocalTheme[] =>
-  localThemesSchema.parse(value)
