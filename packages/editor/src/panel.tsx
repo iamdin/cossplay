@@ -306,7 +306,7 @@ export function PanelSections() {
   const theme = useTheme() ?? defaults
   const styles = theme[mode]
   const [format, setFormat] = useState<ColorFormat>("hex")
-  const [search, setSearch] = useState("")
+  const search = usePanelStore((s) => s.search)
   const [issuesOnly, setIssuesOnly] = useState(false)
   const matches = (group: string, key: string) =>
     `${group} ${key}`.toLowerCase().includes(search.toLowerCase())
@@ -342,7 +342,9 @@ export function PanelSections() {
               aria-label="Search colors"
               placeholder="Search colors…"
               value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
+              onChange={(e) =>
+                usePanelStore.setState({ search: e.currentTarget.value })
+              }
             />
             <Select
               items={formatItems}

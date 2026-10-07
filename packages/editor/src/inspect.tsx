@@ -38,6 +38,11 @@ export async function focusControl(token: Token) {
     document.querySelector<HTMLInputElement>(
       `input[data-token="${CSS.escape(token)}"]`
     )
+  // Clear the color search, which may hide the control; its sections then remount.
+  if (usePanelStore.getState().search) {
+    usePanelStore.setState({ search: "" })
+    await new Promise(requestAnimationFrame)
+  }
   if (!find())
     for (const tab of document.querySelectorAll<HTMLElement>(
       '[aria-label="Editor sections"] [role="tab"]'
@@ -52,4 +57,15 @@ export async function focusControl(token: Token) {
   if (section) section.open = true
   input.scrollIntoView({ block: "center" })
   input.focus({ preventScroll: true })
+  // Focus from code shows no focus-visible ring, so flash the control's row.
+  ;(input.closest("[data-control]") ?? input).animate(
+    [
+      {
+        backgroundColor: "color-mix(in srgb, var(--ring) 24%, transparent)",
+        boxShadow: "0 0 0 2px var(--ring)",
+      },
+      {},
+    ],
+    { duration: 1200, easing: "ease-out" }
+  )
 }

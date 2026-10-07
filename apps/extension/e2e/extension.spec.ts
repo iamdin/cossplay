@@ -137,11 +137,12 @@ test("inspect mode reports the picked token over the inspector port", async () =
     await page.locator("#cta").hover({ position: { x: 2, y: 2 } })
     await expect(card).toBeVisible({ timeout: 500 })
   }).toPass()
+  // One row per token, with the classes that use it.
   await expect(card.getByRole("button")).toHaveText([
-    "bg-primary",
-    "text-primary-foreground",
+    "primarybg-primary",
+    "primary-foregroundtext-primary-foreground",
   ])
-  await card.getByRole("button", { name: "text-primary-foreground" }).click()
+  await card.getByTitle("Edit primary-foreground").click()
   const state = () =>
     sw.evaluate(
       () =>

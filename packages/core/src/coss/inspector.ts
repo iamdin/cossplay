@@ -34,15 +34,18 @@ const css = `
   font: 12px/1.4 ui-sans-serif, system-ui, sans-serif; color: #18181b; background: #fff;
   border: 1px solid #e4e4e7; border-radius: 8px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.16); }
 .title { padding: 2px 6px 4px; color: #71717a; font-size: 11px; }
-button { all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 6px; width: 100%; padding: 3px 6px;
-  border-radius: 4px; cursor: pointer; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+button { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 12px minmax(0, 1fr); align-items: center;
+  column-gap: 6px; width: 100%; padding: 3px 6px; border-radius: 4px; cursor: pointer; }
 button:hover, button:focus-visible { background: #f4f4f5; }
-.swatch { flex: none; width: 12px; height: 12px; box-sizing: border-box; border: 1px solid rgb(0 0 0 / 0.15); border-radius: 3px; }
+.swatch { width: 12px; height: 12px; box-sizing: border-box; border: 1px solid rgb(0 0 0 / 0.15); border-radius: 3px; }
+.token { font-weight: 500; }
+.classes { grid-column: 2; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #71717a; font-size: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 `
 
 /**
  * Inspect mode over `root`: hovering outlines the nearest element whose classes reference theme
- * tokens and lists them in a card. Clicking a listed class, or an element with a single token,
+ * tokens and lists those tokens in a card. Clicking a listed token, or an element with a single token,
  * calls `onPick`; Escape calls `onExit`. The page underneath gets no clicks while inspecting, and
  * `.ui-chrome` (the editor's own controls) is left alone. Returns a cleanup.
  */
@@ -78,23 +81,36 @@ export function startInspector(
   }
   const show = (el: Element) => {
     current = el
-    const classes = tokenClasses(el.getAttribute("class") ?? "")
+    // One row per token; tokens used without a variant (`bg-primary`) before state-only ones.
+    const byToken = new Map<Token, string[]>()
+    for (const { className, token } of tokenClasses(
+      el.getAttribute("class") ?? ""
+    ).sort((a, b) => +a.className.includes(":") - +b.className.includes(":")))
+      byToken.set(token, [...(byToken.get(token) ?? []), className])
     const styles = getComputedStyle(el)
     card.replaceChildren(
       Object.assign(document.createElement("div"), {
         className: "title",
         textContent: "Click a token to edit it",
       }),
-      ...classes.map(({ className, token }) => {
+      ...[...byToken].map(([token, names]) => {
         const button = document.createElement("button")
         button.title = `Edit ${token}`
+        const swatch = document.createElement("span")
         if (isColor(token)) {
-          const swatch = document.createElement("span")
           swatch.className = "swatch"
           swatch.style.background = styles.getPropertyValue(`--${token}`)
-          button.append(swatch)
         }
-        button.append(className)
+        const label = Object.assign(document.createElement("span"), {
+          className: "token",
+          textContent: token,
+        })
+        const used = Object.assign(document.createElement("span"), {
+          className: "classes",
+          textContent: names.join(" "),
+          title: names.join("\n"),
+        })
+        button.append(swatch, label, used)
         button.addEventListener("click", () => onPick(token))
         return button
       })
