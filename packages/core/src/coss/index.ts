@@ -1,4 +1,5 @@
 export * from "./colors"
+export * from "./inspector"
 export * from "./installer"
 export * from "./messages"
 export * from "./site"
