@@ -18,6 +18,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useEffect } from "react"
 import { Components, Typography } from "@/editor/gallery"
 import { connect } from "@/editor/host"
+import { PreviewInspector } from "@/editor/inspect"
 import styles from "@/styles/editor.css?url"
 
 export const Route = createFileRoute("/editor")({
@@ -75,6 +76,7 @@ function Editor() {
               >
                 {status}
               </span>
+              <PreviewInspector />
               <HistoryActions />
               <span className="mx-2 h-5 w-px bg-border" />
               <ImportExport />

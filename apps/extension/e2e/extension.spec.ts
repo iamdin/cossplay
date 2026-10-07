@@ -107,3 +107,58 @@ test("detects coss variables and applies stored per-origin overrides", async () 
   await expect(cta).toHaveCSS("border-radius", "10px")
   await expect(page.locator("#cossplay-theme")).toHaveCount(0)
 })
+
+test("inspect mode reports the picked token over the inspector port", async () => {
+  const page = await ctx.newPage()
+  await page.route("http://inspect.test/**", (route) =>
+    route.fulfill({
+      contentType: "text/html",
+      body: COSS_PAGE.replace(
+        '<button id="cta">',
+        '<button id="cta" class="bg-primary text-primary-foreground">'
+      ),
+    })
+  )
+  await page.goto("http://inspect.test/")
+  const [sw] = ctx.serviceWorkers()
+  // Stands in for the side panel, which connects the same way.
+  await sw.evaluate(async () => {
+    const [tab] = await chrome.tabs.query({ url: "http://inspect.test/*" })
+    const port = chrome.tabs.connect(tab.id!, { name: "cossplay-inspector" })
+    const state = { picks: [] as string[], disconnected: false }
+    port.onMessage.addListener(({ token }) => state.picks.push(token))
+    port.onDisconnect.addListener(() => {
+      state.disconnected = true
+    })
+    Object.assign(globalThis, { inspectorState: state })
+  })
+  const card = page.locator("cossplay-inspector .card")
+  await expect(async () => {
+    await page.locator("#cta").hover({ position: { x: 2, y: 2 } })
+    await expect(card).toBeVisible({ timeout: 500 })
+  }).toPass()
+  await expect(card.getByRole("button")).toHaveText([
+    "bg-primary",
+    "text-primary-foreground",
+  ])
+  await card.getByRole("button", { name: "text-primary-foreground" }).click()
+  const state = () =>
+    sw.evaluate(
+      () =>
+        (
+          globalThis as unknown as {
+            inspectorState: { picks: string[]; disconnected: boolean }
+          }
+        ).inspectorState
+    )
+  await expect.poll(state).toEqual({
+    picks: ["primary-foreground"],
+    disconnected: false,
+  })
+  await page.keyboard.press("Escape")
+  await expect(page.locator("cossplay-inspector")).toHaveCount(0)
+  await expect.poll(state).toEqual({
+    picks: ["primary-foreground"],
+    disconnected: true,
+  })
+})

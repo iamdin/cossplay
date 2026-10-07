@@ -39,6 +39,7 @@ import {
 import { useEffect, useState } from "react"
 import { ColorControl, FontControl, NumericControl, Section } from "./controls"
 import { ExportDialog, ImportDialog } from "./dialogs"
+import { InspectToggle } from "./inspect"
 import {
   adjust,
   applyOverrides,
@@ -642,6 +643,7 @@ export function Panel({ liveSite = false }: { liveSite?: boolean }) {
           <PresetSelect />
         </div>
         <div className="mt-1 flex items-center justify-end gap-1">
+          {liveSite && <InspectToggle />}
           <HistoryActions liveSite={liveSite} />
         </div>
       </div>

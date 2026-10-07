@@ -1,7 +1,7 @@
 /// <reference types="chrome" />
 import { defineExtensionMessaging } from "@webext-core/messaging"
 import type { Detection, Edit, SiteState } from "./site"
-import type { Theme } from "./theme"
+import type { Theme, Token } from "./theme"
 
 // Requests handled by the service worker. The worker is the only writer of extension storage,
 // so every read-modify-write is serialized there.
@@ -20,3 +20,7 @@ interface ContentProtocol {
 }
 export const worker = defineExtensionMessaging<WorkerProtocol>()
 export const content = defineExtensionMessaging<ContentProtocol>()
+// Inspect mode on a tab lives as long as this port: the panel connects to start it, and closing
+// the panel, switching tabs or navigating disconnects it. The tab posts the token the user picked.
+export const inspectorPort = "cossplay-inspector"
+export type InspectorPick = { token: Token }
