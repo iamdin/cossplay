@@ -4,10 +4,8 @@ import {
   effective,
   fontsKey,
   type KeyValue,
-  localThemesKey,
   newSite,
   readFonts,
-  readLocalThemes,
   readSite,
   siteKey,
   variables,
@@ -44,7 +42,6 @@ export function connect() {
   setHost({
     edit: store.edit,
     load: stored,
-    themes: store.themes,
     font: store.font,
     async fetchText(url) {
       const response = await fetch(url)
@@ -76,32 +73,29 @@ export function connect() {
   document.head.append(style)
 
   let active = true
-  Promise.all([
-    stored(origin),
-    kv.getItem(localThemesKey),
-    kv.getItem(fontsKey(origin)),
-  ]).then(([site, locals, fonts]) => {
-    if (!active) return
-    for (const sheet of Object.values(readFonts(fonts))) {
-      const font = document.createElement("style")
-      font.textContent = sheet
-      document.head.append(font)
+  Promise.all([stored(origin), kv.getItem(fontsKey(origin))]).then(
+    ([site, fonts]) => {
+      if (!active) return
+      for (const sheet of Object.values(readFonts(fonts))) {
+        const font = document.createElement("style")
+        font.textContent = sheet
+        document.head.append(font)
+      }
+      usePanelStore.setState({
+        site,
+        detection: {
+          detected: true,
+          theme: defaults,
+          sourceFormat: { light: {}, dark: {} },
+          sources: [],
+          mode: "light",
+          warnings: [],
+        },
+        mode: site.previewMode ?? "light",
+        status: "Saved locally",
+      })
     }
-    usePanelStore.setState({
-      site,
-      detection: {
-        detected: true,
-        theme: defaults,
-        sourceFormat: { light: {}, dark: {} },
-        sources: [],
-        mode: "light",
-        warnings: [],
-      },
-      mode: site.previewMode ?? "light",
-      status: "Saved locally",
-      locals: readLocalThemes(locals),
-    })
-  })
+  )
   return () => {
     active = false
     unsubscribe()

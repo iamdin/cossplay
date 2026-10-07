@@ -1,6 +1,5 @@
 import {
   type ColorFormat,
-  clone,
   contrast,
   contrastPairs,
   defaults,
@@ -50,7 +49,6 @@ import {
   reset,
   setError,
   syncSidebar,
-  themeOp,
   updateToken,
   usePanelStore,
   useTheme,
@@ -301,16 +299,14 @@ export function PanelAlerts() {
   )
 }
 
-/** The Colors / Typography / Other / My themes tabs. */
+/** The Colors / Typography / Other tabs. */
 export function PanelSections() {
   const { site, mode, detected } = usePanel()
-  const locals = usePanelStore((s) => s.locals)
   const theme = useTheme() ?? defaults
   const styles = theme[mode]
   const [format, setFormat] = useState<ColorFormat>("hex")
   const [search, setSearch] = useState("")
   const [issuesOnly, setIssuesOnly] = useState(false)
-  const [name, setName] = useState("")
   const matches = (group: string, key: string) =>
     `${group} ${key}`.toLowerCase().includes(search.toLowerCase())
   return (
@@ -321,7 +317,7 @@ export function PanelSections() {
       <Tabs defaultValue="colors" className="min-h-0 flex-1 gap-0">
         <TabsList
           aria-label="Editor sections"
-          className="mx-2 my-1.5 grid w-auto shrink-0 grid-cols-4"
+          className="mx-2 my-1.5 grid w-auto shrink-0 grid-cols-3"
         >
           <TabsTrigger value="colors" className="text-[11px]">
             Colors
@@ -331,9 +327,6 @@ export function PanelSections() {
           </TabsTrigger>
           <TabsTrigger value="other" className="text-[11px]">
             Other
-          </TabsTrigger>
-          <TabsTrigger value="themes" className="text-[11px]">
-            My themes
           </TabsTrigger>
         </TabsList>
 
@@ -597,87 +590,6 @@ export function PanelSections() {
               ))}
             </div>
           </Section>
-        </TabsContent>
-
-        <TabsContent
-          value="themes"
-          className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
-        >
-          <section className="mb-2 border bg-card p-2">
-            <h2 className="pb-1 font-semibold text-xs">Save locally</h2>
-            <p className={cn(muted, "mb-2")}>
-              No account. Themes stay in this browser.
-            </p>
-            <div className="flex gap-2">
-              <Input
-                className="text-sm"
-                size="sm"
-                aria-label="Local theme name"
-                placeholder="Theme name"
-                maxLength={100}
-                value={name}
-                onChange={(e) => setName(e.currentTarget.value)}
-              />
-              <Button
-                onClick={() => {
-                  if (!name.trim()) return setError("Enter a theme name")
-                  themeOp({
-                    kind: "add",
-                    name: name.trim(),
-                    theme: clone(theme),
-                  })
-                  setName("")
-                }}
-              >
-                Save
-              </Button>
-            </div>
-          </section>
-          {locals.map((local) => (
-            <section
-              key={`${local.id}:${local.name}`}
-              className="mb-2 border bg-card p-2"
-            >
-              <Input
-                className="text-sm"
-                size="sm"
-                aria-label={`Rename ${local.name}`}
-                maxLength={100}
-                defaultValue={local.name}
-                onBlur={(e) => {
-                  const n = e.currentTarget.value.trim()
-                  if (!n) {
-                    e.currentTarget.value = local.name
-                    return setError("Theme name cannot be empty")
-                  }
-                  if (n !== local.name)
-                    themeOp({ kind: "rename", id: local.id, name: n })
-                }}
-              />
-              <div className="mt-2 flex gap-1.5">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => applyOverrides(clone(local.theme))}
-                >
-                  Apply
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => {
-                    if (confirm(`Delete “${local.name}”?`))
-                      themeOp({ kind: "delete", id: local.id })
-                  }}
-                >
-                  Delete
-                </Button>
-              </div>
-            </section>
-          ))}
-          {!locals.length && (
-            <p className={muted}>Your saved themes will appear here.</p>
-          )}
         </TabsContent>
       </Tabs>
     </fieldset>

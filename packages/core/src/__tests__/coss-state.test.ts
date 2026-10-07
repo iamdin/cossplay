@@ -3,7 +3,6 @@ import {
   effective,
   fontsKey,
   newSite,
-  readLocalThemes,
   readSite,
   type SiteState,
   siteKey,
@@ -201,46 +200,6 @@ test("continuous edits coalesce only when nothing else happened in between", asy
   assert.equal(state.past.length, 4)
 })
 
-test("local theme operations apply to the latest collection", async () => {
-  const storage = memory(),
-    store = createStore(storage)
-  const theme = clone(defaults)
-  // Both panels loaded an empty list; neither sends its cached list.
-  await store.themes({ kind: "add", name: "A", theme })
-  const themes = await store.themes({ kind: "add", name: "B", theme })
-  assert.deepEqual(
-    themes.map((t) => t.name),
-    ["A", "B"]
-  )
-  const renamed = await store.themes({
-    kind: "rename",
-    id: themes[0].id,
-    name: "  A2 ",
-  })
-  assert.deepEqual(
-    renamed.map((t) => t.name),
-    ["A2", "B"]
-  )
-  assert.deepEqual(
-    (await store.themes({ kind: "delete", id: themes[1].id })).map(
-      (t) => t.name
-    ),
-    ["A2"]
-  )
-  await assert.rejects(
-    store.themes({ kind: "rename", id: themes[0].id, name: " " }),
-    /empty/
-  )
-  await assert.rejects(
-    store.themes({
-      kind: "add",
-      name: "bad",
-      theme: { light: {}, dark: {} } as Theme,
-    }),
-    /Invalid theme/
-  )
-})
-
 test("fonts loaded from different tabs of one origin are merged", async () => {
   const storage = memory(),
     store = createStore(storage)
@@ -299,12 +258,4 @@ test("presets override only the tokens they define and keep coss-only tokens fro
   assert.equal(theme.light.info, "#0000ff")
   assert.equal(theme.light.primary, overrides.light.primary)
   assert.equal(transition(state, { kind: "undo" }, page).current.themeId, "")
-})
-
-test("local themes without createdAt are kept", () => {
-  const themes = readLocalThemes([{ id: "a", name: "A", theme: defaults }])
-  assert.deepEqual(
-    themes.map((t) => [t.id, t.createdAt]),
-    [["a", ""]]
-  )
 })

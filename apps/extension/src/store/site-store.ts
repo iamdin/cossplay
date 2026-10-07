@@ -1,9 +1,7 @@
 import {
   content,
   type Detection,
-  localThemesKey,
   newSite,
-  readLocalThemes,
   readSite,
   siteKey,
   worker,
@@ -31,7 +29,6 @@ setHost({
   edit: async (origin, edit, baseline, key) =>
     (await worker.sendMessage("edit", { origin, edit, baseline, key })).state,
   load: stored,
-  themes: async (op) => (await worker.sendMessage("themes", { op })).themes,
   font: (origin, family, css) =>
     worker.sendMessage("font", { origin, family, css }),
   fetchText: async (url) => (await worker.sendMessage("fetch", { url })).text,
@@ -106,12 +103,6 @@ export function connect() {
     windowId = tabs[0].windowId
     if (tabs[0].id) loadTab(tabs[0].id)
   })
-  storage
-    .getItem(localThemesKey)
-    .then((value) => set({ locals: readLocalThemes(value) }))
-  const unwatchThemes = storage.watch(localThemesKey, (value) =>
-    set({ locals: readLocalThemes(value) })
-  )
   const activated = (info: chrome.tabs.TabActiveInfo) => {
     if (info.windowId === windowId) loadTab(info.tabId)
   }
@@ -123,7 +114,6 @@ export function connect() {
   return () => {
     chrome.tabs.onActivated.removeListener(activated)
     chrome.tabs.onUpdated.removeListener(updated)
-    unwatchThemes()
     unwatchSite?.()
     loading?.abort()
   }
