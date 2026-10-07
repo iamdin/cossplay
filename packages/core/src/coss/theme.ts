@@ -466,3 +466,37 @@ export function exportLayout(
     .join(" ")
   return `import type { ReactNode } from "react";\n${imports ? `import { ${imports} } from "next/font/google";\n` : ""}import "./globals.css";\n\n${definitions}\n\nexport default function RootLayout({ children }: { children: ReactNode }) {\n  return (\n    <html lang="en">\n      <body className={\`${classes} relative font-sans\`}>\n        <div className="isolate relative flex min-h-svh flex-col">{children}</div>\n      </body>\n    </html>\n  );\n}\n`
 }
+// The site's static shadcn registry: one item per preset (applied to coss ui's defaults) plus an
+// index. The web build writes them to /r/themes/<name>.json.
+export const registryUrl = "https://cossplay.vercel.app/r/themes"
+export function presetRegistry() {
+  const items = ["default", ...Object.keys(presets)].map((id) => {
+    const overrides = presetOverrides(id)
+    const title = id === "default" ? "Default coss" : presets[id].label
+    return {
+      ...registryTheme(
+        {
+          light: { ...defaults.light, ...overrides.light },
+          dark: { ...defaults.dark, ...overrides.dark },
+        },
+        id
+      ),
+      title,
+      description: `The ${title} theme for coss ui, from Cossplay.`,
+    }
+  })
+  return {
+    items,
+    index: {
+      $schema: "https://ui.shadcn.com/schema/registry.json",
+      name: "cossplay",
+      homepage: "https://cossplay.vercel.app",
+      items: items.map(({ name, type, title, description }) => ({
+        name,
+        type,
+        title,
+        description,
+      })),
+    },
+  }
+}

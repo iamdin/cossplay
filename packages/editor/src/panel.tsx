@@ -6,6 +6,7 @@ import {
   effective,
   groups,
   hslPresets,
+  type Overrides,
   presetOverrides,
   presets,
   shadows,
@@ -41,6 +42,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Moon,
+  Plug,
   Power,
   Redo2,
   RefreshCcw,
@@ -53,7 +55,8 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { ColorControl, FontControl, NumericControl, Section } from "./controls"
-import { ExportDialog, ImportDialog } from "./dialogs"
+import { ExportDialog, ImportDialog, McpDialog } from "./dialogs"
+import { InspectToggle } from "./inspect"
 import {
   adjust,
   applyOverrides,
@@ -370,7 +373,7 @@ export function PanelSections() {
   const theme = useTheme() ?? defaults
   const styles = theme[mode]
   const [format, setFormat] = useState<ColorFormat>("hex")
-  const [search, setSearch] = useState("")
+  const search = usePanelStore((s) => s.search)
   const [issuesOnly, setIssuesOnly] = useState(false)
   const matches = (group: string, key: string) =>
     `${group} ${key}`.toLowerCase().includes(search.toLowerCase())
@@ -406,7 +409,9 @@ export function PanelSections() {
               aria-label="Search colors"
               placeholder="Search colors…"
               value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
+              onChange={(e) =>
+                usePanelStore.setState({ search: e.currentTarget.value })
+              }
             />
             <Select
               items={formatItems}
@@ -661,12 +666,38 @@ export function PanelSections() {
   )
 }
 
+const sameOverrides = (a: Overrides, b: Overrides) =>
+  (["light", "dark"] as const).every(
+    (mode) =>
+      Object.keys(a[mode]).length === Object.keys(b[mode]).length &&
+      Object.entries(a[mode]).every(
+        ([token, value]) => b[mode][token as keyof Overrides["light"]] === value
+      )
+  )
+
 export function ImportExport() {
-  const { detected } = usePanel()
+  const { site, detected } = usePanel()
   const theme = useTheme() ?? defaults
-  const [dialog, setDialog] = useState<"import" | "export" | null>(null)
+  const [dialog, setDialog] = useState<"import" | "export" | "mcp" | null>(null)
+  // The CLI installs the preset as published, so only offer it while nothing is edited.
+  const themeId = site?.current.themeId ?? ""
+  const presetId =
+    dialog === "export" &&
+    (themeId === "default" || Object.hasOwn(presets, themeId)) &&
+    sameOverrides(site!.current.overrides, presetOverrides(themeId))
+      ? themeId
+      : ""
   return (
     <>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Use with AI editors"
+        title="Use with AI editors (MCP)"
+        onClick={() => setDialog("mcp")}
+      >
+        <Plug />
+      </Button>
       <Button
         size="sm"
         variant="outline"
@@ -690,6 +721,11 @@ export function ImportExport() {
         open={dialog === "export"}
         onOpenChange={(open) => setDialog(open ? "export" : null)}
         theme={theme}
+        presetId={presetId}
+      />
+      <McpDialog
+        open={dialog === "mcp"}
+        onOpenChange={(open) => setDialog(open ? "mcp" : null)}
       />
     </>
   )
@@ -707,6 +743,7 @@ export function Panel({ liveSite = false }: { liveSite?: boolean }) {
           <PresetSelect />
         </div>
         <div className="mt-1 flex items-center justify-end gap-1">
+          {liveSite && <InspectToggle />}
           <HistoryActions liveSite={liveSite} />
         </div>
       </div>

@@ -44,6 +44,10 @@ interface PanelStore {
   mode: Mode
   status: string
   error: string
+  /** Inspect mode: picking an element in the preview or site focuses its token's control. */
+  inspecting: boolean
+  /** The Colors tab's filter. */
+  search: string
 }
 
 export const usePanelStore = create<PanelStore>()(() => ({
@@ -52,6 +56,8 @@ export const usePanelStore = create<PanelStore>()(() => ({
   mode: "light",
   status: "",
   error: "",
+  inspecting: false,
+  search: "",
 }))
 
 const set = usePanelStore.setState

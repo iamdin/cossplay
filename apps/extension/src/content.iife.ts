@@ -6,6 +6,8 @@ import {
   defaults,
   effective,
   fontsKey,
+  type InspectorPick,
+  inspectorPort,
   isColor,
   type Mode,
   readFonts,
@@ -14,6 +16,7 @@ import {
   type Source,
   siteKey,
   sourceFormat,
+  startInspector,
   type Token,
   tokens,
   validValue,
@@ -405,6 +408,14 @@ initial
   .then(inspect)
   .catch((error) => console.error("Cossplay detection failed", error))
 content.onMessage("inspect", inspect)
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name !== inspectorPort) return
+  const stop = startInspector(document.documentElement, {
+    onPick: (token) => port.postMessage({ token } satisfies InspectorPick),
+    onExit: () => port.disconnect(),
+  })
+  port.onDisconnect.addListener(stop)
+})
 storage.watch(key, (value) => {
   state = readSite(value, origin)
   apply()

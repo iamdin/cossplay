@@ -1,11 +1,14 @@
 import {
   content,
   type Detection,
+  type InspectorPick,
+  inspectorPort,
   newSite,
   readSite,
   siteKey,
   worker,
 } from "@cossplay/core/coss"
+import { focusControl } from "@cossplay/editor/inspect"
 import { editsPending, setHost, usePanelStore } from "@cossplay/editor/store"
 import { storage } from "@wxt-dev/storage"
 
@@ -34,7 +37,24 @@ setHost({
   fetchText: async (url) => (await worker.sendMessage("fetch", { url })).text,
 })
 
+let inspector: chrome.runtime.Port | null = null
+
+/** Inspect mode on the tab follows the panel's toggle while the port stays connected. */
+function inspect(on: boolean) {
+  inspector?.disconnect()
+  inspector = null
+  if (!on || tabId === null) return
+  const port = chrome.tabs.connect(tabId, { name: inspectorPort })
+  port.onMessage.addListener(({ token }: InspectorPick) => focusControl(token))
+  // The tab ended it (Escape) or went away.
+  port.onDisconnect.addListener(() => {
+    if (inspector === port) set({ inspecting: false })
+  })
+  inspector = port
+}
+
 async function loadTab(id: number) {
+  set({ inspecting: false })
   loading?.abort()
   loading = new AbortController()
   const { signal } = loading
@@ -109,6 +129,9 @@ export function connect() {
   const updated = (id: number, info: chrome.tabs.TabChangeInfo) => {
     if (info.status === "complete" && id === tabId) loadTab(id)
   }
+  const unsubscribe = usePanelStore.subscribe((state, previous) => {
+    if (state.inspecting !== previous.inspecting) inspect(state.inspecting)
+  })
   chrome.tabs.onActivated.addListener(activated)
   chrome.tabs.onUpdated.addListener(updated)
   return () => {
@@ -116,5 +139,7 @@ export function connect() {
     chrome.tabs.onUpdated.removeListener(updated)
     unwatchSite?.()
     loading?.abort()
+    unsubscribe()
+    inspect(false)
   }
 }

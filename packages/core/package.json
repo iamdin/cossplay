@@ -26,6 +26,7 @@
     "@types/chrome": "catalog:",
     "@types/culori": "catalog:",
     "jsdom": "catalog:",
+    "shadcn": "^4.21.3",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
