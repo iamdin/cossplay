@@ -35,6 +35,23 @@ const css = (selector: string, values: Record<string, string>) =>
     .map(([key, value]) => `  --${key}: ${value};`)
     .join("\n")}\n}`
 
+type PanelState = ReturnType<typeof usePanelStore.getState>
+
+// Only the shown mode's overrides, like the extension: untouched tokens keep coss ui's own
+// values, and `:root:root` outranks both `:root` and `.dark` in editor.css.
+const rule = ({ site, detection, mode }: PanelState) => {
+  if (!site || !detection) return null
+  const { overrides } = site.current
+  const theme = effective(detection.theme, overrides)
+  return css(":root:root", variables(theme[mode], overrides[mode]))
+}
+
+/** The stylesheet a custom preview receives: the theme's Google fonts and its variables. */
+export async function previewCss(state: PanelState) {
+  const fonts = readFonts(await kv.getItem(fontsKey(location.origin)))
+  return [...Object.values(fonts), rule(state) ?? ""].join("\n")
+}
+
 /** Loads the saved theme and applies it to this document; returns a cleanup. */
 export function connect() {
   const origin = location.origin
@@ -53,21 +70,10 @@ export function connect() {
 
   const style = document.createElement("style")
   style.id = "cossplay-theme"
-  const apply = ({
-    site,
-    detection,
-    mode,
-  }: ReturnType<typeof usePanelStore.getState>) => {
-    document.documentElement.classList.toggle("dark", mode === "dark")
-    if (!site || !detection) return
-    const { overrides } = site.current
-    const theme = effective(detection.theme, overrides)
-    // Only the shown mode's overrides, like the extension: untouched tokens keep coss ui's own
-    // values, and `:root:root` outranks both `:root` and `.dark` in editor.css.
-    style.textContent = css(
-      ":root:root",
-      variables(theme[mode], overrides[mode])
-    )
+  const apply = (state: PanelState) => {
+    document.documentElement.classList.toggle("dark", state.mode === "dark")
+    const text = rule(state)
+    if (text !== null) style.textContent = text
   }
   const unsubscribe = usePanelStore.subscribe(apply)
   document.head.append(style)

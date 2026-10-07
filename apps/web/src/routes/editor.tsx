@@ -28,6 +28,7 @@ import { ChevronDownIcon, Maximize2Icon, Minimize2Icon } from "lucide-react"
 import { type ComponentType, useEffect, useState } from "react"
 import { Application } from "@/editor/application"
 import { Cards } from "@/editor/cards"
+import { CustomPreview } from "@/editor/custom"
 import { Dashboard } from "@/editor/dashboard"
 import { Components, Typography } from "@/editor/gallery"
 import { connect } from "@/editor/host"
@@ -61,6 +62,7 @@ const pages: [string, string, ComponentType][] = [
   ["marketing", "Marketing", Marketing],
   ["application", "Application", Application],
   ["components", "Components", Components],
+  ["custom", "Custom", CustomPreview],
 ]
 const more: [string, string, ComponentType][] = [
   ["mail", "Mail", Mail],
@@ -214,7 +216,11 @@ function Editor() {
                 <TabsPanel
                   key={value}
                   value={value}
-                  className="@container min-h-0 flex-1 overflow-y-auto"
+                  className={
+                    value === "custom"
+                      ? "min-h-0 flex-1"
+                      : "@container min-h-0 flex-1 overflow-y-auto"
+                  }
                 >
                   <Page />
                 </TabsPanel>
