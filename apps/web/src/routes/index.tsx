@@ -291,9 +291,9 @@ function Landing() {
           </div>
           <img
             src="/screenshot.webp"
-            width="1500"
-            height="864"
-            alt="coss.com/ui themed with the Violet Bloom preset, with the Cossplay side panel open on the color editor"
+            width="1280"
+            height="800"
+            alt="coss.com/ui themed with the Ocean Breeze preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
             className="mt-10 w-full rounded-2xl border shadow-xl/5"
             loading="lazy"
           />

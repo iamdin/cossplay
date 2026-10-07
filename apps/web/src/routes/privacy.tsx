@@ -59,9 +59,11 @@ function Privacy() {
             anywhere. Uninstalling the extension deletes them.
           </p>
           <p>
-            The extension makes network requests only when you ask for them:
-            Google Fonts stylesheets when you load a font, and the URL you enter
-            when you import a theme. It has no analytics or tracking.
+            To read a page's theme, the extension may download that page's own
+            stylesheets, including ones served from another domain, without
+            cookies. Otherwise it makes network requests only when you ask:
+            Google Fonts when you load a font, and the URL you enter when you
+            import a theme. It has no analytics or tracking.
           </p>
         </Part>
 
