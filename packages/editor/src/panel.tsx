@@ -12,9 +12,20 @@ import {
   shadows,
 } from "@cossplay/core/coss"
 import { Button } from "@cossplay/ui/components/button"
+import {
+  Combobox,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxPopup,
+  ComboboxTrigger,
+  ComboboxValue,
+} from "@cossplay/ui/components/combobox"
 import { Input } from "@cossplay/ui/components/input"
 import {
   Select,
+  SelectButton,
   SelectItem,
   SelectPopup,
   SelectTrigger,
@@ -28,12 +39,16 @@ import {
 } from "@cossplay/ui/components/tabs"
 import { cn } from "@cossplay/ui/lib/utils"
 import {
+  ChevronLeft,
+  ChevronRight,
   Moon,
   Plug,
   Power,
   Redo2,
   RefreshCcw,
   RotateCcw,
+  Search,
+  Shuffle,
   Sun,
   Undo2,
   X,
@@ -142,7 +157,7 @@ function Swatches({ colors }: { colors: string[] }) {
   )
 }
 
-/** Preset picker and "discard edits to this preset". */
+/** Preset picker with search, previous / next / random, and "discard edits to this preset". */
 export function PresetSelect() {
   const { site, mode, detected } = usePanel()
   const theme = useTheme()
@@ -151,41 +166,91 @@ export function PresetSelect() {
   const edited =
     !!overrides &&
     Object.keys(overrides.light).length + Object.keys(overrides.dark).length > 0
+  const index = presetItems.findIndex((item) => item.value === themeId)
+  const step = (by: number) =>
+    applyPreset(
+      presetItems[(index + by + presetItems.length) % presetItems.length].value
+    )
+  const random = () => {
+    const others = presetItems.filter((item) => item.value !== themeId)
+    applyPreset(others[Math.floor(Math.random() * others.length)].value)
+  }
   return (
     <>
-      <Select
-        items={[
-          {
-            value: "",
-            label: edited ? "Custom" : "Choose a preset",
-          },
-          ...presetItems,
-        ]}
-        value={themeId}
+      <Combobox
+        items={presetItems}
+        value={presetItems[index] ?? null}
         disabled={!detected}
-        onValueChange={(id) => id && applyPreset(id)}
+        onValueChange={(item) => item && applyPreset(item.value)}
       >
-        <SelectTrigger
-          size="sm"
+        <ComboboxTrigger
           aria-label="Theme preset"
-          className="min-w-0 flex-1 text-sm"
+          render={<SelectButton size="sm" className="min-w-0 flex-1 text-sm" />}
         >
-          {theme && (
-            <Swatches colors={swatchTokens.map((t) => theme[mode][t])} />
-          )}
-          <SelectValue />
-        </SelectTrigger>
-        <SelectPopup alignItemWithTrigger={false} className="ui-chrome">
-          {presetItems.map(({ value, label }) => (
-            <SelectItem key={value} value={value}>
-              <span className="flex items-center gap-2">
-                <Swatches colors={swatchesOf(value)} />
-                {label}
-              </span>
-            </SelectItem>
-          ))}
-        </SelectPopup>
-      </Select>
+          <span className="flex min-w-0 items-center gap-2">
+            {theme && (
+              <Swatches colors={swatchTokens.map((t) => theme[mode][t])} />
+            )}
+            <span className="truncate">
+              <ComboboxValue
+                placeholder={edited ? "Custom" : "Choose a preset"}
+              />
+            </span>
+          </span>
+        </ComboboxTrigger>
+        <ComboboxPopup aria-label="Theme presets" className="ui-chrome">
+          <div className="border-b p-2">
+            <ComboboxInput
+              size="sm"
+              className="rounded-md text-sm before:rounded-[calc(var(--radius-md)-1px)]"
+              placeholder="Search presets…"
+              showTrigger={false}
+              startAddon={<Search />}
+            />
+          </div>
+          <ComboboxEmpty>No presets found.</ComboboxEmpty>
+          <ComboboxList>
+            {(item: (typeof presetItems)[number]) => (
+              <ComboboxItem key={item.value} value={item}>
+                <span className="flex items-center gap-2">
+                  <Swatches colors={swatchesOf(item.value)} />
+                  {item.label}
+                </span>
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxPopup>
+      </Combobox>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Previous preset"
+        title="Previous preset"
+        disabled={!detected}
+        onClick={() => step(index < 0 ? 0 : -1)}
+      >
+        <ChevronLeft />
+      </Button>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Next preset"
+        title="Next preset"
+        disabled={!detected}
+        onClick={() => step(1)}
+      >
+        <ChevronRight />
+      </Button>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Random preset"
+        title="Random preset"
+        disabled={!detected}
+        onClick={random}
+      >
+        <Shuffle />
+      </Button>
       <Button
         size="icon-sm"
         variant="ghost"
