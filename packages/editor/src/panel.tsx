@@ -163,10 +163,15 @@ export function PresetSelect() {
   const theme = useTheme()
   const themeId = site?.current.themeId ?? ""
   const overrides = site?.current.overrides
-  const edited =
-    !!overrides &&
-    Object.keys(overrides.light).length + Object.keys(overrides.dark).length > 0
   const index = presetItems.findIndex((item) => item.value === themeId)
+  // Edits on top of a preset, or a theme from no preset at all.
+  const custom =
+    !!overrides &&
+    (index < 0
+      ? Object.keys(overrides.light).length +
+          Object.keys(overrides.dark).length >
+        0
+      : !sameOverrides(overrides, presetOverrides(themeId)))
   const step = (by: number) =>
     applyPreset(
       presetItems[(index + by + presetItems.length) % presetItems.length].value
@@ -192,9 +197,11 @@ export function PresetSelect() {
               <Swatches colors={swatchTokens.map((t) => theme[mode][t])} />
             )}
             <span className="truncate">
-              <ComboboxValue
-                placeholder={edited ? "Custom" : "Choose a preset"}
-              />
+              {custom ? (
+                "Custom"
+              ) : (
+                <ComboboxValue placeholder="Choose a preset" />
+              )}
             </span>
           </span>
         </ComboboxTrigger>
