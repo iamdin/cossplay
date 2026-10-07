@@ -6,6 +6,7 @@ import {
   effective,
   groups,
   hslPresets,
+  type Overrides,
   presetOverrides,
   presets,
   shadows,
@@ -28,6 +29,7 @@ import {
 import { cn } from "@cossplay/ui/lib/utils"
 import {
   Moon,
+  Plug,
   Power,
   Redo2,
   RefreshCcw,
@@ -38,7 +40,7 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { ColorControl, FontControl, NumericControl, Section } from "./controls"
-import { ExportDialog, ImportDialog } from "./dialogs"
+import { ExportDialog, ImportDialog, McpDialog } from "./dialogs"
 import { InspectToggle } from "./inspect"
 import {
   adjust,
@@ -599,12 +601,38 @@ export function PanelSections() {
   )
 }
 
+const sameOverrides = (a: Overrides, b: Overrides) =>
+  (["light", "dark"] as const).every(
+    (mode) =>
+      Object.keys(a[mode]).length === Object.keys(b[mode]).length &&
+      Object.entries(a[mode]).every(
+        ([token, value]) => b[mode][token as keyof Overrides["light"]] === value
+      )
+  )
+
 export function ImportExport() {
-  const { detected } = usePanel()
+  const { site, detected } = usePanel()
   const theme = useTheme() ?? defaults
-  const [dialog, setDialog] = useState<"import" | "export" | null>(null)
+  const [dialog, setDialog] = useState<"import" | "export" | "mcp" | null>(null)
+  // The CLI installs the preset as published, so only offer it while nothing is edited.
+  const themeId = site?.current.themeId ?? ""
+  const presetId =
+    dialog === "export" &&
+    (themeId === "default" || Object.hasOwn(presets, themeId)) &&
+    sameOverrides(site!.current.overrides, presetOverrides(themeId))
+      ? themeId
+      : ""
   return (
     <>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Use with AI editors"
+        title="Use with AI editors (MCP)"
+        onClick={() => setDialog("mcp")}
+      >
+        <Plug />
+      </Button>
       <Button
         size="sm"
         variant="outline"
@@ -628,6 +656,11 @@ export function ImportExport() {
         open={dialog === "export"}
         onOpenChange={(open) => setDialog(open ? "export" : null)}
         theme={theme}
+        presetId={presetId}
+      />
+      <McpDialog
+        open={dialog === "mcp"}
+        onOpenChange={(open) => setDialog(open ? "mcp" : null)}
       />
     </>
   )

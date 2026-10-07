@@ -3,6 +3,7 @@ import {
   exportCss,
   exportLayout,
   registryTheme,
+  registryUrl,
   type Theme,
 } from "@cossplay/core/coss"
 import { Button } from "@cossplay/ui/components/button"
@@ -22,7 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@cossplay/ui/components/select"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@cossplay/ui/components/tabs"
 import { Textarea } from "@cossplay/ui/components/textarea"
+import { Copy } from "lucide-react"
 import { useState } from "react"
 import fonts from "./fonts.json"
 import { importFrom, setError, usePanelStore } from "./store"
@@ -39,6 +47,34 @@ function DialogError() {
       {error}
     </p>
   ) : null
+}
+
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text)
+    usePanelStore.setState({ status: "Copied to clipboard" })
+  } catch (e) {
+    setError(`Copy failed: ${String(e)}`)
+  }
+}
+
+function CodeBlock({ code, label }: { code: string; label: string }) {
+  return (
+    <div className="flex min-w-0 items-start gap-1 rounded-lg border bg-muted/50 p-2">
+      <pre className="min-w-0 flex-1 overflow-x-auto whitespace-pre font-mono text-xs leading-relaxed">
+        {code}
+      </pre>
+      <Button
+        size="icon-xs"
+        variant="ghost"
+        aria-label={`Copy ${label}`}
+        title="Copy"
+        onClick={() => copyText(code)}
+      >
+        <Copy />
+      </Button>
+    </div>
+  )
 }
 
 export function ImportDialog({ open, onOpenChange }: DialogProps) {
@@ -147,21 +183,54 @@ function exportCode(theme: Theme, type: ExportType) {
   return exportCss(theme, type === "v3" ? "3" : "4")
 }
 
+const runners = {
+  pnpm: "pnpm dlx",
+  npm: "npx",
+  yarn: "yarn dlx",
+  bun: "bunx --bun",
+} as const
+
+/** `shadcn add` for an unedited preset; the CSS export covers everything else. */
+function InstallCommand({ presetId }: { presetId: string }) {
+  if (!presetId)
+    return (
+      <p className="text-muted-foreground text-xs">
+        The shadcn CLI command is available for unedited presets. For this
+        theme, use the CSS export below.
+      </p>
+    )
+  return (
+    <Tabs defaultValue="pnpm" className="min-w-0 gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="font-medium text-sm">Install with shadcn CLI</h3>
+        <TabsList aria-label="Package manager">
+          {Object.keys(runners).map((pm) => (
+            <TabsTrigger key={pm} value={pm} className="text-xs">
+              {pm}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+      {Object.entries(runners).map(([pm, runner]) => (
+        <TabsContent key={pm} value={pm} className="min-w-0">
+          <CodeBlock
+            label="install command"
+            code={`${runner} shadcn@latest add ${registryUrl}/${presetId}.json`}
+          />
+        </TabsContent>
+      ))}
+    </Tabs>
+  )
+}
+
 export function ExportDialog({
   open,
   onOpenChange,
   theme,
-}: DialogProps & { theme: Theme }) {
+  presetId,
+}: DialogProps & { theme: Theme; presetId: string }) {
   const [type, setType] = useState<ExportType>("v4")
   const output = exportCode(theme, type)
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(output)
-      usePanelStore.setState({ status: "Copied to clipboard" })
-    } catch (e) {
-      setError(`Copy failed: ${String(e)}`)
-    }
-  }
   const download = () => {
     const url = URL.createObjectURL(new Blob([output], { type: "text/plain" }))
     const a = document.createElement("a")
@@ -178,6 +247,7 @@ export function ExportDialog({
         </DialogHeader>
         <DialogPanel className="grid gap-4">
           <DialogError />
+          <InstallCommand presetId={presetId} />
           <Select
             items={exportItems}
             value={type}
@@ -206,8 +276,84 @@ export function ExportDialog({
           <Button variant="outline" onClick={download}>
             Download
           </Button>
-          <Button onClick={copy}>Copy code</Button>
+          <Button onClick={() => copyText(output)}>Copy code</Button>
         </DialogFooter>
+      </DialogPopup>
+    </Dialog>
+  )
+}
+
+const mcpClients = {
+  cursor: {
+    label: "Cursor",
+    file: ".cursor/mcp.json",
+    key: "mcpServers",
+  },
+  windsurf: {
+    label: "Windsurf",
+    file: "~/.codeium/windsurf/mcp_config.json",
+    key: "mcpServers",
+  },
+  claude: { label: "Claude Code", file: ".mcp.json", key: "mcpServers" },
+  vscode: { label: "VS Code", file: ".vscode/mcp.json", key: "servers" },
+} as const
+const json = (value: unknown) => JSON.stringify(value, null, 2)
+
+/** Lets AI editors browse and install the presets through shadcn's registry MCP server. */
+export function McpDialog({ open, onOpenChange }: DialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogPopup className="ui-chrome max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Use with AI editors (MCP)</DialogTitle>
+        </DialogHeader>
+        <DialogPanel className="grid gap-4 text-xs">
+          <DialogError />
+          <p className="text-muted-foreground">
+            1. Add the Cossplay registry to your project's{" "}
+            <code>components.json</code>:
+          </p>
+          <CodeBlock
+            label="components.json registries"
+            code={json({
+              registries: { "@cossplay": `${registryUrl}/{name}.json` },
+            })}
+          />
+          <p className="text-muted-foreground">
+            2. Add shadcn's MCP server to your editor, then ask it for a theme
+            from @cossplay.
+          </p>
+          <Tabs defaultValue="cursor" className="min-w-0 gap-2">
+            <TabsList aria-label="Editor">
+              {Object.entries(mcpClients).map(([id, { label }]) => (
+                <TabsTrigger key={id} value={id} className="text-xs">
+                  {label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {Object.entries(mcpClients).map(([id, { file, key }]) => (
+              <TabsContent key={id} value={id} className="grid min-w-0 gap-2">
+                <p className="text-muted-foreground">
+                  <code>{file}</code>
+                </p>
+                <CodeBlock
+                  label="MCP config"
+                  code={json({
+                    [key]: {
+                      shadcn: {
+                        command: "npx",
+                        args: ["shadcn@latest", "mcp"],
+                      },
+                    },
+                  })}
+                />
+              </TabsContent>
+            ))}
+          </Tabs>
+          <p className="text-muted-foreground">
+            Registry index: <code>{registryUrl}/registry.json</code>
+          </p>
+        </DialogPanel>
       </DialogPopup>
     </Dialog>
   )
