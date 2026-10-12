@@ -1,219 +1,380 @@
+import { Badge } from "@cossplay/ui/components/badge"
+import { Button } from "@cossplay/ui/components/button"
 import { createFileRoute } from "@tanstack/react-router"
-import styles from "../styles.css?url"
+import {
+  ArrowRightIcon,
+  CheckIcon,
+  ChromeIcon,
+  CodeIcon,
+  ContrastIcon,
+  CopyIcon,
+  HistoryIcon,
+  LockIcon,
+  PaletteIcon,
+  PanelRightIcon,
+  SquareDashedMousePointerIcon,
+  TypeIcon,
+} from "lucide-react"
+import { type ReactNode, useState } from "react"
+import { Footer, Logo } from "@/landing/chrome"
+import { ThemeDemo } from "@/landing/demo"
+import styles from "@/styles/landing.css?url"
+
+const site = "https://cossplay.vercel.app"
+const title = "Cossplay: live theme editor for coss ui"
+const description =
+  "Theme coss ui apps live: 42 tweakcn presets, colors, fonts, radius and contrast checks, in the browser or in Chrome's side panel on your own site. Export Tailwind CSS or install with the shadcn CLI."
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Cossplay — live themes for coss ui sites" },
-      {
-        name: "description",
-        content:
-          "A Chrome side panel that live-edits the theme of any coss ui website: 42 tweakcn presets, colors, fonts, radius and contrast checks, exported as Tailwind CSS.",
-      },
-      { property: "og:title", content: "Cossplay" },
-      {
-        property: "og:description",
-        content:
-          "Live-edit the theme of any coss ui website from Chrome's side panel.",
-      },
-      { property: "og:image", content: "/screenshot.webp" },
+      { title },
+      { name: "description", content: description },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${site}/` },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:image", content: `${site}/og.png` },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+      { name: "twitter:image", content: `${site}/og.png` },
     ],
     links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap",
-      },
+      { rel: "canonical", href: `${site}/` },
       { rel: "stylesheet", href: styles },
     ],
   }),
   component: Landing,
 })
 
+/** Set once the Chrome Web Store listing is live. */
+const chromeStoreUrl = ""
+
+function AddToChrome() {
+  return chromeStoreUrl ? (
+    <Button
+      size="lg"
+      variant="outline"
+      render={<a href={chromeStoreUrl} target="_blank" rel="noreferrer" />}
+    >
+      <ChromeIcon />
+      Add to Chrome
+    </Button>
+  ) : (
+    <Button size="lg" variant="outline" disabled>
+      <ChromeIcon />
+      Chrome extension · in review
+    </Button>
+  )
+}
+
+function Section({
+  id,
+  eyebrow,
+  title,
+  lede,
+  children,
+}: {
+  id: string
+  eyebrow: string
+  title: string
+  lede: string
+  children: ReactNode
+}) {
+  return (
+    <section id={id} className="scroll-mt-20 py-16 sm:py-24">
+      <p className="font-medium text-muted-foreground text-sm">{eyebrow}</p>
+      <h2 className="mt-2 max-w-2xl text-balance font-semibold text-3xl tracking-tight sm:text-4xl">
+        {title}
+      </h2>
+      <p className="mt-4 max-w-2xl text-pretty text-lg text-muted-foreground">
+        {lede}
+      </p>
+      <div className="mt-12">{children}</div>
+    </section>
+  )
+}
+
+const ways = [
+  {
+    icon: CodeIcon,
+    title: "In the browser",
+    body: "Open the editor and theme a gallery of real coss ui components: cards, dashboard, mail, marketing and app pages. Nothing to install.",
+    action: (
+      <a
+        href="/editor"
+        className="inline-flex items-center gap-1 font-medium text-sm hover:underline"
+      >
+        Open the editor <ArrowRightIcon className="size-4" />
+      </a>
+    ),
+  },
+  {
+    icon: PanelRightIcon,
+    title: "On any coss ui site",
+    body: "The Chrome extension docks in the side panel and edits the theme of the page you're on, localhost or production, and remembers it per site.",
+    action: (
+      <span className="font-medium text-muted-foreground text-sm">
+        Chrome Web Store listing in review
+      </span>
+    ),
+  },
+  {
+    icon: PaletteIcon,
+    title: "In your own app, from the editor",
+    body: "Add one script tag in development and the editor's Custom tab themes your running app live, next to the controls.",
+    action: (
+      <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs">
+        {`<script src="${site}/bridge.js">`}
+      </code>
+    ),
+  },
+]
+
 const features = [
   {
-    head: (
-      <div className="swatches">
-        {["#1e9df1", "#a3004c", "#c96442", "#7c3aed"].map((background) => (
-          <span key={background} style={{ background }} />
-        ))}
-      </div>
-    ),
-    title: "42 tweakcn presets",
-    body: "Apply any tweakcn theme to a coss ui page. Colors are mapped onto coss semantics, so destructive text and code blocks stay readable.",
+    icon: PaletteIcon,
+    title: "42 presets, coss-aware",
+    body: "Every tweakcn preset plus coss ui's default, mapped onto coss tokens like info, success, warning and code. Search, step through or shuffle them.",
   },
   {
-    head: <span className="icon">#1e9df1 · oklch · hsl</span>,
+    icon: SquareDashedMousePointerIcon,
+    title: "Inspect to edit",
+    body: "Point at any element to see which tokens color it, then click to jump straight to that control.",
+  },
+  {
+    icon: CodeIcon,
     title: "Precise color editing",
-    body: "Grouped tokens with search, HEX / OKLCH / HSL / RGB input, channel sliders and opacity, written back in the site's own format.",
+    body: "HEX, OKLCH, HSL or RGB with channel sliders, opacity and the Tailwind palette. Values are written back in the site's own format.",
   },
   {
-    head: <span className="icon">Aa · 0.625rem</span>,
-    title: "Type and geometry",
-    body: "Google font search and loading, letter spacing, radius, spacing and shadows, shared across light and dark.",
+    icon: TypeIcon,
+    title: "Type and shape",
+    body: "Google Fonts search and loading, letter spacing, radius, spacing and shadows, shared across light and dark.",
   },
   {
-    head: <span className="icon">4.5:1 AA</span>,
+    icon: ContrastIcon,
     title: "Contrast checks",
     body: "WCAG ratios for 15 coss color pairs, with an issues-only view while you edit.",
   },
   {
-    head: <span className="icon">⌘Z · ⌘⇧Z</span>,
+    icon: HistoryIcon,
     title: "Undo everything",
-    body: "Every edit is in history. Reset to a preset or back to the site's original theme at any time.",
-  },
-  {
-    head: <span className="icon">local only</span>,
-    title: "No account, no server",
-    body: "Themes are saved per site in your browser and restored before first paint on reload.",
+    body: "Every edit is in history with ⌘Z and ⌘⇧Z. Reset to the preset, or back to the site's original theme.",
   },
 ]
 
 const formats = [
-  "Tailwind v4 · OKLCH CSS",
-  "Tailwind v3 · HSL CSS",
+  "Tailwind v4 · OKLCH",
+  "Tailwind v3 · HSL",
   "shadcn registry JSON",
-  "Light / dark token JSON",
+  "Token JSON",
   "tailwind.config.js",
-  "Next.js font layout",
+  "Next.js fonts",
 ]
 
-const addToChrome = (
-  <span className="btn soon" aria-disabled="true">
-    Add to Chrome <small>Coming soon</small>
-  </span>
-)
+const faqs = [
+  {
+    q: "Is it free?",
+    a: "Yes. No account, no sign-up, no paid tier.",
+  },
+  {
+    q: "Where are my themes stored?",
+    a: "In your browser only. The editor uses local storage and the extension uses Chrome's extension storage. Nothing is sent to a server.",
+  },
+  {
+    q: "Does it only work with coss ui?",
+    a: "It's built around coss ui's token set, and also works on sites that use shadcn-style CSS variables.",
+  },
+  {
+    q: "Is this an official coss project?",
+    a: "No. Cossplay is an independent project. Presets come from tweakcn (Apache-2.0).",
+  },
+]
+
+function CliCommand() {
+  const command = `npx shadcn@latest add ${site}/r/themes/violet-bloom.json`
+  const [copied, setCopied] = useState(false)
+  return (
+    <div className="flex items-center gap-2 rounded-xl border bg-card p-2 pl-4 font-mono text-sm shadow-xs">
+      <span className="min-w-0 flex-1 truncate">
+        <span className="text-muted-foreground">$ </span>
+        {command}
+      </span>
+      <Button
+        size="icon-sm"
+        variant="ghost"
+        aria-label="Copy command"
+        onClick={() =>
+          navigator.clipboard.writeText(command).then(() => {
+            setCopied(true)
+            setTimeout(() => setCopied(false), 1500)
+          })
+        }
+      >
+        {copied ? <CheckIcon /> : <CopyIcon />}
+      </Button>
+    </div>
+  )
+}
 
 function Landing() {
   return (
-    <div className="wrap">
-      <nav>
-        <a className="logo" href="/">
-          <i />
-          Cossplay
-        </a>
-        <div className="links">
-          <a href="#features">Features</a>
-          <a href="#how">How it works</a>
-          <a href="#export">Export</a>
-          <a href="/editor">Editor</a>
-        </div>
-      </nav>
-
-      <header>
-        <span className="eyebrow">
-          <b />
-          Chrome extension · runs locally
-        </span>
-        <h1>Re-theme any coss ui site, live.</h1>
-        <p className="lede">
-          Cossplay docks next to the page and edits its theme variables while
-          you watch. Try a tweakcn preset, tune colors, fonts and radius, then
-          export the result as Tailwind CSS.
-        </p>
-        <div className="ctas">
-          <a className="btn primary" href="/editor">
+    <div className="min-h-dvh bg-background text-foreground">
+      <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
+        <nav className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
+          <Logo />
+          <div className="hidden items-center gap-5 text-muted-foreground text-sm sm:flex">
+            <a href="#ways" className="hover:text-foreground">
+              How to use
+            </a>
+            <a href="#features" className="hover:text-foreground">
+              Features
+            </a>
+            <a href="#ship" className="hover:text-foreground">
+              Ship it
+            </a>
+          </div>
+          <Button size="sm" className="ml-auto" render={<a href="/editor" />}>
             Open the editor
-          </a>
-          {addToChrome}
-        </div>
-        <div className="shot">
-          <img
-            src="/screenshot.webp"
-            width="1500"
-            height="864"
-            alt="coss.com/ui themed with the Violet Bloom preset, with the Cossplay side panel open on the color editor"
-          />
-        </div>
+          </Button>
+        </nav>
       </header>
 
-      <section id="features">
-        <h2>Everything a theme needs</h2>
-        <p className="sub">
-          Built on coss ui's own token set, including the info, success, warning
-          and code colors that shadcn themes don't have.
-        </p>
-        <div className="grid">
-          {features.map((f) => (
-            <div className="card" key={f.title}>
-              {f.head}
-              <h3>{f.title}</h3>
-              <p>{f.body}</p>
+      <main className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid items-center gap-12 pt-16 pb-8 sm:pt-24 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          <div>
+            <Badge variant="outline" className="gap-1.5">
+              <LockIcon className="size-3" />
+              Free · no account · runs in your browser
+            </Badge>
+            <h1 className="mt-5 text-balance font-semibold text-4xl tracking-tight sm:text-5xl">
+              Theme your coss ui app, live.
+            </h1>
+            <p className="mt-5 text-pretty text-lg text-muted-foreground">
+              Try 42 presets, tune colors, fonts and radius, and watch real
+              components change as you go. Then export Tailwind CSS or install
+              the theme with the shadcn CLI.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button size="lg" render={<a href="/editor" />}>
+                Open the editor
+                <ArrowRightIcon />
+              </Button>
+              <AddToChrome />
             </div>
-          ))}
+          </div>
+          <ThemeDemo />
         </div>
-      </section>
 
-      <section id="how">
-        <h2>How it works</h2>
-        <p className="sub">
-          Cossplay only overrides the variables you change. Everything else
-          keeps following the site.
-        </p>
-        <ol className="steps">
-          <li>
-            <h3>Open a coss ui site</h3>
-            <p>
-              The extension reads the page's theme variables from{" "}
-              <code>:root</code>, <code>.dark</code> and <code>@theme</code>.
-            </p>
-          </li>
-          <li>
-            <h3>Edit in the side panel</h3>
-            <p>
-              Pick a preset or tweak tokens. The page updates instantly in light
-              or dark.
-            </p>
-          </li>
-          <li>
-            <h3>Export the code</h3>
-            <p>
-              Copy or download CSS shaped like coss ui's{" "}
-              <code>globals.css</code>, ready to paste into your project.
-            </p>
-          </li>
-        </ol>
-      </section>
+        <Section
+          id="ways"
+          eyebrow="How to use"
+          title="Wherever your theme lives"
+          lede="One editor, three places to use it. Cossplay only overrides the variables you change; everything else keeps following your CSS."
+        >
+          <div className="grid gap-4 md:grid-cols-3">
+            {ways.map((way) => (
+              <div
+                key={way.title}
+                className="flex flex-col gap-3 rounded-2xl border bg-card p-6"
+              >
+                <way.icon className="size-5 text-muted-foreground" />
+                <h3 className="font-semibold">{way.title}</h3>
+                <p className="flex-1 text-muted-foreground text-sm">
+                  {way.body}
+                </p>
+                <div>{way.action}</div>
+              </div>
+            ))}
+          </div>
+          <img
+            src="/screenshot.webp"
+            width="1280"
+            height="800"
+            alt="coss.com/ui themed with the Ocean Breeze preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
+            className="mt-10 w-full rounded-2xl border shadow-xl/5"
+            loading="lazy"
+          />
+        </Section>
 
-      <section id="export">
-        <h2>Export to your stack</h2>
-        <p className="sub">
-          Import from a tweakcn or registry URL, pasted CSS or JSON, then take
-          it anywhere.
-        </p>
-        <div className="formats">
-          {formats.map((format) => (
-            <code key={format}>{format}</code>
-          ))}
+        <Section
+          id="features"
+          eyebrow="Features"
+          title="Everything a theme needs"
+          lede="Built on coss ui's own token set, including the info, success, warning and code colors that shadcn themes don't have."
+        >
+          <div className="grid gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature) => (
+              <div key={feature.title} className="bg-card p-6">
+                <feature.icon className="size-5 text-muted-foreground" />
+                <h3 className="mt-4 font-semibold">{feature.title}</h3>
+                <p className="mt-2 text-muted-foreground text-sm">
+                  {feature.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        <Section
+          id="ship"
+          eyebrow="Ship it"
+          title="From preset to your codebase in one command"
+          lede="Every preset is a shadcn registry item. Install it with the CLI, connect shadcn's MCP server to your editor, or copy the CSS in the format your project uses."
+        >
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div className="flex min-w-0 flex-col gap-3">
+              <CliCommand />
+              <p className="text-muted-foreground text-sm">
+                Edited a theme? Copy or download it from Export instead.
+              </p>
+            </div>
+            <div className="flex flex-wrap content-start gap-2">
+              {formats.map((format) => (
+                <Badge key={format} variant="secondary" size="lg">
+                  {format}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </Section>
+
+        <Section
+          id="faq"
+          eyebrow="FAQ"
+          title="Questions"
+          lede="The short version: free, local, and independent."
+        >
+          <dl className="grid gap-8 sm:grid-cols-2">
+            {faqs.map((faq) => (
+              <div key={faq.q}>
+                <dt className="font-semibold">{faq.q}</dt>
+                <dd className="mt-2 text-muted-foreground">{faq.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </Section>
+
+        <div className="mb-20 rounded-3xl border bg-muted/50 px-6 py-16 text-center">
+          <h2 className="text-balance font-semibold text-3xl tracking-tight">
+            Let your coss ui app play dress-up.
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            Pick a preset and see it on real components in seconds.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button size="lg" render={<a href="/editor" />}>
+              Open the editor
+              <ArrowRightIcon />
+            </Button>
+            <AddToChrome />
+          </div>
         </div>
-      </section>
+      </main>
 
-      <div className="closing">
-        <h2>Let your coss ui site play dress-up.</h2>
-        <p>
-          Cossplay is free and runs entirely in your browser. Chrome Web Store
-          listing coming soon.
-        </p>
-        <div className="ctas">
-          <a className="btn primary" href="/editor">
-            Open the editor
-          </a>
-          {addToChrome}
-        </div>
-      </div>
-
-      <footer>
-        <span>© 2026 Cossplay</span>
-        <span>
-          Presets from <a href="https://github.com/jnsahaj/tweakcn">tweakcn</a>{" "}
-          (Apache-2.0). Not affiliated with coss, Cal.com, tweakcn or shadcn/ui.
-        </span>
-      </footer>
+      <Footer />
     </div>
   )
 }
