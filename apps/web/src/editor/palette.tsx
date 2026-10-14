@@ -1,9 +1,8 @@
 import { defaults, groups } from "@cossplay/core/coss"
 import { focusControl } from "@cossplay/editor/inspect"
-import { groupLabel } from "@cossplay/editor/panel"
 import { usePanelStore, useTheme } from "@cossplay/editor/store"
 
-// 当前模式的每个颜色 token，分组同面板；色块跳到对应控件。
+// Every color token of the shown mode, grouped like the panel; a swatch jumps to its control.
 export function Palette() {
   const theme = useTheme() ?? defaults
   const mode = usePanelStore((s) => s.mode)
@@ -12,14 +11,14 @@ export function Palette() {
       {Object.entries(groups).map(([group, tokens]) => (
         <section key={group}>
           <h2 className="mb-2 font-medium text-muted-foreground text-xs uppercase tracking-wide">
-            {groupLabel(group)}
+            {group}
           </h2>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-3">
             {tokens.map((token) => (
               <button
                 key={token}
                 type="button"
-                title={`编辑 ${token}`}
+                title={`Edit ${token}`}
                 onClick={() => focusControl(token)}
                 className="cursor-pointer overflow-hidden rounded-lg border bg-card text-left text-card-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >

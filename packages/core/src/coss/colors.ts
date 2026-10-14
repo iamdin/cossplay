@@ -32,7 +32,7 @@ export function sourceFormat(value: string): ColorFormat {
 }
 export function formatColor(value: string, format: ColorFormat): string {
   const color = parseColor(value)
-  if (!color) throw Error(`颜色无效：${value}`)
+  if (!color) throw Error(`Invalid color: ${value}`)
   const alpha = color.alpha ?? 1
   const suffix = alpha < 1 ? ` / ${number(alpha)}` : ""
   if (format === "hex") return alpha < 1 ? formatHex8(color) : formatHex(color)
@@ -56,7 +56,7 @@ export function adjustColor(
   lightness: number
 ) {
   const c = converter("hsl")(parseColor(value))
-  if (!c) throw Error(`颜色无效：${value}`)
+  if (!c) throw Error(`Invalid color: ${value}`)
   return formatColor(
     `hsl(${number(((c.h ?? 0) + hue + 720) % 360)} ${number(Math.min(1, Math.max(0, c.s * saturation)) * 100)}% ${number(Math.min(1, Math.max(0.1, c.l * lightness)) * 100)}% / ${c.alpha ?? 1})`,
     "hex"

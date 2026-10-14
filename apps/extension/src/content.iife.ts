@@ -27,7 +27,7 @@ import { storage } from "@wxt-dev/storage"
 
 const origin = location.origin,
   key = siteKey(origin)
-// origin 偏好来自存储；检测只属于这份文档。
+// Origin preferences come from storage; detection belongs to this document only.
 let state: SiteState | null = null,
   detection: Detection | null = null,
   applied: HTMLStyleElement | null = null
@@ -123,7 +123,7 @@ function apply() {
   }
   add(":root:root", mode)
   for (const source of detection.sources) {
-    // 让作用域变量继续生效，但不碰无关的工具类。
+    // Keep scoped variables working, without touching unrelated utility classes.
     if (/^\.dark$/.test(source.selector.trim())) {
       if (mode === "dark") add(".dark.dark", "dark", source.values)
       continue
@@ -172,7 +172,7 @@ function apply() {
     fontStyle?.remove()
     fontStyle = null
   }
-  // USER 来源的 !important 变量会压过后来的作者规则，与优先级无关。
+  // USER-origin !important variables survive later author rules regardless of specificity.
   fallback.install(rules.join("\n"))
   if (!rules.length) document.getElementById("cossplay-loading")?.remove()
 }
@@ -184,7 +184,7 @@ const ready = new Promise<void>((resolve) => {
     })
 })
 async function detect(): Promise<Detection> {
-  // 原生 CSS 可能在缓慢的延迟脚本触发 DOMContentLoaded 之前就已经绘制。
+  // Native CSS can paint well before slow deferred scripts fire DOMContentLoaded.
   await new Promise<void>((resolve) => {
     let frame = 0
     const finish = () => {
@@ -215,8 +215,8 @@ async function detect(): Promise<Detection> {
   function walk(rules: CSSRuleList, href: string | null) {
     for (const rule of Array.from(rules)) {
       if (rule instanceof CSSStyleRule) {
-        // `[--radius:9999px]` 这类 Tailwind 任意属性是故意把 token 限定在一个组件上
-        //（coss 用它们做胶囊和淡边框）；它们不是主题来源。
+        // Tailwind arbitrary properties such as `[--radius:9999px]` scope a token to one component on
+        // purpose (coss uses them for pills and subtle borders); they are not theme sources.
         if (rule.selectorText.includes("\\[--")) continue
         const values: Partial<Record<Token, string>> = {}
         for (const token of tokens) {
@@ -278,14 +278,14 @@ async function detect(): Promise<Detection> {
     (["background", "primary", "foreground"] as const).every((k) =>
       validValue(k, getComputedStyle(root).getPropertyValue(`--${k}`).trim())
     )
-  // 不要为了无关的跨源样式表拉取，拖住已保存的根主题。
+  // Do not delay saved root themes for an unrelated cross-origin stylesheet fetch.
   if (!canDetectNow) await externalReads
   const previousClass = root.getAttribute("class"),
     previousTheme = root.getAttribute("data-theme")
-  // ponytail：USER 来源的 CSS 不在 CSSOM 里；回退生效时保留抓到的基线。
-  // 如果以后需要实时跟踪原生基线，再临时卸掉回退重新采样。
+  // ponytail: USER-origin CSS is not in CSSOM; retain the captured baseline while fallback is active.
+  // Temporarily remove the fallback to resample if live native-baseline tracking becomes necessary.
   if (fallback.active() && detection) return { ...detection, sources, warnings }
-  // 检测同步切换模式；不要让原生组件停在过渡中途。
+  // Detection changes modes synchronously; do not leave native components mid-transition.
   const measuring = document.createElement("style")
   measuring.id = "cossplay-measuring"
   measuring.textContent =
@@ -317,7 +317,7 @@ async function detect(): Promise<Detection> {
       for (const token of tokens) {
         const raw = computed.getPropertyValue(`--${token}`).trim()
         let value = raw
-        // coss 用 var()、color-mix() 和 --alpha() 声明颜色；交给浏览器去解析。
+        // coss declares colors as var(), color-mix() and --alpha(); let the browser resolve them.
         if (
           raw &&
           isColor(token) &&
@@ -366,7 +366,7 @@ async function detect(): Promise<Detection> {
     if (applied?.sheet && previousDisabled !== undefined)
       applied.sheet.disabled = previousDisabled
     detection = result
-    // 先恢复再撤掉测量遮罩，这样原生过渡不会启动。
+    // Restore before removing the measurement guard so native transitions never start.
     apply()
     root.getBoundingClientRect()
     measuring.remove()

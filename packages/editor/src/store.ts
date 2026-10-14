@@ -17,26 +17,26 @@ import { useMemo } from "react"
 import { create } from "zustand"
 import fonts from "./fonts.json"
 
-/** 面板跑在哪里：扩展（真实站点）或网页 Editor。 */
+/** Where the panel runs: the extension (a live site) or the web editor. */
 export type Host = {
-  /** 把一次编辑写进已存状态并返回；以存下来的结果为准。 */
+  /** Applies one edit to the stored state and returns it; the stored result wins. */
   edit(
     origin: string,
     edit: Edit,
     baseline: Detection["theme"],
     key: string
   ): Promise<SiteState>
-  /** 已存状态，保存失败时用来恢复。 */
+  /** The stored state, to recover after a failed save. */
   load(origin: string): Promise<SiteState>
   font(origin: string, family: string, css: string): Promise<void>
   fetchText(url: string): Promise<string>
 }
 
 /**
- * 面板状态。
- *  - `site`：正在编辑的 origin 的偏好（override、历史、开关、预览模式）。
- *  - `detection`：该文档自己的主题。不持久化。
- * 编辑先乐观生效；没有进行中的编辑时，以 Host 的结果为准。
+ * Panel state.
+ *  - `site`: preferences for the edited origin (overrides, history, enabled, preview mode).
+ *  - `detection`: the edited document's own theme. Never persisted.
+ * Edits apply optimistically; the host's result wins once no edit is pending.
  */
 interface PanelStore {
   site: SiteState | null
@@ -44,9 +44,9 @@ interface PanelStore {
   mode: Mode
   status: string
   error: string
-  /** 检查模式：在预览或站点里点选元素，会聚焦对应 token 的控件。 */
+  /** Inspect mode: picking an element in the preview or site focuses its token's control. */
   inspecting: boolean
-  /** 颜色标签的筛选。 */
+  /** The Colors tab's filter. */
   search: string
 }
 
@@ -69,7 +69,7 @@ let lastEdit: LastEdit | null = null
 export const setHost = (h: Host) => {
   host = h
 }
-/** 存储里的 Host 状态不能盖掉还在飞的乐观编辑。 */
+/** Host state from storage must not overwrite optimistic edits still in flight. */
 export const editsPending = () => pending > 0
 
 export const fontTokens = ["font-sans", "font-serif", "font-mono"] as const
@@ -96,7 +96,7 @@ export function useTheme() {
 
 export const setError = (error: string) => set({ error })
 
-/** `key` 标出连续控件：500ms 内的编辑合成一步撤销。 */
+/** `key` names a continuous control: its edits within 500ms form one undo step. */
 export function dispatch(edit: Edit, key = "") {
   const current = get().site
   const baseline = get().detection?.theme
@@ -109,15 +109,15 @@ export function dispatch(edit: Edit, key = "") {
     coalesces(lastEdit, key, current, now)
   )
   lastEdit = { key, at: now, current: JSON.stringify(next.current) }
-  set({ site: next, status: "正在保存…" })
+  set({ site: next, status: "Saving…" })
   pending++
   host.edit(current.origin, edit, baseline, key).then(
     (state) => {
       if (--pending || get().site?.origin !== state.origin) return
-      set({ site: state, status: "已保存在本地" })
+      set({ site: state, status: "Saved locally" })
     },
     (e) => {
-      set({ error: `未能保存：${String(e)}`, status: "未保存" })
+      set({ error: `Could not save: ${String(e)}`, status: "Not saved" })
       if (--pending === 0)
         host?.load(current.origin).then((site) => {
           if (pending === 0 && get().site?.origin === site.origin) set({ site })
@@ -131,7 +131,7 @@ export function updateToken(token: Token, value: string) {
   if (validValue(token, value))
     dispatch({ kind: "token", mode, token, value }, `${mode}:${token}`)
 }
-/** 套用整套主题（预设或导入）并加载其中的 Google 字体。 */
+/** Applies a whole theme (preset or import) and loads its Google fonts. */
 export function applyOverrides(overrides: Overrides, themeId = "") {
   dispatch({ kind: "theme", overrides, themeId })
   const families = new Set(
@@ -157,11 +157,11 @@ export const adjust = (hsl: Hsl, continuous = false) =>
   dispatch({ kind: "hsl", hsl }, continuous ? "hsl" : "")
 export const syncSidebar = () => dispatch({ kind: "sidebar", mode: get().mode })
 
-/** 加载用户选中的 Google 字体，页面里已经声明过的也一样。 */
+/** Loads a Google font the user picked, also when the page already declares it. */
 export async function loadFont(family: string) {
   const theme = currentTheme()
   if (!theme) return
-  // 页面里已有的字体也要变成 override，Host 才会去加载。
+  // A font the page already declares must become an override for the host to load it.
   const mode = get().mode
   for (const token of fontTokens)
     if (familyOf(theme[mode][token]).toLowerCase() === family.toLowerCase())
@@ -170,7 +170,7 @@ export async function loadFont(family: string) {
 }
 
 const fetched = new Set<string>()
-/** 每个 origin 只拉取一次 Google 字体样式表，交给 Host 保存，并在这里加载。 */
+/** Fetches a Google font stylesheet once per origin, stores it for the host and loads it here. */
 async function fetchFont(family: string) {
   const origin = get().site?.origin
   const metadata = fonts.find(
@@ -185,20 +185,20 @@ async function fetchFont(family: string) {
     const url = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(metadata.family)}${wght.length ? `:wght@${wght.join(";")}` : ""}&display=swap`
     const css = await host.fetchText(url)
     await host.font(origin, metadata.family, css)
-    // 面板已换到别的 origin；回来时再在这里加载。
+    // The panel moved to another origin; load it here again when it comes back.
     if (get().site?.origin !== origin) return void fetched.delete(key)
     const sheet = document.createElement("style")
     sheet.textContent = css
     document.head.append(sheet)
-    set({ status: `已加载 ${metadata.family}` })
+    set({ status: `Loaded ${metadata.family}` })
   } catch (err) {
     fetched.delete(key)
     if (get().site?.origin === origin)
-      set({ error: `字体加载失败：${String(err)}` })
+      set({ error: `Font loading failed: ${String(err)}` })
   }
 }
 
-/** 导入 CSS、tweakcn 或注册表 JSON，或从 URL 拉取（含 tweakcn 主题链接）。 */
+/** Imports CSS / tweakcn or registry JSON text, or fetches it from a URL (tweakcn theme links included). */
 export async function importFrom(text: string, rawUrl: string) {
   const origin = get().site?.origin
   let input = text
@@ -212,15 +212,17 @@ export async function importFrom(text: string, rawUrl: string) {
         url.searchParams.get("theme") ??
         url.pathname.split("/").filter(Boolean).at(-1)
       if (!id || id === "editor")
-        throw Error("请使用 tweakcn 主题注册表 URL，或带 ID 的主题链接")
+        throw Error(
+          "Use a tweakcn theme registry URL or a theme link with an ID"
+        )
       url.pathname = `/r/themes/${encodeURIComponent(id)}.json`
       url.search = ""
     }
-    if (!host) throw Error("尚未连接")
+    if (!host) throw Error("Not connected")
     input = await host.fetchText(url.href)
   }
   if (!origin || get().site?.origin !== origin)
-    throw Error("目标已变，请重新导入")
+    throw Error("Target changed; retry the import")
   applyOverrides(importTheme(input))
   set({ error: "" })
 }

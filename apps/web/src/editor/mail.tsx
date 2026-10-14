@@ -23,55 +23,59 @@ import {
 import { Person } from "@/editor/cards"
 
 const folders = [
-  ["收件箱", InboxIcon, 128],
-  ["草稿", FileIcon, 9],
-  ["已发送", SendIcon, 0],
-  ["归档", ArchiveIcon, 0],
-  ["废纸篓", Trash2Icon, 0],
+  ["Inbox", InboxIcon, 128],
+  ["Drafts", FileIcon, 9],
+  ["Sent", SendIcon, 0],
+  ["Archive", ArchiveIcon, 0],
+  ["Trash", Trash2Icon, 0],
 ] as const
 
 const actions = [
-  ["归档", ArchiveIcon],
-  ["移到废纸篓", Trash2Icon],
-  ["回复", ReplyIcon],
+  ["Archive", ArchiveIcon],
+  ["Move to trash", Trash2Icon],
+  ["Reply", ReplyIcon],
 ] as const
 
 const mails = [
   {
-    from: "王明",
-    subject: "明天开会",
-    preview: "你好，明天开个会讨论这个项目吧。我看过细节，有一些想法。",
+    from: "William Smith",
+    subject: "Meeting tomorrow",
+    preview:
+      "Hi, let's have a meeting tomorrow to discuss the project. I've been reviewing the details and have some ideas.",
     time: "09:34",
-    labels: ["会议", "工作"],
+    labels: ["meeting", "work"],
     unread: true,
   },
   {
-    from: "李安",
-    subject: "回复：项目进展",
-    preview: "谢谢项目进展。看起来很好！我看完了报告，进度很不错。",
-    time: "昨天",
-    labels: ["工作"],
+    from: "Alice Smith",
+    subject: "Re: Project update",
+    preview:
+      "Thank you for the project update. It looks great! I've gone through the report and the progress is impressive.",
+    time: "Yesterday",
+    labels: ["work"],
     unread: true,
   },
   {
-    from: "赵博",
-    subject: "周末安排",
-    preview: "周末有安排吗？我想去附近的山里走走。",
-    time: "2 天前",
-    labels: ["私人"],
+    from: "Bob Johnson",
+    subject: "Weekend plans",
+    preview:
+      "Any plans for the weekend? I was thinking of going hiking in the nearby mountains.",
+    time: "2 days ago",
+    labels: ["personal"],
     unread: false,
   },
   {
-    from: "孙雨",
-    subject: "回复：关于预算的问题",
-    preview: "我对接下来这个项目的预算有个问题。看起来有一处对不上。",
-    time: "1 周前",
-    labels: ["预算", "工作"],
+    from: "Emily Davis",
+    subject: "Re: Question about budget",
+    preview:
+      "I have a question about the budget for the upcoming project. It seems there's a discrepancy.",
+    time: "1 week ago",
+    labels: ["budget", "work"],
     unread: false,
   },
 ]
 
-// 类似 shadcn mail 示例的邮件客户端：文件夹、列表和打开的信。
+// A mail client like shadcn's mail example: folders, message list and the open message.
 export function Mail() {
   const open = mails[0]
   return (
@@ -93,11 +97,11 @@ export function Mail() {
       </nav>
       <section className="flex @2xl:w-96 w-full min-w-0 @2xl:shrink-0 flex-col gap-3 p-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-lg">收件箱</h2>
+          <h2 className="font-semibold text-lg">Inbox</h2>
           <Tabs defaultValue="all">
             <TabsList>
-              <TabsTab value="all">全部</TabsTab>
-              <TabsTab value="unread">未读</TabsTab>
+              <TabsTab value="all">All mail</TabsTab>
+              <TabsTab value="unread">Unread</TabsTab>
             </TabsList>
           </Tabs>
         </div>
@@ -105,7 +109,7 @@ export function Mail() {
           <InputGroupAddon>
             <SearchIcon aria-hidden="true" />
           </InputGroupAddon>
-          <InputGroupInput aria-label="搜索邮件" placeholder="搜索" />
+          <InputGroupInput aria-label="Search mail" placeholder="Search" />
         </InputGroup>
         {mails.map((mail) => (
           <button
@@ -131,7 +135,7 @@ export function Mail() {
               {mail.labels.map((label) => (
                 <Badge
                   key={label}
-                  variant={label === "工作" ? "default" : "secondary"}
+                  variant={label === "work" ? "default" : "secondary"}
                 >
                   {label}
                 </Badge>
@@ -152,26 +156,28 @@ export function Mail() {
         <div className="flex items-start justify-between gap-4 p-4">
           <Person
             name={open.from}
-            detail={`${open.subject} · 回复至：williamsmith@example.com`}
+            detail={`${open.subject} · Reply-To: williamsmith@example.com`}
           />
           <span className="shrink-0 text-muted-foreground text-xs">
-            2026 年 10 月 22 日 9:00
+            Oct 22, 2026, 9:00 AM
           </span>
         </div>
         <Separator />
         <div className="flex-1 space-y-4 whitespace-pre-wrap p-4 text-sm">
           {open.preview}
-          {"\n\n请带着问题和想法来。期待见面！\n\n王明"}
+          {
+            "\n\nPlease come prepared with any questions or insights you may have. Looking forward to our meeting!\n\nBest regards, William"
+          }
         </div>
         <Separator />
         <form className="flex flex-col gap-3 p-4">
-          <Textarea placeholder={`回复 ${open.from}…`} />
+          <Textarea placeholder={`Reply ${open.from}…`} />
           <div className="flex items-center">
             <Label className="font-normal text-xs">
-              <Switch aria-label="静音此会话" /> 静音此会话
+              <Switch aria-label="Mute this thread" /> Mute this thread
             </Label>
             <Button size="sm" className="ml-auto">
-              发送
+              Send
             </Button>
           </div>
         </form>

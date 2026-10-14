@@ -5,7 +5,7 @@ export default function Particle() {
   return (
     <Label>
       <Switch />
-      营销邮件
+      Marketing emails
     </Label>
   )
 }

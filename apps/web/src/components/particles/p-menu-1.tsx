@@ -26,73 +26,73 @@ import {
 export default function Particle() {
   return (
     <Menu>
-      <MenuTrigger render={<Button variant="outline" />}>打开菜单</MenuTrigger>
+      <MenuTrigger render={<Button variant="outline" />}>Open menu</MenuTrigger>
       <MenuPopup>
         <MenuGroup>
-          <MenuGroupLabel>播放</MenuGroupLabel>
+          <MenuGroupLabel>Playback</MenuGroupLabel>
           <MenuItem>
             <PlayIcon aria-hidden="true" />
-            播放
+            Play
             <MenuShortcut>⌘P</MenuShortcut>
           </MenuItem>
           <MenuItem disabled>
             <PauseIcon aria-hidden="true" />
-            暂停
+            Pause
             <MenuShortcut>⇧⌘P</MenuShortcut>
           </MenuItem>
           <MenuItem>
             <SkipBackIcon aria-hidden="true" />
-            上一首
+            Previous
             <MenuShortcut>⌘[</MenuShortcut>
           </MenuItem>
           <MenuItem>
             <SkipForwardIcon aria-hidden="true" />
-            下一首
+            Next
             <MenuShortcut>⌘]</MenuShortcut>
           </MenuItem>
         </MenuGroup>
         <MenuSeparator />
-        <MenuCheckboxItem>随机</MenuCheckboxItem>
-        <MenuCheckboxItem>重复</MenuCheckboxItem>
-        <MenuCheckboxItem disabled>增强音效</MenuCheckboxItem>
+        <MenuCheckboxItem>Shuffle</MenuCheckboxItem>
+        <MenuCheckboxItem>Repeat</MenuCheckboxItem>
+        <MenuCheckboxItem disabled>Enhanced Audio</MenuCheckboxItem>
         <MenuSeparator />
         <MenuGroup>
-          <MenuGroupLabel>排序</MenuGroupLabel>
+          <MenuGroupLabel>Sort by</MenuGroupLabel>
           <MenuRadioGroup>
-            <MenuRadioItem value="artist">艺人</MenuRadioItem>
-            <MenuRadioItem value="album">专辑</MenuRadioItem>
-            <MenuRadioItem value="title">标题</MenuRadioItem>
+            <MenuRadioItem value="artist">Artist</MenuRadioItem>
+            <MenuRadioItem value="album">Album</MenuRadioItem>
+            <MenuRadioItem value="title">Title</MenuRadioItem>
           </MenuRadioGroup>
         </MenuGroup>
         <MenuSeparator />
-        <MenuCheckboxItem variant="switch">自动保存</MenuCheckboxItem>
+        <MenuCheckboxItem variant="switch">Auto save</MenuCheckboxItem>
         <MenuSeparator />
         <MenuSub>
-          <MenuSubTrigger>加入播放列表</MenuSubTrigger>
+          <MenuSubTrigger>Add to Playlist</MenuSubTrigger>
           <MenuSubPopup>
-            <MenuItem>爵士</MenuItem>
+            <MenuItem>Jazz</MenuItem>
             <MenuSub>
-              <MenuSubTrigger>摇滚</MenuSubTrigger>
+              <MenuSubTrigger>Rock</MenuSubTrigger>
               <MenuSubPopup>
-                <MenuItem>硬摇滚</MenuItem>
-                <MenuItem>轻摇滚</MenuItem>
-                <MenuItem>经典摇滚</MenuItem>
+                <MenuItem>Hard Rock</MenuItem>
+                <MenuItem>Soft Rock</MenuItem>
+                <MenuItem>Classic Rock</MenuItem>
                 <MenuSeparator />
-                <MenuItem>金属</MenuItem>
-                <MenuItem>朋克</MenuItem>
-                <MenuItem>垃圾摇滚</MenuItem>
-                <MenuItem>另类</MenuItem>
-                <MenuItem>独立</MenuItem>
-                <MenuItem>电子</MenuItem>
+                <MenuItem>Metal</MenuItem>
+                <MenuItem>Punk</MenuItem>
+                <MenuItem>Grunge</MenuItem>
+                <MenuItem>Alternative</MenuItem>
+                <MenuItem>Indie</MenuItem>
+                <MenuItem>Electronic</MenuItem>
               </MenuSubPopup>
             </MenuSub>
-            <MenuItem>流行</MenuItem>
+            <MenuItem>Pop</MenuItem>
           </MenuSubPopup>
         </MenuSub>
         <MenuSeparator />
         <MenuItem variant="destructive">
           <TrashIcon aria-hidden="true" />
-          删除
+          Delete
           <MenuShortcut>⌘⌫</MenuShortcut>
         </MenuItem>
       </MenuPopup>

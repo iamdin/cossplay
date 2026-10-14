@@ -20,7 +20,7 @@ export type Source = {
   values: Partial<Record<Token, string>>
   href: string | null
 }
-// 一份文档的事实。只留在该文档和它的面板里，从不持久化。
+// Facts about one document. They stay in that document and its panel, and are never persisted.
 export type Detection = {
   detected: boolean
   theme: Theme
@@ -30,8 +30,8 @@ export type Detection = {
   warnings: string[]
 }
 export type Hsl = { hue: number; saturation: number; lightness: number }
-// 一步可撤销的编辑。只有用户选的值；有效主题是文档基线加上这些 override。
-// hslBase 是 HSL 调整开始时固化的有效主题，这样重复调整不会叠乘。
+// One undoable edit. Only user-chosen values; the effective theme is a document baseline plus these overrides.
+// hslBase is the effective theme materialized when an HSL adjustment starts, so repeated adjustments do not compound.
 export type Snapshot = {
   overrides: Overrides
   themeId: string
@@ -39,7 +39,7 @@ export type Snapshot = {
   hslBase: Theme | null
   sidebarSync: boolean
 }
-// 按 origin 共享的偏好，存在 siteKey(origin) 下，只有 worker 会写。
+// Origin-shared preferences, persisted under siteKey(origin) and written only by the worker.
 export type SiteState = {
   enabled: boolean
   origin: string
@@ -123,8 +123,8 @@ export type Edit =
   | { kind: "redo" }
   | { kind: "enabled"; enabled: boolean }
   | { kind: "preview"; mode: Mode }
-// 编辑改变站点状态的唯一地方。面板先乐观跑一遍；worker 再对最新存储跑一遍，
-// 这样并发的面板不会互相覆盖。
+// The single place edits change site state. The panel runs it optimistically; the worker runs it
+// again on the latest stored state, so concurrent panels never overwrite each other's edits.
 export function transition(
   state: SiteState,
   edit: Edit,
@@ -185,7 +185,7 @@ export function transition(
     }
   }
 }
-// 同一控件 500ms 内的连续编辑合成一步撤销，除非中间还有别的改动。
+// Consecutive edits of one control within 500ms form one undo step, unless anything else changed in between.
 export type LastEdit = { key: string; at: number; current: string }
 export const coalesces = (
   last: LastEdit | null,
@@ -198,7 +198,8 @@ export const coalesces = (
   now - last.at < 500 &&
   last.current === JSON.stringify(state.current)
 
-// 存储和消息都是不可信输入：值会进到注入的 CSS 里。解析只留合法的，其余丢掉。
+// Storage and messages are untrusted input: values end up in injected CSS. Parsing keeps what is
+// valid and drops the rest.
 const modeValues = z
   .record(z.string(), z.unknown())
   .catch({})

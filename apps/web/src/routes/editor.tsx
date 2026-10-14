@@ -45,7 +45,7 @@ export const Route = createFileRoute("/editor")({
       {
         name: "description",
         content:
-          "在浏览器里设计 coss ui 主题：在真实 coss ui 组件上调整预设、颜色、字体和圆角，并导出为 Tailwind CSS。",
+          "Design a coss ui theme in the browser: presets, colors, fonts and radius on real coss ui components, exported as Tailwind CSS.",
       },
     ],
     links: [{ rel: "stylesheet", href: styles }],
@@ -55,24 +55,24 @@ export const Route = createFileRoute("/editor")({
 
 const bar = "ui-chrome flex h-14 shrink-0 items-center gap-1 border-b px-3"
 
-// 预览页，布局同 tweakcn；放不下的收进「更多」。
+// Preview pages, like tweakcn's; the rest sit in a "More" menu so the tabs fit.
 const pages: [string, string, ComponentType][] = [
-  ["cards", "卡片", Cards],
-  ["dashboard", "仪表盘", Dashboard],
-  ["marketing", "营销页", Marketing],
-  ["application", "应用", Application],
-  ["components", "组件", Components],
-  ["custom", "自定义", CustomPreview],
+  ["cards", "Cards", Cards],
+  ["dashboard", "Dashboard", Dashboard],
+  ["marketing", "Marketing", Marketing],
+  ["application", "Application", Application],
+  ["components", "Components", Components],
+  ["custom", "Custom", CustomPreview],
 ]
 const more: [string, string, ComponentType][] = [
-  ["mail", "邮件", Mail],
-  ["typography", "排版", Typography],
-  ["palette", "色板", Palette],
+  ["mail", "Mail", Mail],
+  ["typography", "Typography", Typography],
+  ["palette", "Color Palette", Palette],
 ]
 
 const widthKey = "cossplay:panel-width"
 
-// 布局同 tweakcn 的 Editor：顶栏、左侧控件、右侧操作与 Preview。
+// Laid out like tweakcn's editor: site header, controls on the left, actions and preview on the right.
 function Editor() {
   useEffect(connect, [])
   useUndoShortcuts()
@@ -82,7 +82,7 @@ function Editor() {
   const [width, setWidth] = useState<number>()
   useEffect(() => {
     if (!full) return
-    // Escape 退出全屏，除非已打开的对话框、菜单或检查先接住了它。
+    // Escape leaves fullscreen unless something open (a dialog, a menu, inspect) took it.
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !e.defaultPrevented) setFull(false)
     }
@@ -119,7 +119,7 @@ function Editor() {
             href="/#how"
             className="text-muted-foreground text-sm hover:text-foreground"
           >
-            Chrome 扩展
+            Chrome extension
           </a>
         </header>
         <div className="flex min-h-0 flex-1">
@@ -128,9 +128,9 @@ function Editor() {
               "ui-chrome flex min-w-80 shrink-0 flex-col text-xs",
               !width && "w-[30%] max-w-md"
             )}
-            // max-width 会把在更宽窗口里存下的宽度再夹回来。
+            // max-width re-clamps a width saved on a wider window.
             style={width ? { width, maxWidth: "60vw" } : undefined}
-            // 全屏时从检查点进来的控件必须能看见。
+            // A control focused from fullscreen (an inspector pick) must be seen.
             onFocus={() => setFull(false)}
           >
             <div className={bar}>
@@ -139,11 +139,11 @@ function Editor() {
             <PanelAlerts />
             <PanelSections />
           </aside>
-          {/* biome-ignore lint/a11y/useSemanticElements: 可聚焦的分隔条是分割条的 ARIA 模式。 */}
+          {/* biome-ignore lint/a11y/useSemanticElements: a focusable separator is the ARIA pattern for a splitter. */}
           <div
             role="separator"
             aria-orientation="vertical"
-            aria-label="调整面板宽度"
+            aria-label="Resize panel"
             aria-valuenow={width}
             tabIndex={0}
             className="relative w-px shrink-0 cursor-col-resize bg-border outline-none before:absolute before:inset-y-0 before:-right-1 before:-left-1 hover:bg-ring focus-visible:bg-ring"
@@ -184,7 +184,7 @@ function Editor() {
               className="flex min-h-0 flex-1 flex-col gap-0"
             >
               <div className="ui-chrome flex shrink-0 flex-wrap items-center gap-2 px-4 pt-3 pb-1">
-                <TabsList aria-label="预览">
+                <TabsList aria-label="Preview">
                   {pages.map(([value, label]) => (
                     <TabsTab key={value} value={value}>
                       {label}
@@ -200,7 +200,7 @@ function Editor() {
                       />
                     }
                   >
-                    {overflow?.[1] ?? "更多"}
+                    {overflow?.[1] ?? "More"}
                     <ChevronDownIcon />
                   </MenuTrigger>
                   <MenuPopup className="ui-chrome" align="start">
@@ -217,7 +217,7 @@ function Editor() {
                   variant="ghost"
                   size="icon-sm"
                   className="ml-auto"
-                  aria-label={full ? "退出全屏" : "全屏"}
+                  aria-label={full ? "Exit fullscreen" : "Fullscreen"}
                   aria-pressed={full}
                   onClick={() => setFull(!full)}
                 >
@@ -228,7 +228,7 @@ function Editor() {
                 <TabsPanel
                   key={value}
                   value={value}
-                  // 自定义预览的框架在切换标签时保留用户应用的状态。
+                  // The custom preview's frame keeps the user's app state across tab switches.
                   keepMounted={value === "custom"}
                   className={
                     value === "custom"

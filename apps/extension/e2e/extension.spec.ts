@@ -38,7 +38,7 @@ test("panel page renders", async () => {
   await expect(page.getByRole("tab", { name: "Colors" })).toBeVisible()
 })
 
-// 一个 coss 风格的页面：颜色通过 var()、color-mix() 和 --alpha() 的输出声明。
+// A coss-style page: colors declared through var(), color-mix() and --alpha() output.
 const COSS_PAGE = `<!doctype html><html><head><style>
 :root { --color-white: #fff; --color-neutral-800: oklch(26.9% 0 0); --radius: 0.625rem;
   --background: var(--color-white); --foreground: var(--color-neutral-800); --primary: var(--color-neutral-800);
@@ -58,7 +58,7 @@ test("detects coss variables and applies stored per-origin overrides", async () 
 
   const detection = await sw.evaluate(async () => {
     const [tab] = await chrome.tabs.query({ url: "http://coss.test/*" })
-    // @webext-core/messaging 的线上格式：进来是 { type, id, timestamp }，出去是 { res } 或 { err }。
+    // @webext-core/messaging wire format: { type, id, timestamp } in, { res } or { err } out.
     return (
       await chrome.tabs.sendMessage(tab.id!, {
         type: "inspect",
@@ -90,13 +90,13 @@ test("detects coss variables and applies stored per-origin overrides", async () 
     })
   )
   const cta = page.locator("#cta")
-  // 按页面自己的格式写回（这里是 oklch）：#ff0000 是 oklch(0.628 0.258 29.23)。
+  // Written back in the page's own format (oklch here): #ff0000 is oklch(0.628 0.258 29.23).
   await expect(cta).toHaveCSS(
     "background-color",
     /^oklch\(0\.62\d* 0\.25\d* 29\.2\d*\)$/
   )
   await expect(cta).toHaveCSS("border-radius", "16px")
-  // 组件作用域的任意属性保持自己的值。
+  // Component-scoped arbitrary properties keep their own value.
   await expect(page.locator("#pill")).toHaveCSS("border-radius", "9999px")
 
   await sw.evaluate(() =>
@@ -127,7 +127,7 @@ test("inspect mode reports the picked token over the inspector port", async () =
   )
   await page.goto("http://inspect.test/")
   const [sw] = ctx.serviceWorkers()
-  // 代替侧边栏，连接方式和它一样。
+  // Stands in for the side panel, which connects the same way.
   await sw.evaluate(async () => {
     const [tab] = await chrome.tabs.query({ url: "http://inspect.test/*" })
     const port = chrome.tabs.connect(tab.id!, { name: "cossplay-inspector" })
@@ -143,12 +143,12 @@ test("inspect mode reports the picked token over the inspector port", async () =
     await page.locator("#cta").hover({ position: { x: 2, y: 2 } })
     await expect(card).toBeVisible({ timeout: 500 })
   }).toPass()
-  // 每个 token 一行，带上用到它的 class。
+  // One row per token, with the classes that use it.
   await expect(card.getByRole("button")).toHaveText([
     "primarybg-primary",
     "primary-foregroundtext-primary-foreground",
   ])
-  await card.getByTitle("编辑 primary-foreground").click()
+  await card.getByTitle("Edit primary-foreground").click()
   const state = () =>
     sw.evaluate(
       () =>
@@ -170,8 +170,8 @@ test("inspect mode reports the picked token over the inspector port", async () =
   })
 })
 
-// 侧边栏按停靠宽度驱动一个真实标签。只模拟停靠：
-// 面板查询「自己窗口的当前标签」时返回站点标签。
+// The side panel at its docked width, driving a real tab. Only the docking is stood in for:
+// the panel's "active tab of its window" query returns the site's tab.
 test.describe("side panel", () => {
   let site: Page
   let panel: Page
@@ -215,21 +215,21 @@ test.describe("side panel", () => {
   test.afterEach(() => expect(errors).toEqual([]))
 
   test("preset picker and Tailwind palette theme the site", async () => {
-    const trigger = panel.getByLabel("主题预设")
+    const trigger = panel.getByLabel("Theme preset")
     await expect(trigger).toBeEnabled({ timeout: 10_000 })
     const initial = await primary()
     await trigger.click()
-    await panel.getByPlaceholder("搜索预设…").fill("doom")
+    await panel.getByPlaceholder("Search presets…").fill("doom")
     await panel.getByRole("option", { name: "Doom 64" }).click()
     await expect(trigger).toContainText("Doom 64")
     await expect.poll(primary).not.toBe(initial)
     const preset = await primary()
 
     await panel
-      .getByRole("button", { name: "Primary Tailwind 色板", exact: true })
+      .getByRole("button", { name: "Primary Tailwind colors", exact: true })
       .click()
     const red = panel.getByRole("button", { name: "red-500", exact: true })
-    // 色板要放得进面板。
+    // The palette fits the panel.
     await expect
       .poll(async () => {
         const box = await red.boundingBox()
@@ -238,17 +238,17 @@ test.describe("side panel", () => {
       .toBeLessThanOrEqual(400)
     await red.click()
     await panel.keyboard.press("Escape")
-    await expect(trigger).toHaveText("自定义")
+    await expect(trigger).toHaveText("Custom")
     await expect.poll(primary).not.toBe(preset)
 
-    await panel.getByRole("button", { name: "下一个预设" }).click()
-    await expect(trigger).not.toHaveText("自定义")
+    await panel.getByRole("button", { name: "Next preset" }).click()
+    await expect(trigger).not.toHaveText("Custom")
   })
 
   test("an inspector pick on the site focuses the panel's control", async () => {
-    const search = panel.getByLabel("搜索颜色")
+    const search = panel.getByLabel("Search colors")
     await search.fill("chart")
-    const toggle = panel.getByRole("button", { name: "检查" })
+    const toggle = panel.getByRole("button", { name: "Inspect" })
     await toggle.click()
     await expect(toggle).toHaveAttribute("aria-pressed", "true")
     const card = site.locator("cossplay-inspector .card")
@@ -256,7 +256,7 @@ test.describe("side panel", () => {
       await site.locator("#cta").hover({ position: { x: 2, y: 2 } })
       await expect(card).toBeVisible({ timeout: 500 })
     }).toPass()
-    await card.getByTitle("编辑 primary", { exact: true }).click()
+    await card.getByTitle("Edit primary", { exact: true }).click()
     await expect(panel.locator('input[data-token="primary"]')).toBeFocused()
     await expect(search).toHaveValue("")
 
@@ -264,7 +264,7 @@ test.describe("side panel", () => {
     await expect(site.locator("cossplay-inspector")).toHaveCount(0)
     await expect(toggle).toHaveAttribute("aria-pressed", "false")
 
-    // 在面板里按 Escape 也会结束。
+    // Escape in the panel ends it as well.
     await toggle.click()
     await expect(site.locator("cossplay-inspector")).toHaveCount(1)
     await panel.keyboard.press("Escape")

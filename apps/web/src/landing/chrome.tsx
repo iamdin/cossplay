@@ -16,10 +16,10 @@ export function Footer() {
         <Logo />
         <div className="flex flex-wrap gap-x-5 gap-y-2">
           <a href="/privacy" className="hover:text-foreground">
-            隐私
+            Privacy
           </a>
           <span>
-            预设来自{" "}
+            Presets from{" "}
             <a
               href="https://github.com/jnsahaj/tweakcn"
               className="underline hover:text-foreground"
@@ -28,7 +28,7 @@ export function Footer() {
             </a>{" "}
             (Apache-2.0)
           </span>
-          <span>与 coss、Cal.com、tweakcn 或 shadcn/ui 均无关联。</span>
+          <span>Not affiliated with coss, Cal.com, tweakcn or shadcn/ui.</span>
         </div>
       </div>
     </footer>

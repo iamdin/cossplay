@@ -18,27 +18,31 @@ export default function Particle() {
   return (
     <Dialog>
       <DialogTrigger render={<Button variant="outline" />}>
-        打开对话框
+        Open Dialog
       </DialogTrigger>
       <DialogPopup className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>编辑资料</DialogTitle>
-          <DialogDescription>在这里修改资料。完成后点保存。</DialogDescription>
+          <DialogTitle>Edit profile</DialogTitle>
+          <DialogDescription>
+            Make changes to your profile here. Click save when you&apos;re done.
+          </DialogDescription>
         </DialogHeader>
         <Form className="contents">
           <DialogPanel className="grid gap-4">
             <Field>
-              <FieldLabel>姓名</FieldLabel>
+              <FieldLabel>Name</FieldLabel>
               <Input defaultValue="Margaret Welsh" type="text" />
             </Field>
             <Field>
-              <FieldLabel>用户名</FieldLabel>
+              <FieldLabel>Username</FieldLabel>
               <Input defaultValue="@maggie.welsh" type="text" />
             </Field>
           </DialogPanel>
           <DialogFooter>
-            <DialogClose render={<Button variant="ghost" />}>取消</DialogClose>
-            <Button type="submit">保存</Button>
+            <DialogClose render={<Button variant="ghost" />}>
+              Cancel
+            </DialogClose>
+            <Button type="submit">Save</Button>
           </DialogFooter>
         </Form>
       </DialogPopup>

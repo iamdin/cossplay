@@ -3,7 +3,7 @@ import { focusControl, InspectToggle } from "@cossplay/editor/inspect"
 import { usePanelStore } from "@cossplay/editor/store"
 import { useEffect, useRef } from "react"
 
-/** 预览工具栏上的检查开关；检查它所在的 `<main>`，不含自身控件。 */
+/** The preview toolbar's Inspect toggle; inspects the `<main>` it sits in, minus its chrome. */
 export function PreviewInspector() {
   const ref = useRef<HTMLButtonElement>(null)
   const inspecting = usePanelStore((s) => s.inspecting)

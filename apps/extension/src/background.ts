@@ -15,16 +15,16 @@ async function fetchText(raw: string) {
     url.username ||
     url.password
   )
-    throw Error("只允许不带凭据的 HTTP(S) 地址")
+    throw Error("Only HTTP(S) URLs without credentials are allowed")
   const response = await fetch(url, {
     credentials: "omit",
     signal: AbortSignal.timeout(15000),
   })
-  if (!response.ok) throw Error(`拉取失败：HTTP ${response.status}`)
+  if (!response.ok) throw Error(`Fetch failed: HTTP ${response.status}`)
   if (Number(response.headers.get("content-length")) > 2_000_000)
-    throw Error("主题或样式表太大")
+    throw Error("Theme or stylesheet is too large")
   const text = await response.text()
-  if (text.length > 2_000_000) throw Error("主题或样式表太大")
+  if (text.length > 2_000_000) throw Error("Theme or stylesheet is too large")
   return text
 }
 async function syncEarlyScripts() {
@@ -64,29 +64,30 @@ async function syncEarlyScripts() {
 }
 const store = createStore(storage, syncEarlyScripts)
 type Sender = chrome.runtime.MessageSender
-// 只有扩展页面能改偏好；content script 可以读存储，但不能写。
+// Only extension pages change preferences; content scripts can read storage but never write it.
 function trusted(sender: Sender) {
   if (sender.tab && !sender.url?.startsWith(chrome.runtime.getURL("")))
-    throw Error("发送方不可信")
+    throw Error("Untrusted sender")
 }
 worker.onMessage("fetch", async ({ data }) => {
-  if (typeof data.url !== "string") throw Error("URL 无效")
+  if (typeof data.url !== "string") throw Error("Invalid URL")
   return { text: await fetchText(data.url) }
 })
 worker.onMessage("css", async ({ data, sender }) => {
-  if (sender.tab?.id === undefined) throw Error("CSS 请求必须来自标签页")
+  if (sender.tab?.id === undefined)
+    throw Error("CSS requests must come from a tab")
   if (
     typeof data.css !== "string" ||
     typeof data.previous !== "string" ||
     data.css.length > 1_000_000 ||
     data.previous.length > 1_000_000
   )
-    throw Error("注入的 CSS 无效")
+    throw Error("Invalid injected CSS")
   const target = sender.documentId
     ? { tabId: sender.tab.id, documentIds: [sender.documentId] }
     : { tabId: sender.tab.id, frameIds: [sender.frameId ?? 0] }
-  // 上一张样式表由 content script 提供，worker 挂起之后也一样。
-  // 先插入再移除，失败时留下的正好是上一张。
+  // The content script supplies the previous sheet, including after worker suspension.
+  // Insert before removing so a failure leaves exactly the previous sheet installed.
   if (data.css)
     await chrome.scripting.insertCSS({ target, css: data.css, origin: "USER" })
   if (data.previous)
@@ -105,15 +106,16 @@ worker.onMessage("css", async ({ data, sender }) => {
     }
 })
 worker.onMessage("detected", async ({ data, sender }) => {
-  if (sender.tab?.id === undefined) throw Error("检测结果必须来自标签页")
+  if (sender.tab?.id === undefined)
+    throw Error("Detection reports must come from a tab")
   const tabId = sender.tab.id,
     detected = data.detected === true
   await chrome.action.setBadgeText({ tabId, text: detected ? "✓" : "—" })
   await chrome.action.setTitle({
     tabId,
     title: detected
-      ? "Cossplay — 已检测到主题变量"
-      : "Cossplay — 未检测到主题变量",
+      ? "Cossplay — theme variables detected"
+      : "Cossplay — no theme variables detected",
   })
   await chrome.action.setBadgeBackgroundColor({
     tabId,

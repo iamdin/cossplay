@@ -33,7 +33,7 @@ import { cn } from "@cossplay/ui/lib/utils"
 import { CheckIcon, InfoIcon, MoonIcon, SunIcon } from "lucide-react"
 import { type CSSProperties, useEffect, useMemo, useState } from "react"
 
-// 带品牌名的预设不放在营销页上。
+// Brand-named presets stay out of the marketing page.
 const shown = [
   "default",
   "violet-bloom",
@@ -50,7 +50,7 @@ const label = (id: string) =>
   id === "default" ? "coss ui" : (presets[id]?.label ?? id)
 
 const loadedFonts = new Set<string>()
-/** 为演示加载预设的 Google 字体；系统和 Geist 字体栈不用加载。 */
+/** Loads a preset's Google font for the demo; system and Geist stacks need nothing. */
 function loadFont(stack: string | undefined) {
   const family = stack?.split(",")[0].replaceAll(/['"]/g, "").trim()
   if (!family || /^(Geist|ui-|system-ui|Courier New)/.test(family)) return
@@ -62,7 +62,7 @@ function loadFont(stack: string | undefined) {
   document.head.append(link)
 }
 
-/** 用预设就地换肤的 coss ui 组件，和 Editor、扩展一样。 */
+/** coss ui components re-themed in place by a preset, as the editor and extension do. */
 export function ThemeDemo() {
   const [id, setId] = useState("violet-bloom")
   const [dark, setDark] = useState(false)
@@ -95,7 +95,7 @@ export function ThemeDemo() {
           size="icon-xs"
           variant="outline"
           className="ml-auto"
-          aria-label={dark ? "浅色模式" : "深色模式"}
+          aria-label={dark ? "Light mode" : "Dark mode"}
           onClick={() => setDark(!dark)}
         >
           {dark ? <SunIcon /> : <MoonIcon />}
@@ -108,42 +108,42 @@ export function ThemeDemo() {
         >
           <Card>
             <CardHeader>
-              <CardTitle>创建账户</CardTitle>
-              <CardDescription>开始 14 天试用。</CardDescription>
+              <CardTitle>Create an account</CardTitle>
+              <CardDescription>Start your 14-day trial.</CardDescription>
             </CardHeader>
             <CardPanel className="flex flex-col gap-3">
               <Field>
-                <FieldLabel>邮箱</FieldLabel>
+                <FieldLabel>Email</FieldLabel>
                 <Input
                   type="email"
                   placeholder="you@example.com"
-                  aria-label="演示邮箱"
+                  aria-label="Demo email"
                 />
               </Field>
               <Label className="font-normal">
                 <Switch defaultChecked />
-                接收产品动态
+                Send me product updates
               </Label>
               <div className="flex gap-2">
-                <Button className="flex-1">注册</Button>
-                <Button variant="outline">登录</Button>
+                <Button className="flex-1">Sign up</Button>
+                <Button variant="outline">Log in</Button>
               </div>
             </CardPanel>
           </Card>
           <div className="flex flex-col gap-4">
             <Card>
               <CardHeader>
-                <CardDescription>月收入</CardDescription>
+                <CardDescription>Monthly revenue</CardDescription>
                 <CardTitle className="text-2xl">$48,210</CardTitle>
               </CardHeader>
               <CardPanel className="flex flex-col gap-3">
                 <div className="flex flex-wrap gap-1.5">
                   <Badge variant="success">+12.4%</Badge>
                   <Badge variant="info">Q3</Badge>
-                  <Badge variant="warning">2 项待处理</Badge>
+                  <Badge variant="warning">2 pending</Badge>
                   <Badge variant="secondary">USD</Badge>
                 </div>
-                <Progress value={68} aria-label="演示目标">
+                <Progress value={68} aria-label="Demo goal">
                   <ProgressTrack>
                     <ProgressIndicator />
                   </ProgressTrack>
@@ -152,16 +152,16 @@ export function ThemeDemo() {
                   <Avatar className="size-6">
                     <AvatarFallback className="text-xs">AK</AvatarFallback>
                   </Avatar>
-                  已完成季度目标的 68%
+                  68% of the quarter's goal
                 </div>
               </CardPanel>
             </Card>
             <Alert variant="info">
               <InfoIcon />
-              <AlertTitle>部署完成</AlertTitle>
+              <AlertTitle>Deploy finished</AlertTitle>
               <AlertDescription>
                 <span className="flex items-center gap-1">
-                  <CheckIcon className="size-3.5" /> 全部检查已通过。
+                  <CheckIcon className="size-3.5" /> All checks passed.
                 </span>
               </AlertDescription>
             </Alert>

@@ -12,7 +12,7 @@ import {
 } from "@cossplay/core/coss"
 import { setHost, usePanelStore } from "@cossplay/editor/store"
 
-// Editor 在自己的 origin 下，用 localStorage 存一份主题。
+// The editor keeps one theme, under its own origin, in localStorage.
 const kv: KeyValue = {
   async getItem(key) {
     try {
@@ -37,8 +37,8 @@ const css = (selector: string, values: Record<string, string>) =>
 
 type PanelState = ReturnType<typeof usePanelStore.getState>
 
-// 只注入当前模式的 override，和扩展一样：没动过的 token 仍用 coss ui 自己的值，
-// 而且 editor.css 里 `:root:root` 压过 `:root` 和 `.dark`。
+// Only the shown mode's overrides, like the extension: untouched tokens keep coss ui's own
+// values, and `:root:root` outranks both `:root` and `.dark` in editor.css.
 const rule = ({ site, detection, mode }: PanelState) => {
   if (!site || !detection) return null
   const { overrides } = site.current
@@ -46,13 +46,13 @@ const rule = ({ site, detection, mode }: PanelState) => {
   return css(":root:root", variables(theme[mode], overrides[mode]))
 }
 
-/** 自定义预览收到的样式表：主题的 Google 字体和变量。 */
+/** The stylesheet a custom preview receives: the theme's Google fonts and its variables. */
 export async function previewCss(state: PanelState) {
   const fonts = readFonts(await kv.getItem(fontsKey(location.origin)))
   return [...Object.values(fonts), rule(state) ?? ""].join("\n")
 }
 
-/** 加载已存主题并应用到本文档；返回清理函数。 */
+/** Loads the saved theme and applies it to this document; returns a cleanup. */
 export function connect() {
   const origin = location.origin
   const store = createStore(kv)
@@ -98,7 +98,7 @@ export function connect() {
           warnings: [],
         },
         mode: site.previewMode ?? "light",
-        status: "已保存在本地",
+        status: "Saved locally",
       })
     }
   )

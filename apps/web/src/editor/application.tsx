@@ -36,65 +36,65 @@ import { Person } from "@/editor/cards"
 
 const posts = [
   [
-    "陈玛雅",
-    "@maya · 12 分钟",
-    "今天上了深色模式。每个组件的颜色都从 token 读，一个下午就做完了。",
+    "Maya Chen",
+    "@maya · 12m",
+    "Shipped dark mode today. Every component reads its colors from tokens, so it took one afternoon.",
     24,
     5,
   ],
   [
-    "利奥",
-    "@leo · 1 小时",
-    "说一句：一个好的空状态，比花哨的引导流程更值钱。",
+    "Leo Martins",
+    "@leo · 1h",
+    "Hot take: a good empty state is worth more than a fancy onboarding tour.",
     86,
     17,
   ],
 ] as const
 
 const threads = [
-  ["汤艾娃", "好，三点见！", true],
-  ["加西亚", "发票已经发过去了。", false],
-  ["罗米娅", "能看一下我的 PR 吗？", false],
+  ["Ava Thompson", "Sounds good, see you at 3!", true],
+  ["Noah Garcia", "Sent the invoice over.", false],
+  ["Mia Robinson", "Can you review my PR?", false],
 ] as const
 
 const transactions = [
-  ["Stripe 入账", "10 月 6 日", "+$2,450.00", "已完成"],
-  ["Figma", "10 月 5 日", "-$45.00", "已完成"],
-  ["AWS", "10 月 4 日", "-$318.24", "处理中"],
-  ["客户退款", "10 月 2 日", "-$120.00", "失败"],
-  ["发票 #1042", "10 月 1 日", "+$980.00", "已完成"],
+  ["Stripe payout", "Oct 6", "+$2,450.00", "Completed"],
+  ["Figma", "Oct 5", "-$45.00", "Completed"],
+  ["AWS", "Oct 4", "-$318.24", "Pending"],
+  ["Client refund", "Oct 2", "-$120.00", "Failed"],
+  ["Invoice #1042", "Oct 1", "+$980.00", "Completed"],
 ] as const
 
 const status = {
-  已完成: "success",
-  处理中: "warning",
-  失败: "error",
+  Completed: "success",
+  Pending: "warning",
+  Failed: "error",
 } as const
 
-// 应用画面：动态、消息和交易。
+// App screens: a social feed, messaging and transactions.
 export function Application() {
   return (
     <div className="grid @4xl:grid-cols-2 gap-4 px-4 pt-2 pb-6">
       <Card>
         <CardHeader>
-          <CardTitle>动态</CardTitle>
+          <CardTitle>Feed</CardTitle>
           <CardAction>
             <Tabs defaultValue="for-you">
               <TabsList>
-                <TabsTab value="for-you">为你推荐</TabsTab>
-                <TabsTab value="following">关注</TabsTab>
+                <TabsTab value="for-you">For you</TabsTab>
+                <TabsTab value="following">Following</TabsTab>
               </TabsList>
             </Tabs>
           </CardAction>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           <div className="flex flex-col gap-2 rounded-lg border p-3">
-            <Textarea placeholder="有什么新鲜事？" />
+            <Textarea placeholder="What's happening?" />
             <div className="flex items-center justify-between text-muted-foreground text-xs">
               <span>
-                <Kbd>⌘</Kbd> <Kbd>Enter</Kbd> 发布
+                <Kbd>⌘</Kbd> <Kbd>Enter</Kbd> to post
               </span>
-              <Button size="sm">发布</Button>
+              <Button size="sm">Post</Button>
             </div>
           </div>
           {posts.map(([name, handle, text, likes, replies]) => (
@@ -111,7 +111,7 @@ export function Application() {
                 </Button>
                 <Button variant="ghost" size="xs">
                   <Repeat2Icon />
-                  转发
+                  Repost
                 </Button>
                 <Button variant="ghost" size="xs">
                   <HeartIcon />
@@ -125,8 +125,8 @@ export function Application() {
 
       <Card>
         <CardHeader>
-          <CardTitle>消息</CardTitle>
-          <CardDescription>3 个会话</CardDescription>
+          <CardTitle>Messages</CardTitle>
+          <CardDescription>3 conversations</CardDescription>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
@@ -145,13 +145,13 @@ export function Application() {
           </div>
           <div className="flex flex-col gap-2 rounded-lg bg-muted/50 p-3 text-sm">
             <p className="w-max max-w-[75%] rounded-lg bg-background px-3 py-2">
-              设计评审还是那个时间吗？
+              Are we still on for the design review?
             </p>
             <p className="ml-auto w-max max-w-[75%] rounded-lg bg-primary px-3 py-2 text-primary-foreground">
-              是的！我会带上新主题。
+              Yes! I'll bring the new themes.
             </p>
             <p className="w-max max-w-[75%] rounded-lg bg-background px-3 py-2">
-              好，三点见！
+              Sounds good, see you at 3!
             </p>
           </div>
           <ChatInput />
@@ -160,20 +160,20 @@ export function Application() {
 
       <CardFrame className="@4xl:col-span-2 min-w-0">
         <CardFrameHeader>
-          <CardFrameTitle>交易</CardFrameTitle>
+          <CardFrameTitle>Transactions</CardFrameTitle>
           <CardFrameAction>
             <Button variant="outline" size="sm">
-              导出
+              Export
             </Button>
           </CardFrameAction>
         </CardFrameHeader>
         <Table variant="card">
           <TableHeader>
             <TableRow>
-              <TableHead>说明</TableHead>
-              <TableHead>日期</TableHead>
-              <TableHead>状态</TableHead>
-              <TableHead className="text-right">金额</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

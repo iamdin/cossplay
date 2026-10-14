@@ -30,17 +30,17 @@ export default function Particle() {
   return (
     <Card className="w-full max-w-xs">
       <CardHeader>
-        <CardTitle>创建项目</CardTitle>
-        <CardDescription>一键部署你的新项目。</CardDescription>
+        <CardTitle>Create project</CardTitle>
+        <CardDescription>Deploy your new project in one-click.</CardDescription>
       </CardHeader>
       <CardPanel>
         <Form className="flex w-full flex-col gap-4">
           <Field>
-            <FieldLabel>名称</FieldLabel>
-            <Input placeholder="项目名称" type="text" />
+            <FieldLabel>Name</FieldLabel>
+            <Input placeholder="Name of your project" type="text" />
           </Field>
           <Field>
-            <FieldLabel>框架</FieldLabel>
+            <FieldLabel>Framework</FieldLabel>
             <Select defaultValue="next" items={frameworkOptions}>
               <SelectTrigger>
                 <SelectValue />
@@ -55,14 +55,14 @@ export default function Particle() {
             </Select>
           </Field>
           <Button className="w-full" type="submit">
-            部署
+            Deploy
           </Button>
         </Form>
       </CardPanel>
       <CardFooter>
         <div className="flex gap-1 text-muted-foreground text-xs">
           <CircleAlertIcon className="size-3 h-lh shrink-0" />
-          <p>这需要几秒钟。</p>
+          <p>This will take a few seconds to complete.</p>
         </div>
       </CardFooter>
     </Card>

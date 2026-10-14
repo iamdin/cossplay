@@ -1,8 +1,8 @@
-# Chrome 网上应用店上架材料
+# Chrome Web Store listing
 
-开发者后台各个标签要填的内容，按标签顺序排列。图片在本目录；`apps/extension/scripts/store-screenshots.ts` 用构建好的扩展和线上 https://coss.com/ui 重新生成它们（先 `pnpm build`，再在 `apps/extension` 里运行 `node scripts/store-screenshots.ts`）。
+Everything the Chrome Web Store developer dashboard asks for, in the order of its tabs. Images are in this folder; `apps/extension/scripts/store-screenshots.ts` regenerates them from the built extension and the live https://coss.com/ui (`pnpm build`, then `node scripts/store-screenshots.ts` in `apps/extension`).
 
-## 安装包
+## Package
 
 ```bash
 pnpm install --frozen-lockfile
@@ -10,101 +10,101 @@ pnpm build
 (cd apps/extension/dist && zip -r ../cossplay-v0.1.0.zip .)
 ```
 
-上传 `apps/extension/cossplay-v0.1.0.zip`。压缩包根目录有 `manifest.json`，这是商店的要求；它和 `chrome-extension-release.yml` 工作流附在 `v*` GitHub 发布上的是同一份归档。之后每次上传都要提高 `apps/extension/package.json` 里的 `version`（清单的版本从那里来）。
+Upload `apps/extension/cossplay-v0.1.0.zip`. The zip has `manifest.json` at its root, as the store requires; it is the same archive the `chrome-extension-release.yml` workflow attaches to a `v*` GitHub release. Each later upload needs a higher `version` in `apps/extension/package.json` (the manifest takes its version from there).
 
-版本是 0.1.0，因为标签 `v0.0.1` 到 `v0.0.4` 已经属于更早的 coss-ui-theme-tweak 构建的发布，所以这份代码不能再打 0.0.3 的标签并发布。
+The version is 0.1.0 because the tags `v0.0.1` to `v0.0.4` already belong to releases of the earlier coss-ui-theme-tweak build, so 0.0.3 could not be tagged and released from this code.
 
-## 商品详情标签
+## Store listing tab
 
-**名称**：Cossplay
+**Name**: Cossplay
 
-**摘要**（来自清单的 `description`，最多 132 个字符；清单里的原文照用）：
+**Summary** (from the manifest `description`, 132 characters max; the manifest's is used as is):
 
-> 在侧边栏实时编辑任意网站上的 coss ui 主题变量。
+> Live-edit coss ui theme variables on any website, from your side panel.
 
-**描述**：
+**Description**:
 
 ```text
-Cossplay 从 Chrome 的侧边栏实时编辑用 coss ui 搭建的网站（或任何使用 shadcn 风格 CSS 变量的站点）的主题。改动在你操作时就显示在页面上，而且只在你的屏幕上。
+Cossplay live-edits the theme of a website built with coss ui (or any site that uses shadcn-style CSS variables) from Chrome's side panel. Changes show on the page as you make them, and only on your screen.
 
-打开一个 coss ui 站点，点 Cossplay 图标，侧边栏会读出站点自己的主题：:root、.dark 和 [data-theme] 上的颜色，以及字体、圆角、间距、字距和阴影。
+Open a coss ui site, click the Cossplay icon and the side panel reads the site's own theme: colors on :root, .dark and [data-theme], plus fonts, radius, spacing, letter spacing and shadows.
 
-- 43 个预设：coss ui 的默认主题和 42 个 tweakcn 预设。可以逐个切换或随机。
-- 用 HEX、OKLCH、HSL 或 RGB 改色，带拾色器、Tailwind 色板、通道滑杆和不透明度。写回时用站点自己的颜色格式。
-- 浅色和深色分开编辑；可以在页面上预览任一模式。
-- 检查：在页面上悬停元素，看它用了哪些主题 token，点一个即可编辑。
-- 全局色相、饱和度和明度调整。
-- 排版：带 Google Fonts 搜索的字体栈，以及字距。
-- 15 组颜色对的 WCAG 对比度检查。
-- 每次编辑都可撤销和重做。
-- 从 tweakcn 或 shadcn 注册表 URL、粘贴的 CSS 或 JSON、或文件导入主题。
-- 导出 Tailwind v4（OKLCH）或 v3（HSL）CSS、注册表 JSON、token JSON、Tailwind v3 配置或 Next.js 字体布局。未改动的预设还会显示 shadcn CLI 安装命令。
-- 按站点保存，带开关；再次回来时，在页面绘制前恢复。
+- 43 presets: coss ui's default theme and 42 tweakcn presets. Step through them or shuffle.
+- Color editing in HEX, OKLCH, HSL or RGB, with a color picker, Tailwind palette, channel sliders and opacity. Values are written back in the site's own color format.
+- Light and dark mode, edited separately; preview either mode on the page.
+- Inspect: hover an element on the page to see which theme tokens it uses, click one to edit it.
+- Global hue, saturation and lightness adjustments.
+- Typography: font stacks with Google Fonts search, letter spacing.
+- WCAG contrast checks for 15 color pairs.
+- Undo and redo for every edit.
+- Import a theme from a tweakcn or shadcn registry URL, pasted CSS or JSON, or a file.
+- Export Tailwind v4 (OKLCH) or v3 (HSL) CSS, registry JSON, token JSON, a Tailwind v3 config or a Next.js font layout. Unedited presets also show a shadcn CLI install command.
+- Saved per site, with an on/off switch; restored before the page paints when you come back.
 
-只注入你编辑过的 token；其余仍跟着站点。什么都不会上传：主题留在 Chrome 的本地扩展存储里，没有账户，也没有服务器。
+Only the tokens you edit are injected; everything else keeps following the site. Nothing is uploaded: themes stay in Chrome's local extension storage, there is no account and no server.
 
-同一个编辑器也可以不装扩展，在 https://cossplay.vercel.app/editor 使用。
+The same editor runs without the extension at https://cossplay.vercel.app/editor.
 
-与 coss、tweakcn 或 shadcn/ui 均无关联。预设来自 tweakcn（Apache-2.0）。
+Not affiliated with coss, tweakcn or shadcn/ui. Presets come from tweakcn (Apache-2.0).
 ```
 
-**类别**：开发者工具
+**Category**: Developer Tools
 
-**语言**：中文
+**Language**: English
 
-**图片**：
+**Graphics**:
 
-| 字段 | 文件 |
+| Field | File |
 |---|---|
-| 商店图标（128x128） | `apps/extension/public/icons/icon-128.png` |
-| 截图（1280x800） | `screenshot-1-presets.png`、`screenshot-2-dark-channels.png`、`screenshot-3-inspect.png`、`screenshot-4-export.png` |
-| 小宣传图（440x280） | `promo-small-440x280.png` |
-| 横幅宣传图（1400x560） | `promo-marquee-1400x560.png` |
+| Store icon (128x128) | `apps/extension/public/icons/icon-128.png` |
+| Screenshots (1280x800) | `screenshot-1-presets.png`, `screenshot-2-dark-channels.png`, `screenshot-3-inspect.png`, `screenshot-4-export.png` |
+| Small promo tile (440x280) | `promo-small-440x280.png` |
+| Marquee promo tile (1400x560) | `promo-marquee-1400x560.png` |
 
-**官方网址**：无（需要在 Search Console 里验证过的站点）。**主页网址**：https://cossplay.vercel.app。**支持网址**：https://github.com/iamdin/cossplay/issues。
+**Official URL**: none (needs a site verified in Search Console). **Homepage URL**: https://cossplay.vercel.app. **Support URL**: https://github.com/iamdin/cossplay/issues.
 
-## 隐私标签
+## Privacy tab
 
-**单一用途**：
+**Single purpose**:
 
-> Cossplay 从侧边栏编辑当前标签页网站的 CSS 主题变量（颜色、字体、圆角、阴影），让开发者能为 coss ui 或 shadcn 风格的站点试主题并导出。
+> Cossplay edits the CSS theme variables (colors, fonts, radius, shadows) of the website in the current tab from the side panel, so a developer can try and export a theme for a coss ui or shadcn-style site.
 
-**权限说明**：
+**Permission justifications**:
 
-| 权限 | 说明 |
+| Permission | Justification |
 |---|---|
-| `sidePanel` | 编辑器是贴在所编辑页面旁边的侧边栏；点工具栏图标即打开。 |
-| `storage` | 把每个站点的主题修改、开关、撤销历史和选中的 Google 字体样式表存在 `chrome.storage.local`，这样刷新后修改还在。不会同步，也不会上传。 |
-| `tabs` | 侧边栏跟随自己窗口的当前标签（`tabs.query`、`tabs.onActivated`、`tabs.onUpdated`），读取 URL 以知道要加载哪个站点的主题，连接该标签的 content script 做消息和检查模式，并在其他页面上显示「请打开一个 HTTP(S) 网站」。 |
-| `scripting` | 把编辑过的主题变量作为用户来源的样式表注入（`scripting.insertCSS` / `removeCSS`），从而压过站点自己的 CSS；并只为用户编辑过的站点注册一小段脚本（`scripting.registerContentScripts`），在恢复已存主题时最多把页面藏 1.5 秒，避免先闪一下原来的主题。 |
-| 主机权限 `http://*/*`、`https://*/*` | 扩展的用途是编辑用户打开的任意站点的主题，域名无法事先列全，包括 localhost 和预发主机。content script 读取页面的 CSS 变量并应用用户的修改；注入 CSS 需要对该标签的主机访问；service worker 还要拉取页面的跨源样式表（页面的 CSSOM 读不到）来找出主题。用户没编辑过的站点上，扩展只读样式表，不改任何东西。 |
+| `sidePanel` | The editor is a side panel next to the page it edits; clicking the toolbar icon opens it. |
+| `storage` | Saves each site's theme edits, on/off switch, undo history and picked Google font stylesheets in `chrome.storage.local`, so edits survive reloads. Nothing is synced or uploaded. |
+| `tabs` | The side panel follows the active tab of its window (`tabs.query`, `tabs.onActivated`, `tabs.onUpdated`) and reads its URL to know which site's theme to load, connects to the tab's content script for messaging and inspect mode, and shows "Open an HTTP(S) website" on other pages. |
+| `scripting` | Injects the edited theme variables as a user-origin stylesheet (`scripting.insertCSS` / `removeCSS`) so they win over the site's own CSS, and registers a tiny script (`scripting.registerContentScripts`) only for sites the user has edited, which hides the page for at most 1.5 s while the saved theme is restored, to avoid a flash of the original theme. |
+| Host permissions `http://*/*`, `https://*/*` | The extension's purpose is editing the theme of whichever site the user opens, which can be any domain, including localhost and staging hosts, so the hosts cannot be listed in advance. The content script reads the page's CSS variables and applies the user's edits; injected CSS needs host access to the tab; and the service worker fetches the page's cross-origin stylesheets (which the page's CSSOM cannot read) to find its theme. On sites the user has not edited, the extension only reads stylesheets and changes nothing. |
 
-**远程代码**：否，我不使用远程代码。（service worker 把 CSS 文本和主题 JSON 当数据拉取：Google Fonts 样式表、用户粘贴进导入框的主题 URL，以及当前页面的样式表。不会拉取或执行 JavaScript。）
+**Remote code**: No, I am not using remote code. (The service worker fetches CSS text and theme JSON as data: Google Fonts stylesheets, theme URLs the user pastes into Import, and the current page's stylesheets. No JavaScript is fetched or evaluated.)
 
-**数据使用**：所有数据类别都不勾选。主题修改只存在浏览器的本地扩展存储里，从不离开设备；页面样式表在本地读取，用来检测主题。仅有的网络请求是用户触发的，或页面本来就会发的：用户选中的字体的 Google Fonts CSS（`fonts.googleapis.com`，字体文件来自 `fonts.gstatic.com`）、用户填写的导入 URL，以及所访问页面自己的样式表。全部不带 cookie（`credentials: "omit"`）。
+**Data usage**: check none of the data categories. Theme edits are stored only in the browser's local extension storage and never leave the device; page stylesheets are read locally to detect the theme. The only network requests are those the user triggers or the page already makes: Google Fonts CSS for a font the user picks (`fonts.googleapis.com`, with font files from `fonts.gstatic.com`), an import URL the user enters, and the visited page's own stylesheets. All are sent without cookies (`credentials: "omit"`).
 
-三项都确认：
+Certify all three:
 
-- 我不向第三方出售或转移用户数据，已批准的用途除外。
-- 我不把用户数据用于与本项单一用途无关的目的。
-- 我不把用户数据用于信用评估或借贷。
+- I do not sell or transfer user data to third parties, outside of the approved use cases.
+- I do not use or transfer user data for purposes that are unrelated to my item's single purpose.
+- I do not use or transfer user data to determine creditworthiness or for lending purposes.
 
-**隐私政策网址**：https://cossplay.vercel.app/privacy
+**Privacy policy URL**: https://cossplay.vercel.app/privacy
 
-## 分发标签
+## Distribution tab
 
-免费、公开、所有地区。
+Free, public, all regions.
 
-## 提交
+## Submit
 
-1. 用 Google 账号在 https://chrome.google.com/webstore/devconsole 注册为 Chrome 网上应用店开发者：支付一次性 5 美元费用，并在 **账户** 里验证联系邮箱。
-2. **商品 → 新商品**，上传 `apps/extension/cossplay-v0.1.0.zip`（见安装包）。
-3. 按本文件填写 **商品详情**、**隐私** 和 **分发**，并上传图片。先确认 https://cossplay.vercel.app/privacy 已经上线。
-4. **提交审核**。可以保持「审核通过后自动发布」，或关掉它以便手动发布。
-5. 更新时：提高版本、构建、打包，然后在该商品上 **安装包 → 上传新的安装包**，再提交一次。
+1. Register as a Chrome Web Store developer at https://chrome.google.com/webstore/devconsole with a Google account: pay the one-time US$5 fee, and verify the contact email in **Account**.
+2. **Items → New item**, upload `apps/extension/cossplay-v0.1.0.zip` (see Package).
+3. Fill **Store listing**, **Privacy** and **Distribution** from this file and upload the images. Make sure https://cossplay.vercel.app/privacy is live first.
+4. **Submit for review**. Leave "publish automatically after review" on, or turn it off to publish by hand.
+5. For updates: bump the version, build, zip, then **Package → Upload new package** on the item and submit again.
 
-## 审核时可能被问到的
+## Expected review concerns
 
-- **宽泛的主机权限**（`http://*/*`、`https://*/*`，再加上所有站点上的 content script）会触发深入审核，耗时会明显长于普通审核。主机权限说明直接回答了这一点：单一用途是编辑用户打开的任意站点，域名事先未知；主机访问用来读取页面的 CSS 变量、注入编辑后的变量，并读取跨源样式表；不收集、也不发送任何东西。如果审核要求收窄访问，替代方案是 `activeTab` 加上按站点授予的可选主机权限，那样会失去在重新加载时于首次绘制前恢复已存主题；那是代码改动，不是上架文案的改动。
-- **`tabs`**：有了全部 HTTP(S) 站点的主机权限，标签 URL 本来就能读到，审核人可能会问为什么还要 `tabs`。它额外的作用只是读取非 HTTP 标签的 URL（例如 `chrome://`），面板只用这个来说自己不能编辑它们。去掉 `tabs` 可以避开这个问题；那些标签的 URL 会读成空，面板仍会显示同一句提示。
-- **远程资源**：会拉取并存储 Google Fonts CSS，但它是 CSS，不是代码，而且只针对用户选中的字体。
+- **Broad host permissions** (`http://*/*`, `https://*/*` plus a content script on all sites) trigger an in-depth review, which can take noticeably longer than a normal one. The host permission justification answers it directly: the single purpose is editing whichever site the user opens, on domains unknown in advance; host access is used to read the page's CSS variables, inject the edited variables and read cross-origin stylesheets; nothing is collected or sent anywhere. If the review asks for narrower access, the alternative is `activeTab` plus optional host permissions granted per site, which would lose restoring a saved theme before first paint on reload; that is a code change, not a listing change.
+- **`tabs`**: with host permissions for all HTTP(S) sites, the tab URL is already readable, so a reviewer may ask why `tabs` is needed. Its only extra effect is reading URLs of non-HTTP tabs (for example `chrome://`), which the panel uses solely to say it cannot edit them. Dropping `tabs` would avoid the question; the panel would then show the same message for those tabs, since their URL reads as empty.
+- **Remote resources**: Google Fonts CSS is fetched and stored, but it is CSS, not code, and only for a font the user picks.

@@ -13,104 +13,104 @@ import {
 export default function Particle() {
   return (
     <Table>
-      <TableCaption>当前项目列表。</TableCaption>
+      <TableCaption>A list of current projects.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead>项目</TableHead>
-          <TableHead>状态</TableHead>
-          <TableHead>团队</TableHead>
-          <TableHead className="text-right">预算</TableHead>
+          <TableHead>Project</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Team</TableHead>
+          <TableHead className="text-right">Budget</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow>
-          <TableCell className="font-medium">网站改版</TableCell>
+          <TableCell className="font-medium">Website Redesign</TableCell>
           <TableCell>
             <Badge variant="outline">
               <span
                 aria-hidden="true"
                 className="size-1.5 rounded-full bg-emerald-500"
               />
-              已付款
+              Paid
             </Badge>
           </TableCell>
-          <TableCell>前端团队</TableCell>
+          <TableCell>Frontend Team</TableCell>
           <TableCell className="text-right">$12,500</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="font-medium">移动应用</TableCell>
+          <TableCell className="font-medium">Mobile App</TableCell>
           <TableCell>
             <Badge variant="outline">
               <span
                 aria-hidden="true"
                 className="size-1.5 rounded-full bg-muted-foreground/64"
               />
-              未付款
+              Unpaid
             </Badge>
           </TableCell>
-          <TableCell>移动团队</TableCell>
+          <TableCell>Mobile Team</TableCell>
           <TableCell className="text-right">$8,750</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="font-medium">API 集成</TableCell>
+          <TableCell className="font-medium">API Integration</TableCell>
           <TableCell>
             <Badge variant="outline">
               <span
                 aria-hidden="true"
                 className="size-1.5 rounded-full bg-amber-500"
               />
-              待处理
+              Pending
             </Badge>
           </TableCell>
-          <TableCell>后端团队</TableCell>
+          <TableCell>Backend Team</TableCell>
           <TableCell className="text-right">$5,200</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="font-medium">数据库迁移</TableCell>
+          <TableCell className="font-medium">Database Migration</TableCell>
           <TableCell>
             <Badge variant="outline">
               <span
                 aria-hidden="true"
                 className="size-1.5 rounded-full bg-emerald-500"
               />
-              已付款
+              Paid
             </Badge>
           </TableCell>
-          <TableCell>运维团队</TableCell>
+          <TableCell>DevOps Team</TableCell>
           <TableCell className="text-right">$3,800</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="font-medium">用户仪表盘</TableCell>
+          <TableCell className="font-medium">User Dashboard</TableCell>
           <TableCell>
             <Badge variant="outline">
               <span
                 aria-hidden="true"
                 className="size-1.5 rounded-full bg-emerald-500"
               />
-              已付款
+              Paid
             </Badge>
           </TableCell>
-          <TableCell>体验团队</TableCell>
+          <TableCell>UX Team</TableCell>
           <TableCell className="text-right">$7,200</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell className="font-medium">安全审计</TableCell>
+          <TableCell className="font-medium">Security Audit</TableCell>
           <TableCell>
             <Badge variant="outline">
               <span
                 aria-hidden="true"
                 className="size-1.5 rounded-full bg-red-500"
               />
-              失败
+              Failed
             </Badge>
           </TableCell>
-          <TableCell>安全团队</TableCell>
+          <TableCell>Security Team</TableCell>
           <TableCell className="text-right">$2,100</TableCell>
         </TableRow>
       </TableBody>
       <TableFooter>
         <TableRow>
-          <TableCell colSpan={3}>预算合计</TableCell>
+          <TableCell colSpan={3}>Total Budget</TableCell>
           <TableCell className="text-right">$39,550</TableCell>
         </TableRow>
       </TableFooter>

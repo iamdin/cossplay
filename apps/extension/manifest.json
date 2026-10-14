@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Cossplay",
-  "description": "在侧边栏实时编辑任意网站上的 coss ui 主题变量。",
+  "description": "Live-edit coss ui theme variables on any website, from your side panel.",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -26,7 +26,7 @@
     }
   ],
   "action": {
-    "default_title": "打开侧边栏",
+    "default_title": "Open Side Panel",
     "default_icon": {
       "16": "icons/icon-16.png",
       "32": "icons/icon-32.png"

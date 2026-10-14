@@ -1,15 +1,15 @@
 import { colorTokens, isColor, type Token } from "./theme"
 
 const colors = new Set<string>(colorTokens)
-// 接受颜色的 Tailwind 工具类，例如 `bg-primary`、`border-t-input`、`ring-offset-background`。
+// Tailwind utilities that take a color, e.g. `bg-primary`, `border-t-input`, `ring-offset-background`.
 const colorUtility =
   /^(?:bg|text|border(?:-[xytrbl]|-[se])?|ring(?:-offset)?|inset-ring|outline|fill|stroke|from|via|to|divide|placeholder|caret|accent|decoration|shadow|inset-shadow)-([a-z0-9-]+)(?:\/\S+)?$/
 
-/** class 属性引用的主题 token，例如 `hover:bg-accent/50` → `accent`。 */
+/** The theme tokens a class attribute references, e.g. `hover:bg-accent/50` → `accent`. */
 export function tokenClasses(className: string) {
   const found: { className: string; token: Token }[] = []
   for (const name of new Set(className.split(/\s+/))) {
-    // 丢掉变体（`dark:hover:`），但保留任意值里的冒号（`[--radius:9999px]`）。
+    // Drop variants (`dark:hover:`) but not colons inside arbitrary values (`[--radius:9999px]`).
     const utility = name
       .split(/:(?![^[(]*[\])])/)
       .at(-1)!
@@ -44,20 +44,21 @@ button:hover, button:focus-visible { background: #f4f4f5; }
 `
 
 /**
- * 在 `root` 上检查：悬停时框出最近的、class 引用了主题 token 的元素，并在卡片里列出这些 token。
- * 点列表中的 token，或只含一个 token 的元素，会调用 `onPick`；Escape 调用 `onExit`。
- * 检查时下层页面收不到点击，`.ui-chrome`（编辑器自己的控件）不动。返回清理函数。
+ * Inspect mode over `root`: hovering outlines the nearest element whose classes reference theme
+ * tokens and lists those tokens in a card. Clicking a listed token, or an element with a single token,
+ * calls `onPick`; Escape calls `onExit`. The page underneath gets no clicks while inspecting, and
+ * `.ui-chrome` (the editor's own controls) is left alone. Returns a cleanup.
  */
 export function startInspector(
   root: Element,
   { onPick, onExit }: { onPick: (token: Token) => void; onExit: () => void }
 ) {
-  // 自定义元素加 shadow root，让站点 CSS 碰不到这层覆盖。
+  // A custom element in a shadow root keeps the site's CSS away from the overlay.
   const host = document.createElement("cossplay-inspector")
   host.style.cssText =
     "all: initial; position: fixed; inset: 0; z-index: 2147483647; pointer-events: none;"
   const shadow = host.attachShadow({ mode: "open" })
-  shadow.innerHTML = `<style>${css}</style><div class="box"></div><div class="card" role="dialog" aria-label="主题 token"></div>`
+  shadow.innerHTML = `<style>${css}</style><div class="box"></div><div class="card" role="dialog" aria-label="Theme tokens"></div>`
   const box = shadow.querySelector<HTMLElement>(".box")!
   const card = shadow.querySelector<HTMLElement>(".card")!
   document.documentElement.append(host)
@@ -80,7 +81,7 @@ export function startInspector(
   }
   const show = (el: Element) => {
     current = el
-    // 每个 token 一行；没有变体的用法（`bg-primary`）排在只有状态的前面。
+    // One row per token; tokens used without a variant (`bg-primary`) before state-only ones.
     const byToken = new Map<Token, string[]>()
     for (const { className, token } of tokenClasses(
       el.getAttribute("class") ?? ""
@@ -90,11 +91,11 @@ export function startInspector(
     card.replaceChildren(
       Object.assign(document.createElement("div"), {
         className: "title",
-        textContent: "点击 token 即可编辑",
+        textContent: "Click a token to edit it",
       }),
       ...[...byToken].map(([token, names]) => {
         const button = document.createElement("button")
-        button.title = `编辑 ${token}`
+        button.title = `Edit ${token}`
         const swatch = document.createElement("span")
         if (isColor(token)) {
           swatch.className = "swatch"
@@ -122,7 +123,7 @@ export function startInspector(
       width: `${rect.width}px`,
       height: `${rect.height}px`,
     })
-    // 放在元素下方并贴着它，指针才够得到卡片；放不下就放到上方。
+    // Below the element, touching it so the pointer can reach the card; above when there is no room.
     card.style.display = "block"
     const { width, height } = card.getBoundingClientRect()
     const below = rect.bottom + height <= innerHeight

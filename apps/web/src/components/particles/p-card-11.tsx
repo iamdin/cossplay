@@ -21,12 +21,12 @@ export default function Particle() {
   return (
     <CardFrame className="w-full">
       <CardFrameHeader>
-        <CardFrameTitle>项目</CardFrameTitle>
-        <CardFrameDescription>管理你的项目</CardFrameDescription>
+        <CardFrameTitle>Project</CardFrameTitle>
+        <CardFrameDescription>Manage your projects</CardFrameDescription>
         <CardFrameAction>
           <Button variant="outline">
             <PlusIcon />
-            添加
+            Add
           </Button>
         </CardFrameAction>
       </CardFrameHeader>
@@ -37,8 +37,10 @@ export default function Particle() {
               <EmptyMedia variant="icon">
                 <FolderIcon />
               </EmptyMedia>
-              <EmptyTitle>还没有项目</EmptyTitle>
-              <EmptyDescription>添加第一个项目来开始。</EmptyDescription>
+              <EmptyTitle>No projects yet</EmptyTitle>
+              <EmptyDescription>
+                Get started by adding your first project.
+              </EmptyDescription>
             </EmptyHeader>
           </Empty>
         </CardPanel>

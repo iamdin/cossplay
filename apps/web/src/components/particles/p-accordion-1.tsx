@@ -9,19 +9,20 @@ export default function Particle() {
   const items = [
     {
       content:
-        "Base UI 是一套高质量、无样式的 React 组件，用来做设计系统和网页应用。",
+        "Base UI is a library of high-quality unstyled React components for design systems and web apps.",
       id: "1",
-      title: "Base UI 是什么？",
+      title: "What is Base UI?",
     },
     {
-      content: "去文档里的「快速开始」。如果你用过无样式组件库，会觉得很熟悉。",
+      content:
+        "Head to the \"Quick start\" guide in the docs. If you've used unstyled libraries before, you'll feel at home.",
       id: "2",
-      title: "怎么开始？",
+      title: "How do I get started?",
     },
     {
-      content: "当然。Base UI 免费且开源。",
+      content: "Of course! Base UI is free and open source.",
       id: "3",
-      title: "能用在我的项目里吗？",
+      title: "Can I use it for my project?",
     },
   ]
 

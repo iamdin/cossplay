@@ -23,59 +23,59 @@ import Toast from "@/components/particles/p-toast-1"
 import Toggle from "@/components/particles/p-toggle-1"
 import Tooltip from "@/components/particles/p-tooltip-1"
 
-// 每种常见组件一个 coss ui particle，分组让每个颜色 token 都出现。
+// One coss ui particle per common component, grouped so every color token shows up somewhere.
 const groups: [string, [string, ComponentType][]][] = [
   [
-    "操作",
+    "Actions",
     [
-      ["按钮", Button],
-      ["开关按钮", Toggle],
+      ["Button", Button],
+      ["Toggle", Toggle],
     ],
   ],
   [
-    "表单",
+    "Forms",
     [
-      ["输入框", Input],
-      ["多行输入", Textarea],
-      ["选择", Select],
-      ["复选框", Checkbox],
-      ["单选组", RadioGroup],
-      ["开关", Switch],
-      ["滑杆", Slider],
+      ["Input", Input],
+      ["Textarea", Textarea],
+      ["Select", Select],
+      ["Checkbox", Checkbox],
+      ["Radio Group", RadioGroup],
+      ["Switch", Switch],
+      ["Slider", Slider],
     ],
   ],
   [
-    "展示",
+    "Display",
     [
-      ["卡片", Card],
-      ["徽章", Badge],
-      ["头像", Avatar],
-      ["表格", Table],
-      ["分隔线", Separator],
+      ["Card", Card],
+      ["Badge", Badge],
+      ["Avatar", Avatar],
+      ["Table", Table],
+      ["Separator", Separator],
     ],
   ],
   [
-    "反馈",
+    "Feedback",
     [
-      ["提示", Alert],
-      ["进度", Progress],
-      ["吐司", Toast],
+      ["Alert", Alert],
+      ["Progress", Progress],
+      ["Toast", Toast],
     ],
   ],
   [
-    "浮层",
+    "Overlays",
     [
-      ["对话框", Dialog],
-      ["气泡", Popover],
-      ["菜单", Menu],
-      ["工具提示", Tooltip],
+      ["Dialog", Dialog],
+      ["Popover", Popover],
+      ["Menu", Menu],
+      ["Tooltip", Tooltip],
     ],
   ],
   [
-    "导航",
+    "Navigation",
     [
-      ["标签页", Tabs],
-      ["手风琴", Accordion],
+      ["Tabs", Tabs],
+      ["Accordion", Accordion],
     ],
   ],
 ]
@@ -112,40 +112,44 @@ export function Components() {
 export function Typography() {
   return (
     <article className="mx-auto max-w-2xl space-y-5 p-6 text-foreground">
-      <p className="text-muted-foreground text-sm">排版</p>
+      <p className="text-muted-foreground text-sm">Typography</p>
       <h1 className="font-heading font-semibold text-4xl tracking-tight">
-        永字八法，天地玄黄
+        The quick brown fox jumps over the lazy dog
       </h1>
       <p className="text-lg text-muted-foreground">
-        主题不只是颜色：字体族、字距和圆角决定每个组件读起来的样子。
+        A theme is more than colors: font families, letter spacing and radius
+        shape how every component reads.
       </p>
       <h2 className="font-heading font-semibold text-2xl tracking-tight">
-        无衬线、衬线与等宽
+        Sans, serif and mono
       </h2>
       <p>
-        正文使用 <code>font-sans</code>。在面板里选一种 Google
-        字体，这里会立刻加载。链接
+        Body text uses <code>font-sans</code>. Pick a Google font in the panel
+        and it loads here immediately. Links look{" "}
         <a href="#typography" className="text-primary underline">
-          长这样
+          like this
         </a>
-        ，<strong>加粗文字</strong>会更突出。
+        , and <strong>strong text</strong> stands out.
       </p>
-      <p className="font-serif">这一段用衬线字体，适合编辑页和长文阅读。</p>
+      <p className="font-serif">
+        This paragraph uses the serif font, for editorial pages and long-form
+        reading.
+      </p>
       <blockquote className="border-l-2 pl-4 text-muted-foreground italic">
-        “让你的 coss ui 站点换身装。”
+        “Let your coss ui site play dress-up.”
       </blockquote>
       <ul className="list-disc space-y-1 pl-6">
-        <li>标题和正文共用字距 token。</li>
+        <li>Headings and body share the letter spacing token.</li>
         <li>
-          行内 <code className="rounded bg-muted px-1 font-mono">代码</code>{" "}
-          使用等宽字体。
+          Inline <code className="rounded bg-muted px-1 font-mono">code</code>{" "}
+          uses the mono font.
         </li>
-        <li>代码块使用 code 颜色。</li>
+        <li>Code blocks use the code colors.</li>
       </ul>
       <pre className="overflow-x-auto rounded-lg border bg-code p-4 font-mono text-code-foreground text-sm">
         <code>
           {`export function Button() {
-  return <button className="bg-primary">保存</button>
+  return <button className="bg-primary">Save</button>
 }`}
         </code>
       </pre>

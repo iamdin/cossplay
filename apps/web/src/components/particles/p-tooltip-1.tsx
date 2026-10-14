@@ -9,9 +9,9 @@ export default function Particle() {
   return (
     <Tooltip>
       <TooltipTrigger render={<Button variant="outline" />}>
-        悬停看看
+        Hover me
       </TooltipTrigger>
-      <TooltipPopup>有用的提示</TooltipPopup>
+      <TooltipPopup>Helpful hint</TooltipPopup>
     </Tooltip>
   )
 }

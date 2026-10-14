@@ -211,7 +211,10 @@ test("fonts loaded from different tabs of one origin are merged", async () => {
     Inter: "a",
     Lora: "b",
   })
-  await assert.rejects(store.font("chrome://extensions", "Inter", "a"), /来源/)
+  await assert.rejects(
+    store.font("chrome://extensions", "Inter", "a"),
+    /origin/
+  )
 })
 
 test("invalid edits are rejected without writing", async () => {
@@ -219,15 +222,15 @@ test("invalid edits are rejected without writing", async () => {
     store = createStore(storage)
   await assert.rejects(
     store.edit(origin, { kind: "nope" } as never, defaults, ""),
-    /未知编辑/
+    /Unknown edit/
   )
   await assert.rejects(
     store.edit(origin, { kind: "undo" }, { light: {}, dark: {} }, ""),
-    /基线/
+    /baseline/
   )
   await assert.rejects(
     store.edit("javascript:alert(1)", { kind: "undo" }, defaults, ""),
-    /来源/
+    /origin/
   )
   assert.equal(storage.data.size, 0)
   const state: SiteState = await store.edit(
