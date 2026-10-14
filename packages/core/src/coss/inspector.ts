@@ -57,7 +57,7 @@ export function startInspector(
   host.style.cssText =
     "all: initial; position: fixed; inset: 0; z-index: 2147483647; pointer-events: none;"
   const shadow = host.attachShadow({ mode: "open" })
-  shadow.innerHTML = `<style>${css}</style><div class="box"></div><div class="card" role="dialog" aria-label="主题令牌"></div>`
+  shadow.innerHTML = `<style>${css}</style><div class="box"></div><div class="card" role="dialog" aria-label="主题 token"></div>`
   const box = shadow.querySelector<HTMLElement>(".box")!
   const card = shadow.querySelector<HTMLElement>(".card")!
   document.documentElement.append(host)
@@ -90,7 +90,7 @@ export function startInspector(
     card.replaceChildren(
       Object.assign(document.createElement("div"), {
         className: "title",
-        textContent: "点击令牌即可编辑",
+        textContent: "点击 token 即可编辑",
       }),
       ...[...byToken].map(([token, names]) => {
         const button = document.createElement("button")

@@ -29,11 +29,11 @@ export default function Particle() {
           <DialogPanel className="grid gap-4">
             <Field>
               <FieldLabel>姓名</FieldLabel>
-              <Input defaultValue="林薇" type="text" />
+              <Input defaultValue="Margaret Welsh" type="text" />
             </Field>
             <Field>
               <FieldLabel>用户名</FieldLabel>
-              <Input defaultValue="@lin.wei" type="text" />
+              <Input defaultValue="@maggie.welsh" type="text" />
             </Field>
           </DialogPanel>
           <DialogFooter>

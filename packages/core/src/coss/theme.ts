@@ -200,7 +200,7 @@ export function importOverrides(value: unknown): Overrides {
     !Object.keys(dark).length &&
     !Object.keys(shared).length
   )
-    throw Error("没有识别到 coss 主题令牌")
+    throw Error("没有识别到 coss 主题 token")
   const common = Object.fromEntries(
     Object.entries({ ...shared, ...light }).filter(([key]) =>
       isCommon(key as Token)

@@ -164,7 +164,7 @@ const exportTypes = {
   v4: { label: "Tailwind v4 · OKLCH CSS", file: "globals.css" },
   v3: { label: "Tailwind v3 · HSL CSS", file: "globals.css" },
   json: { label: "tweakcn / shadcn 注册表 JSON", file: "theme.json" },
-  raw: { label: "浅色 / 深色令牌 JSON", file: "tokens.json" },
+  raw: { label: "浅色 / 深色 token JSON", file: "tokens.json" },
   config: { label: "Tailwind v3 配置", file: "tailwind.config.js" },
   layout: { label: "Next.js 字体布局", file: "layout.tsx" },
 } as const

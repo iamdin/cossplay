@@ -236,9 +236,9 @@ export function CustomPreview() {
         <div className="ui-chrome mx-auto flex w-full max-w-2xl flex-col gap-3 overflow-y-auto p-4 text-sm">
           <h2 className="font-semibold text-base">预览你自己的应用</h2>
           <p className="text-muted-foreground">
-            把 Cossplay
-            的桥接脚本加到应用里（只在开发环境即可），启动它，再在上面填
-            URL。之后编辑器会在你编辑时实时给它换主题。
+            把 Cossplay 的 Bridge
+            加到应用里（只在开发环境即可），启动它，再在上面填 URL。之后 Editor
+            会在你编辑时实时给它换主题。
           </p>
           <Setup />
         </div>
@@ -247,7 +247,7 @@ export function CustomPreview() {
           <div className="ui-chrome shrink-0">
             {status === "loading" && (
               <p className="flex items-center gap-2 text-muted-foreground text-xs">
-                <Spinner className="size-3.5" /> 正在连接桥接脚本…
+                <Spinner className="size-3.5" /> 正在连接 Bridge…
               </p>
             )}
             {status === "connected" && (
@@ -260,7 +260,7 @@ export function CustomPreview() {
               <Alert variant="warning">
                 <AlertTitle>已连接，但没有找到 coss ui</AlertTitle>
                 <AlertDescription>
-                  桥接脚本在运行，但这个页面没有声明 coss ui 的主题变量（例如
+                  Bridge 在运行，但这个页面没有声明 coss ui 的主题变量（例如
                   --background、--primary 和
                   --info），所以主题可能显示不出来。请装上 coss ui
                   的主题，然后重新加载。
@@ -269,11 +269,11 @@ export function CustomPreview() {
             )}
             {status === "missing" && (
               <Alert variant="error">
-                <AlertTitle>没有找到桥接脚本</AlertTitle>
+                <AlertTitle>没有找到 Bridge</AlertTitle>
                 <AlertDescription>
                   <p>
-                    {new URL(src).origin}{" "}
-                    没有回应。请把桥接脚本加到应用里并重新加载。禁止被嵌入的应用（X-Frame-Options
+                    {new URL(src).origin} 没有回应。请把 Bridge
+                    脚本加到应用里并重新加载。禁止被嵌入的应用（X-Frame-Options
                     或 frame-ancestors CSP）无法预览。
                   </p>
                   <Setup />

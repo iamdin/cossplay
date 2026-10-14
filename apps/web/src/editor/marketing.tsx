@@ -28,7 +28,7 @@ import {
 } from "lucide-react"
 import { Person } from "@/editor/cards"
 
-const logos = ["北风", "环球", "因泰", "保护伞", "胡力", "素伦"]
+const logos = ["Northwind", "Globex", "Initech", "Umbrella", "Hooli", "Soylent"]
 
 const features = [
   [GaugeIcon, "默认就快", "页面保持精简，一眨眼就加载完。"],
@@ -64,10 +64,10 @@ const plans = [
 const quotes = [
   [
     "朴丽娜",
-    "环球 技术负责人",
+    "Globex 技术负责人",
     "我们用 Acme 换掉了三个工具，发布节奏翻了一倍。",
   ],
-  ["马库斯", "胡力 创始人", "光是换主题，就给设计团队省了好几周。"],
+  ["马库斯", "Hooli 创始人", "光是换主题，就给设计团队省了好几周。"],
 ]
 
 const faqs = [

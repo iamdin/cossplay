@@ -1,6 +1,6 @@
 import { defaults, groups } from "@cossplay/core/coss"
 import { focusControl } from "@cossplay/editor/inspect"
-import { groupLabel, title } from "@cossplay/editor/panel"
+import { groupLabel } from "@cossplay/editor/panel"
 import { usePanelStore, useTheme } from "@cossplay/editor/store"
 
 // 当前模式的每个颜色 token，分组同面板；色块跳到对应控件。
@@ -28,7 +28,7 @@ export function Palette() {
                   style={{ background: `var(--${token})` }}
                 />
                 <span className="block truncate px-2 pt-1.5 font-medium text-xs">
-                  {title(token)}
+                  {token}
                 </span>
                 <span className="block truncate px-2 pb-1.5 font-mono text-[10px] text-muted-foreground">
                   {theme[mode][token]}
