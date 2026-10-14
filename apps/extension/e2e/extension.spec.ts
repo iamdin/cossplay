@@ -35,7 +35,7 @@ test.afterAll(async () => {
 test("panel page renders", async () => {
   const page = await ctx.newPage()
   await page.goto(`chrome-extension://${extId}/sidepanel.html`)
-  await expect(page.getByRole("tab", { name: "颜色" })).toBeVisible()
+  await expect(page.getByRole("tab", { name: "Colors" })).toBeVisible()
 })
 
 // 一个 coss 风格的页面：颜色通过 var()、color-mix() 和 --alpha() 的输出声明。
