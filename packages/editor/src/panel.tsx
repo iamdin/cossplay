@@ -54,7 +54,16 @@ import {
   X,
 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { ColorControl, FontControl, NumericControl, Section } from "./controls"
+import {
+  ColorControl,
+  FontControl,
+  groupLabel,
+  NumericControl,
+  Section,
+} from "./controls"
+
+export { groupLabel }
+
 import { ExportDialog, ImportDialog, McpDialog } from "./dialogs"
 import { InspectToggle } from "./inspect"
 import {
@@ -73,10 +82,28 @@ import {
 } from "./store"
 
 const hslControls = [
-  { key: "hue", label: "Hue shift", min: -180, max: 180, step: 1 },
-  { key: "saturation", label: "Saturation scale", min: 0, max: 2, step: 0.01 },
-  { key: "lightness", label: "Lightness scale", min: 0.2, max: 2, step: 0.01 },
+  { key: "hue", label: "色相偏移", min: -180, max: 180, step: 1 },
+  { key: "saturation", label: "饱和度缩放", min: 0, max: 2, step: 0.01 },
+  { key: "lightness", label: "明度缩放", min: 0.2, max: 2, step: 0.01 },
 ] as const
+const hslPresetLabels: Record<string, string> = {
+  "Hue (-120°)": "色相 −120°",
+  "Hue (-60°)": "色相 −60°",
+  "Hue (+60°)": "色相 +60°",
+  "Hue (+120°)": "色相 +120°",
+  "Hue Invert": "色相反转",
+  Grayscale: "灰度",
+  Muted: "降低饱和",
+  Vibrant: "提高饱和",
+  Dimmer: "变暗",
+  Brighter: "变亮",
+  "H(+30) S(-50) L(-5%)": "色相+30 饱和−50 明度−5%",
+  "H(-20) S(+20) L(+5%)": "色相−20 饱和+20 明度+5%",
+  "H(+20) S(-30) L(-5%)": "色相+20 饱和−30 明度−5%",
+  "H(-10) S(-25) L(+10%)": "色相−10 饱和−25 明度+10%",
+  "H(+60) S(+50) L(+10%)": "色相+60 饱和+50 明度+10%",
+}
+const hslPresetLabel = (label: string) => hslPresetLabels[label] ?? label
 const shadowTokens = [
   "shadow-opacity",
   "shadow-blur",
@@ -107,7 +134,7 @@ function applyPreset(id: string) {
   }
 }
 
-/** ⌘Z / ⌘⇧Z outside text fields. */
+/** 文本框外的 ⌘Z / ⌘⇧Z。 */
 export function useUndoShortcuts() {
   useEffect(() => {
     const keydown = (event: KeyboardEvent) => {
@@ -128,7 +155,7 @@ export function useUndoShortcuts() {
 
 const swatchTokens = ["primary", "secondary", "accent", "border"] as const
 const presetItems = [
-  { value: "default", label: "Default coss" },
+  { value: "default", label: "coss 默认" },
   ...Object.entries(presets).map(([value, { label }]) => ({ value, label })),
 ]
 const presetSwatches = new Map<string, string[]>()
@@ -147,7 +174,7 @@ function Swatches({ colors }: { colors: string[] }) {
     <span className="flex shrink-0 gap-0.5">
       {colors.map((color, i) => (
         <span
-          // biome-ignore lint/suspicious/noArrayIndexKey: fixed token order
+          // biome-ignore lint/suspicious/noArrayIndexKey: token 顺序固定
           key={i}
           className="size-3 rounded-sm border border-black/10"
           style={{ background: color }}
@@ -157,14 +184,14 @@ function Swatches({ colors }: { colors: string[] }) {
   )
 }
 
-/** Preset picker with search, previous / next / random, and "discard edits to this preset". */
+/** 预设选择：搜索、上一个 / 下一个 / 随机，以及丢弃对该预设的修改。 */
 export function PresetSelect() {
   const { site, mode, detected } = usePanel()
   const theme = useTheme()
   const themeId = site?.current.themeId ?? ""
   const overrides = site?.current.overrides
   const index = presetItems.findIndex((item) => item.value === themeId)
-  // Edits on top of a preset, or a theme from no preset at all.
+  // 预设之上的修改，或根本没有预设的主题。
   const custom =
     !!overrides &&
     (index < 0
@@ -189,7 +216,7 @@ export function PresetSelect() {
         onValueChange={(item) => item && applyPreset(item.value)}
       >
         <ComboboxTrigger
-          aria-label="Theme preset"
+          aria-label="主题预设"
           render={<SelectButton size="sm" className="min-w-0 flex-1 text-sm" />}
         >
           <span className="flex min-w-0 items-center gap-2">
@@ -197,25 +224,21 @@ export function PresetSelect() {
               <Swatches colors={swatchTokens.map((t) => theme[mode][t])} />
             )}
             <span className="truncate">
-              {custom ? (
-                "Custom"
-              ) : (
-                <ComboboxValue placeholder="Choose a preset" />
-              )}
+              {custom ? "自定义" : <ComboboxValue placeholder="选择预设" />}
             </span>
           </span>
         </ComboboxTrigger>
-        <ComboboxPopup aria-label="Theme presets" className="ui-chrome">
+        <ComboboxPopup aria-label="主题预设" className="ui-chrome">
           <div className="border-b p-2">
             <ComboboxInput
               size="sm"
               className="rounded-md text-sm before:rounded-[calc(var(--radius-md)-1px)]"
-              placeholder="Search presets…"
+              placeholder="搜索预设…"
               showTrigger={false}
               startAddon={<Search />}
             />
           </div>
-          <ComboboxEmpty>No presets found.</ComboboxEmpty>
+          <ComboboxEmpty>没有匹配的预设。</ComboboxEmpty>
           <ComboboxList>
             {(item: (typeof presetItems)[number]) => (
               <ComboboxItem key={item.value} value={item}>
@@ -231,8 +254,8 @@ export function PresetSelect() {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label="Previous preset"
-        title="Previous preset"
+        aria-label="上一个预设"
+        title="上一个预设"
         disabled={!detected}
         onClick={() => step(index < 0 ? 0 : -1)}
       >
@@ -241,8 +264,8 @@ export function PresetSelect() {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label="Next preset"
-        title="Next preset"
+        aria-label="下一个预设"
+        title="下一个预设"
         disabled={!detected}
         onClick={() => step(1)}
       >
@@ -251,8 +274,8 @@ export function PresetSelect() {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label="Random preset"
-        title="Random preset"
+        aria-label="随机预设"
+        title="随机预设"
         disabled={!detected}
         onClick={random}
       >
@@ -261,8 +284,8 @@ export function PresetSelect() {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label="Reset preset"
-        title="Discard edits to this preset"
+        aria-label="重置预设"
+        title="丢弃对该预设的修改"
         disabled={!detected || !site?.current.themeId}
         onClick={() =>
           site?.current.themeId && applyPreset(site.current.themeId)
@@ -274,7 +297,7 @@ export function PresetSelect() {
   )
 }
 
-/** Light/dark preview, undo/redo and reset; `liveSite` adds the per-site on/off switch. */
+/** 浅色/深色预览、撤销/重做与重置；`liveSite` 再加上按站点开关。 */
 export function HistoryActions({ liveSite = false }: { liveSite?: boolean }) {
   const { site, mode, detected } = usePanel()
   return (
@@ -282,8 +305,8 @@ export function HistoryActions({ liveSite = false }: { liveSite?: boolean }) {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label={mode === "light" ? "Preview dark" : "Preview light"}
-        title={mode === "light" ? "Preview dark" : "Preview light"}
+        aria-label={mode === "light" ? "预览深色" : "预览浅色"}
+        title={mode === "light" ? "预览深色" : "预览浅色"}
         disabled={!detected}
         onClick={() => preview(mode === "light" ? "dark" : "light")}
       >
@@ -292,8 +315,8 @@ export function HistoryActions({ liveSite = false }: { liveSite?: boolean }) {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label="Undo"
-        title="Undo · ⌘Z"
+        aria-label="撤销"
+        title="撤销 · ⌘Z"
         disabled={!site?.past.length}
         onClick={() => dispatch({ kind: "undo" })}
       >
@@ -302,8 +325,8 @@ export function HistoryActions({ liveSite = false }: { liveSite?: boolean }) {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label="Redo"
-        title="Redo · ⌘⇧Z"
+        aria-label="重做"
+        title="重做 · ⌘⇧Z"
         disabled={!site?.future.length}
         onClick={() => dispatch({ kind: "redo" })}
       >
@@ -312,10 +335,8 @@ export function HistoryActions({ liveSite = false }: { liveSite?: boolean }) {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label={liveSite ? "Reset site" : "Reset theme"}
-        title={
-          liveSite ? "Back to the site's own theme" : "Back to coss ui's theme"
-        }
+        aria-label={liveSite ? "重置站点" : "重置主题"}
+        title={liveSite ? "恢复该站点自己的主题" : "恢复 coss ui 的主题"}
         disabled={!site}
         onClick={reset}
       >
@@ -325,9 +346,9 @@ export function HistoryActions({ liveSite = false }: { liveSite?: boolean }) {
         <Button
           size="icon-sm"
           variant="ghost"
-          aria-label="Enable theme for this site"
+          aria-label="为此站点启用主题"
           aria-pressed={site?.enabled ?? false}
-          title={`${site?.enabled ? "Theme on" : "Theme off"} · ${site?.origin ?? ""}`}
+          title={`${site?.enabled ? "主题开" : "主题关"} · ${site?.origin ?? ""}`}
           className="aria-pressed:text-emerald-600"
           disabled={!detected}
           onClick={() => dispatch({ kind: "enabled", enabled: !site?.enabled })}
@@ -352,7 +373,7 @@ export function PanelAlerts() {
           {error}
           <button
             type="button"
-            aria-label="Dismiss error"
+            aria-label="关闭错误"
             className="absolute top-1.5 right-1.5 p-1"
             onClick={() => setError("")}
           >
@@ -362,7 +383,7 @@ export function PanelAlerts() {
       )}
       {detection?.warnings.length ? (
         <details className="mx-2 my-2 text-[10px] text-amber-700">
-          <summary>Stylesheet warnings</summary>
+          <summary>样式表警告</summary>
           {detection.warnings.map((w) => (
             <p key={w} className="mt-1 [overflow-wrap:anywhere]">
               {w}
@@ -374,7 +395,7 @@ export function PanelAlerts() {
   )
 }
 
-/** The Colors / Typography / Other tabs. */
+/** 颜色 / 排版 / 其他。 */
 export function PanelSections() {
   const { site, mode, detected } = usePanel()
   const theme = useTheme() ?? defaults
@@ -383,7 +404,9 @@ export function PanelSections() {
   const search = usePanelStore((s) => s.search)
   const [issuesOnly, setIssuesOnly] = useState(false)
   const matches = (group: string, key: string) =>
-    `${group} ${key}`.toLowerCase().includes(search.toLowerCase())
+    `${groupLabel(group)} ${group} ${key}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
   return (
     <fieldset
       disabled={!detected}
@@ -391,17 +414,17 @@ export function PanelSections() {
     >
       <Tabs defaultValue="colors" className="min-h-0 flex-1 gap-0">
         <TabsList
-          aria-label="Editor sections"
+          aria-label="编辑分区"
           className="mx-2 my-1.5 grid w-auto shrink-0 grid-cols-3"
         >
           <TabsTrigger value="colors" className="text-[11px]">
-            Colors
+            颜色
           </TabsTrigger>
           <TabsTrigger value="typography" className="text-[11px]">
-            Typography
+            排版
           </TabsTrigger>
           <TabsTrigger value="other" className="text-[11px]">
-            Other
+            其他
           </TabsTrigger>
         </TabsList>
 
@@ -413,8 +436,8 @@ export function PanelSections() {
             <Input
               className="text-sm"
               size="sm"
-              aria-label="Search colors"
-              placeholder="Search colors…"
+              aria-label="搜索颜色"
+              placeholder="搜索颜色…"
               value={search}
               onChange={(e) =>
                 usePanelStore.setState({ search: e.currentTarget.value })
@@ -427,7 +450,7 @@ export function PanelSections() {
             >
               <SelectTrigger
                 size="sm"
-                aria-label="Color format"
+                aria-label="颜色格式"
                 className="w-24 min-w-0 text-sm"
               >
                 <SelectValue />
@@ -447,7 +470,7 @@ export function PanelSections() {
               filtered.length > 0 && (
                 <Section
                   key={`${group}-${!!search}`}
-                  label={group}
+                  label={groupLabel(group)}
                   count={filtered.length}
                   open={
                     !!search || group === "Primary" || group === "Secondary"
@@ -457,12 +480,12 @@ export function PanelSections() {
                     <label className="flex items-center gap-1.5 px-2 py-2 text-[10px] text-muted-foreground">
                       <input
                         type="checkbox"
-                        aria-label="Sync sidebar colors"
+                        aria-label="同步侧栏颜色"
                         className="accent-primary"
                         checked={site?.current.sidebarSync ?? false}
                         onChange={syncSidebar}
                       />
-                      Sync sidebar to base colors
+                      侧栏颜色与基础色同步
                     </label>
                   )}
                   {filtered.map((token) => (
@@ -481,20 +504,20 @@ export function PanelSections() {
           {search &&
             !Object.entries(groups).some(([g, keys]) =>
               keys.some((k) => matches(g, k))
-            ) && <p className={muted}>No matching colors.</p>}
-          <Section label="Contrast checker" count="WCAG">
+            ) && <p className={muted}>没有匹配的颜色。</p>}
+          <Section label="对比度检查" count="WCAG">
             <p className={cn(muted, "mx-2 my-2")}>
-              AA normal text ≥ 4.5:1 · large text ≥ 3:1 · AAA ≥ 7:1
+              正文 AA ≥ 4.5:1 · 大字 AA ≥ 3:1 · AAA ≥ 7:1
             </p>
             <label className="flex items-center gap-1.5 px-2 py-2 text-[10px] text-muted-foreground">
               <input
                 type="checkbox"
-                aria-label="Show contrast issues only"
+                aria-label="只显示对比度问题"
                 className="accent-primary"
                 checked={issuesOnly}
                 onChange={(e) => setIssuesOnly(e.currentTarget.checked)}
               />
-              Show issues only
+              只显示问题
             </label>
             {contrastPairs.map(({ label, foreground, background }) => {
               const ratio = contrast(
@@ -508,7 +531,7 @@ export function PanelSections() {
                   key={label}
                   className="flex justify-between px-2 py-1.5 text-[10px]"
                 >
-                  <span>{label}</span>
+                  <span>{groupLabel(label)}</span>
                   <output
                     className={
                       ratio < 4.5
@@ -518,10 +541,10 @@ export function PanelSections() {
                   >
                     {ratio.toFixed(2)}:1 ·{" "}
                     {ratio < 4.5
-                      ? "AA fail"
+                      ? "未达 AA"
                       : ratio < 7
-                        ? "AA pass"
-                        : "AAA pass"}
+                        ? "通过 AA"
+                        : "通过 AAA"}
                   </output>
                 </div>
               )
@@ -534,11 +557,11 @@ export function PanelSections() {
           className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
         >
           <p className={cn(muted, "mb-3")}>
-            Typography and geometry are shared between light and dark, like
-            tweakcn. Custom fonts need to be installed or loaded.
+            排版和几何参数在浅色与深色之间共用，和 tweakcn
+            一样。自定义字体需要安装或加载。
           </p>
           <section className="mb-2 border bg-card p-2">
-            <h2 className="pb-3 font-semibold text-xs">Font family</h2>
+            <h2 className="pb-3 font-semibold text-xs">字体</h2>
             {fontTokens.map((token) => (
               <FontControl
                 key={token}
@@ -550,7 +573,7 @@ export function PanelSections() {
             ))}
           </section>
           <section className="mb-2 border bg-card p-2">
-            <h2 className="pb-3 font-semibold text-xs">Letter spacing</h2>
+            <h2 className="pb-3 font-semibold text-xs">字距</h2>
             <NumericControl
               token="letter-spacing"
               value={styles["letter-spacing"]}
@@ -563,9 +586,9 @@ export function PanelSections() {
           value="other"
           className="mt-0 min-h-0 flex-1 overflow-y-auto border-t px-2 pt-2 pb-3"
         >
-          <Section label="HSL adjustments" open>
+          <Section label="HSL 调整" open>
             <p className={cn(muted, "mx-2 my-2")}>
-              Adjust all colors in both modes from one checkpoint.
+              从一个检查点同时调整两种模式的全部颜色。
             </p>
             <div className="mx-2 my-2 flex flex-wrap gap-1">
               {hslPresets.map((p) => (
@@ -581,7 +604,7 @@ export function PanelSections() {
                     })
                   }
                 >
-                  {p.label}
+                  {hslPresetLabel(p.label)}
                 </Button>
               ))}
               <Button
@@ -589,7 +612,7 @@ export function PanelSections() {
                 variant="outline"
                 onClick={() => adjust({ hue: 0, saturation: 1, lightness: 1 })}
               >
-                Reset HSL
+                重置 HSL
               </Button>
             </div>
             {hslControls.map((c) => (
@@ -628,7 +651,7 @@ export function PanelSections() {
             ))}
           </Section>
           <section className="mb-2 border bg-card p-2">
-            <h2 className="pb-3 font-semibold text-xs">Radius & spacing</h2>
+            <h2 className="pb-3 font-semibold text-xs">圆角与间距</h2>
             {(["radius", "spacing"] as const).map((token) => (
               <NumericControl
                 key={token}
@@ -638,7 +661,7 @@ export function PanelSections() {
               />
             ))}
           </section>
-          <Section label="Shadows" open>
+          <Section label="阴影" open>
             <ColorControl
               token="shadow-color"
               value={styles["shadow-color"]}
@@ -686,7 +709,7 @@ export function ImportExport() {
   const { site, detected } = usePanel()
   const theme = useTheme() ?? defaults
   const [dialog, setDialog] = useState<"import" | "export" | "mcp" | null>(null)
-  // The CLI installs the preset as published, so only offer it while nothing is edited.
+  // CLI 安装的是已发布的预设，所以只在没有改动时提供。
   const themeId = site?.current.themeId ?? ""
   const presetId =
     dialog === "export" &&
@@ -699,8 +722,8 @@ export function ImportExport() {
       <Button
         size="icon-sm"
         variant="ghost"
-        aria-label="Use with AI editors"
-        title="Use with AI editors (MCP)"
+        aria-label="用于 AI 编辑器"
+        title="用于 AI 编辑器（MCP）"
         onClick={() => setDialog("mcp")}
       >
         <Plug />
@@ -711,14 +734,14 @@ export function ImportExport() {
         disabled={!detected}
         onClick={() => setDialog("import")}
       >
-        Import
+        导入
       </Button>
       <Button
         size="sm"
         disabled={!detected}
         onClick={() => setDialog("export")}
       >
-        Export
+        导出
       </Button>
       <ImportDialog
         open={dialog === "import"}
@@ -738,7 +761,7 @@ export function ImportExport() {
   )
 }
 
-/** The editing controls as one column (the extension's side panel). */
+/** 编辑控件排成一列（扩展的侧边栏）。 */
 export function Panel({ liveSite = false }: { liveSite?: boolean }) {
   const { site, detected } = usePanel()
   const status = usePanelStore((s) => s.status)
@@ -762,7 +785,7 @@ export function Panel({ liveSite = false }: { liveSite?: boolean }) {
           className="min-w-0 flex-1 truncate text-[10px] text-muted-foreground"
           title={site?.origin}
         >
-          {detected ? status : (site?.origin ?? "No website selected")}
+          {detected ? status : (site?.origin ?? "未选择网站")}
           {!detected && site ? ` · ${status}` : ""}
         </div>
         <ImportExport />

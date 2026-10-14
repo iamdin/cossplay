@@ -1,6 +1,5 @@
-// Resolves the coss registry style (what `npx shadcn init @coss/style` installs) into concrete
-// colors and writes src/coss/defaults.json.
-// Usage: pnpm sync:defaults [coss revision]
+// 把 coss 注册表样式（`npx shadcn init @coss/style` 装上的那份）解析成具体颜色，写入 src/coss/defaults.json。
+// 用法：pnpm sync:defaults [coss 修订]
 
 import fs from "node:fs/promises"
 import module from "node:module"

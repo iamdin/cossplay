@@ -43,7 +43,7 @@ import EmptyProjects from "@/components/particles/p-card-11"
 import ChatInput from "@/components/particles/p-input-group-29"
 import Verify from "@/components/particles/p-otp-field-4"
 
-/** A coss ui Select over plain string options; the first is the default. */
+/** 普通字符串选项上的 coss ui Select；第一项是默认值。 */
 export function Choice({ label, items }: { label: string; items: string[] }) {
   return (
     <Select
@@ -93,49 +93,49 @@ export function Person({
 }
 
 const stats = [
-  ["Total revenue", "$15,231.89", "+20.1% from last month", "success"],
-  ["Subscriptions", "+2,350", "+180.1% from last month", "success"],
-  ["Churn", "2.4%", "+0.6% from last month", "error"],
+  ["总收入", "$15,231.89", "较上月 +20.1%", "success"],
+  ["订阅", "+2,350", "较上月 +180.1%", "success"],
+  ["流失", "2.4%", "较上月 +0.6%", "error"],
 ] as const
 
 const team = [
-  ["Sofia Davis", "sofia@example.com", "Owner"],
-  ["Jackson Lee", "jackson@example.com", "Developer"],
-  ["Isabella Nguyen", "bella@example.com", "Billing"],
+  ["林晓", "sofia@example.com", "所有者"],
+  ["陈远", "jackson@example.com", "开发"],
+  ["阮安", "bella@example.com", "账单"],
 ]
 
 const messages = [
-  ["them", "Hi, how can I help you today?"],
-  ["me", "Hey, I'm having trouble with my account."],
-  ["them", "What seems to be the problem?"],
-  ["me", "I can't log in."],
+  ["them", "你好，今天需要什么帮助？"],
+  ["me", "嗨，我的账户出了点问题。"],
+  ["them", "具体是什么情况？"],
+  ["me", "我登不进去。"],
 ]
 
 const notifications = [
-  ["Your call has been confirmed.", "1 hour ago", true],
-  ["You have a new message!", "1 hour ago", true],
-  ["Your subscription is expiring soon!", "2 hours ago", false],
+  ["你的通话已确认。", "1 小时前", true],
+  ["你有一条新消息！", "1 小时前", true],
+  ["你的订阅即将到期！", "2 小时前", false],
 ] as const
 
 const methods = [
-  ["card", "Card", CreditCardIcon],
+  ["card", "银行卡", CreditCardIcon],
   ["paypal", "PayPal", WalletIcon],
-  ["bank", "Bank", LandmarkIcon],
+  ["bank", "银行", LandmarkIcon],
 ] as const
 
 const cookies = [
-  ["Strictly necessary", "Essential for the site to work.", true],
-  ["Functional", "Remember your preferences.", false],
-  ["Performance", "Help us improve the site.", false],
+  ["严格必要", "网站运行所必需。", true],
+  ["功能", "记住你的偏好。", false],
+  ["性能", "帮助我们改进网站。", false],
 ] as const
 
 const storage = [
-  ["Documents", 42],
-  ["Photos", 27],
-  ["Backups", 13],
+  ["文档", 42],
+  ["照片", 27],
+  ["备份", 13],
 ] as const
 
-// Realistic cards like shadcn's cards example, laid out as a masonry of columns.
+// 类似 shadcn cards 示例的卡片，按列砌成瀑布流。
 export function Cards() {
   return (
     <div className="columns-[19rem] gap-4 px-4 pt-2 pb-6 *:mb-4 *:break-inside-avoid">
@@ -156,10 +156,8 @@ export function Cards() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Create an account</CardTitle>
-          <CardDescription>
-            Enter your email below to create your account.
-          </CardDescription>
+          <CardTitle>创建账户</CardTitle>
+          <CardDescription>在下面填写邮箱以创建账户。</CardDescription>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-2">
@@ -174,25 +172,25 @@ export function Cards() {
           </div>
           <div className="flex items-center gap-2 text-muted-foreground text-xs uppercase">
             <Separator className="flex-1" />
-            Or continue with
+            或继续使用
             <Separator className="flex-1" />
           </div>
           <Field>
-            <FieldLabel>Email</FieldLabel>
+            <FieldLabel>邮箱</FieldLabel>
             <Input type="email" placeholder="m@example.com" />
           </Field>
           <Field>
-            <FieldLabel>Password</FieldLabel>
+            <FieldLabel>密码</FieldLabel>
             <Input type="password" />
           </Field>
-          <Button className="w-full">Create account</Button>
+          <Button className="w-full">创建账户</Button>
         </CardPanel>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Team members</CardTitle>
-          <CardDescription>Invite your team to collaborate.</CardDescription>
+          <CardTitle>团队成员</CardTitle>
+          <CardDescription>邀请团队一起协作。</CardDescription>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           {team.map(([name, email, role]) => (
@@ -200,8 +198,8 @@ export function Cards() {
               <Person name={name} detail={email} />
               <div className="w-32 shrink-0">
                 <Choice
-                  label={`${name}'s role`}
-                  items={[role, "Viewer", "Admin"]}
+                  label={`${name}的角色`}
+                  items={[role, "查看者", "管理员"]}
                 />
               </div>
             </div>
@@ -211,10 +209,8 @@ export function Cards() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Payment method</CardTitle>
-          <CardDescription>
-            Add a new payment method to your account.
-          </CardDescription>
+          <CardTitle>支付方式</CardTitle>
+          <CardDescription>为账户添加一种新的支付方式。</CardDescription>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           <RadioGroup defaultValue="card" className="grid grid-cols-3 gap-2">
@@ -230,29 +226,29 @@ export function Cards() {
             ))}
           </RadioGroup>
           <Field>
-            <FieldLabel>Name</FieldLabel>
-            <Input placeholder="First Last" />
+            <FieldLabel>姓名</FieldLabel>
+            <Input placeholder="姓 名" />
           </Field>
           <Field>
-            <FieldLabel>Card number</FieldLabel>
+            <FieldLabel>卡号</FieldLabel>
             <Input placeholder="4242 4242 4242 4242" />
           </Field>
           <div className="grid grid-cols-3 gap-2">
-            <Choice label="Month" items={["January", "February", "March"]} />
-            <Choice label="Year" items={["2027", "2028", "2029"]} />
-            <Input aria-label="CVC" placeholder="CVC" />
+            <Choice label="月" items={["一月", "二月", "三月"]} />
+            <Choice label="年" items={["2027", "2028", "2029"]} />
+            <Input aria-label="安全码" placeholder="安全码" />
           </div>
         </CardPanel>
         <CardFooter>
-          <Button className="w-full">Continue</Button>
+          <Button className="w-full">继续</Button>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Chat</CardTitle>
+          <CardTitle>聊天</CardTitle>
           <CardAction>
-            <Badge variant="success">Online</Badge>
+            <Badge variant="success">在线</Badge>
           </CardAction>
         </CardHeader>
         <CardPanel className="flex flex-col gap-3">
@@ -275,48 +271,46 @@ export function Cards() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Report an issue</CardTitle>
-          <CardDescription>
-            What area are you having problems with?
-          </CardDescription>
+          <CardTitle>报告问题</CardTitle>
+          <CardDescription>你在哪一块遇到了问题？</CardDescription>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-2">
             <Field>
-              <FieldLabel>Area</FieldLabel>
-              <Choice label="Area" items={["Billing", "Account", "Security"]} />
+              <FieldLabel>范围</FieldLabel>
+              <Choice label="范围" items={["账单", "账户", "安全"]} />
             </Field>
             <Field>
-              <FieldLabel>Severity</FieldLabel>
-              <Choice label="Severity" items={["Medium", "Low", "High"]} />
+              <FieldLabel>严重程度</FieldLabel>
+              <Choice label="严重程度" items={["中", "低", "高"]} />
             </Field>
           </div>
           <Field>
-            <FieldLabel>Subject</FieldLabel>
-            <Input placeholder="I need help with…" />
+            <FieldLabel>主题</FieldLabel>
+            <Input placeholder="我需要帮助…" />
           </Field>
           <Field>
-            <FieldLabel>Description</FieldLabel>
-            <Textarea placeholder="Please include all relevant information." />
+            <FieldLabel>描述</FieldLabel>
+            <Textarea placeholder="请写上所有相关信息。" />
           </Field>
         </CardPanel>
         <CardFooter className="justify-between">
-          <Button variant="ghost">Cancel</Button>
-          <Button>Submit</Button>
+          <Button variant="ghost">取消</Button>
+          <Button>提交</Button>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Notifications</CardTitle>
-          <CardDescription>You have 3 unread messages.</CardDescription>
+          <CardTitle>通知</CardTitle>
+          <CardDescription>你有 3 条未读消息。</CardDescription>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           <Label className="justify-between rounded-lg border p-3">
             <span>
-              Push notifications
+              推送通知
               <span className="block font-normal text-muted-foreground text-xs">
-                Send notifications to device.
+                把通知发到设备。
               </span>
             </span>
             <Switch defaultChecked />
@@ -338,15 +332,15 @@ export function Cards() {
         </CardPanel>
         <CardFooter>
           <Button variant="secondary" className="w-full">
-            Mark all as read
+            全部标为已读
           </Button>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Cookie settings</CardTitle>
-          <CardDescription>Manage your cookie settings here.</CardDescription>
+          <CardTitle>Cookie 设置</CardTitle>
+          <CardDescription>在这里管理 Cookie 设置。</CardDescription>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           {cookies.map(([title, text, on]) => (
@@ -363,15 +357,15 @@ export function Cards() {
         </CardPanel>
         <CardFooter>
           <Button variant="outline" className="w-full">
-            Save preferences
+            保存偏好
           </Button>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Storage</CardTitle>
-          <CardDescription>Your plan includes 100 GB.</CardDescription>
+          <CardTitle>存储</CardTitle>
+          <CardDescription>你的方案包含 100 GB。</CardDescription>
         </CardHeader>
         <CardPanel className="flex flex-col gap-4">
           {storage.map(([label, value]) => (
@@ -387,18 +381,18 @@ export function Cards() {
           ))}
         </CardPanel>
         <CardFooter>
-          <Button className="w-full">Upgrade plan</Button>
+          <Button className="w-full">升级方案</Button>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Two-factor authentication</CardTitle>
-          <CardDescription>Confirm it's you to continue.</CardDescription>
+          <CardTitle>两步验证</CardTitle>
+          <CardDescription>确认是你本人后再继续。</CardDescription>
         </CardHeader>
         <CardPanel className="flex flex-col items-center gap-4">
           <Verify />
-          <Button className="w-full">Verify</Button>
+          <Button className="w-full">验证</Button>
         </CardPanel>
       </Card>
 

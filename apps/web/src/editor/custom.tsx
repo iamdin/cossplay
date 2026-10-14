@@ -28,33 +28,37 @@ const STORAGE_KEY = "cossplay:custom-url"
 const TIMEOUT = 3000
 
 const snippets: [string, string, string][] = [
-  ["html", "HTML", `<!-- Inside <head> -->\n<script src="${BRIDGE}"></script>`],
+  [
+    "html",
+    "HTML",
+    `<!-- 放在 <head> 里 -->\n<script src="${BRIDGE}"></script>`,
+  ],
   [
     "next-app",
     "Next.js App",
-    `// app/layout.tsx\nimport Script from "next/script"\n\n// Inside <body>:\n{process.env.NODE_ENV === "development" && (\n  <Script src="${BRIDGE}" />\n)}`,
+    `// app/layout.tsx\nimport Script from "next/script"\n\n// 放在 <body> 里：\n{process.env.NODE_ENV === "development" && (\n  <Script src="${BRIDGE}" />\n)}`,
   ],
   [
     "next-pages",
     "Next.js Pages",
-    `// pages/_document.tsx, inside <Head>:\n{process.env.NODE_ENV === "development" && (\n  <script src="${BRIDGE}" async />\n)}`,
+    `// pages/_document.tsx，放在 <Head> 里：\n{process.env.NODE_ENV === "development" && (\n  <script src="${BRIDGE}" async />\n)}`,
   ],
   [
     "vite",
     "Vite",
-    `<!-- index.html, inside <head> -->\n<script src="${BRIDGE}"></script>`,
+    `<!-- index.html，放在 <head> 里 -->\n<script src="${BRIDGE}"></script>`,
   ],
   [
     "remix",
     "Remix",
-    `// app/root.tsx, inside <head>:\n{process.env.NODE_ENV === "development" && (\n  <script src="${BRIDGE}" async />\n)}`,
+    `// app/root.tsx，放在 <head> 里：\n{process.env.NODE_ENV === "development" && (\n  <script src="${BRIDGE}" async />\n)}`,
   ],
 ]
 
 function Setup() {
   return (
     <Tabs defaultValue="html" className="gap-2">
-      <TabsList aria-label="Framework">
+      <TabsList aria-label="框架">
         {snippets.map(([value, label]) => (
           <TabsTab key={value} value={value}>
             {label}
@@ -69,11 +73,11 @@ function Setup() {
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Copy snippet"
+            aria-label="复制片段"
             className="absolute top-1.5 right-1.5"
             onClick={async () => {
               await navigator.clipboard.writeText(code)
-              usePanelStore.setState({ status: "Copied to clipboard" })
+              usePanelStore.setState({ status: "已复制到剪贴板" })
             }}
           >
             <CopyIcon />
@@ -84,7 +88,7 @@ function Setup() {
   )
 }
 
-// Accepts "localhost:3000" as well as full http(s) URLs.
+// 接受 "localhost:3000"，也接受完整的 http(s) 地址。
 function parseUrl(value: string) {
   try {
     const url = new URL(/^https?:\/\//i.test(value) ? value : `http://${value}`)
@@ -96,14 +100,14 @@ function parseUrl(value: string) {
 
 type Status = "loading" | "missing" | "no-coss" | "connected"
 
-/** The user's own app in a frame, themed live through the bridge it includes. */
+/** 用户自己的应用放在框架里，靠它引入的 Bridge 实时换主题。 */
 export function CustomPreview() {
   const frame = useRef<HTMLIFrameElement>(null)
   const [draft, setDraft] = useState("")
   const [src, setSrc] = useState("")
-  // Bumped to remount the frame, which reloads it even at the same URL.
+  // 递增以重新挂载框架，同一 URL 也会重新加载。
   const [reloads, setReloads] = useState(0)
-  // A new object on every frame load, also for navigations inside the frame.
+  // 每次框架加载都换一个新对象，框架内跳转也一样。
   const [loaded, setLoaded] = useState<{ origin: string } | null>(null)
   const [status, setStatus] = useState<Status>("loading")
 
@@ -159,7 +163,7 @@ export function CustomPreview() {
       }
     }
     setStatus("loading")
-    // Keeps pinging: a bridge may load late, and coss ui's styles may arrive after it.
+    // 持续 ping：Bridge 可能晚到，coss ui 的样式也可能在它之后才到。
     post({ type: "ping" })
     const ping = setInterval(() => post({ type: "ping" }), 500)
     addEventListener("message", onMessage)
@@ -194,7 +198,7 @@ export function CustomPreview() {
         className="ui-chrome flex shrink-0 items-center gap-1 px-4 pb-3"
       >
         <Input
-          aria-label="App URL"
+          aria-label="应用 URL"
           placeholder="http://localhost:3000"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -204,13 +208,13 @@ export function CustomPreview() {
           className="flex-1"
         />
         <Button type="submit" variant="outline" size="sm">
-          Load
+          加载
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="icon-sm"
-          aria-label="Reload"
+          aria-label="重新加载"
           disabled={!src}
           onClick={() => open(src)}
         >
@@ -219,7 +223,7 @@ export function CustomPreview() {
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label="Open in new tab"
+          aria-label="在新标签页打开"
           disabled={!src}
           render={
             <a href={src || undefined} target="_blank" rel="noreferrer" />
@@ -230,11 +234,11 @@ export function CustomPreview() {
       </form>
       {!src ? (
         <div className="ui-chrome mx-auto flex w-full max-w-2xl flex-col gap-3 overflow-y-auto p-4 text-sm">
-          <h2 className="font-semibold text-base">Preview your own app</h2>
+          <h2 className="font-semibold text-base">预览你自己的应用</h2>
           <p className="text-muted-foreground">
-            Add the Cossplay bridge to your app (only in development is enough),
-            start it, and enter its URL above. The editor then themes it live as
-            you edit.
+            把 Cossplay 的 Bridge
+            加到应用里（只在开发环境即可），启动它，再在上面填 URL。之后 Editor
+            会在你编辑时实时给它换主题。
           </p>
           <Setup />
         </div>
@@ -243,35 +247,34 @@ export function CustomPreview() {
           <div className="ui-chrome shrink-0">
             {status === "loading" && (
               <p className="flex items-center gap-2 text-muted-foreground text-xs">
-                <Spinner className="size-3.5" /> Connecting to the bridge…
+                <Spinner className="size-3.5" /> 正在连接 Bridge…
               </p>
             )}
             {status === "connected" && (
               <p className="flex items-center gap-2 text-muted-foreground text-xs">
-                <CircleCheckIcon className="size-3.5 text-success" /> Connected
-                — edits apply live
+                <CircleCheckIcon className="size-3.5 text-success" /> 已连接 —
+                编辑会实时生效
               </p>
             )}
             {status === "no-coss" && (
               <Alert variant="warning">
-                <AlertTitle>Connected, but no coss ui found</AlertTitle>
+                <AlertTitle>已连接，但没有找到 coss ui</AlertTitle>
                 <AlertDescription>
-                  The bridge is running, but this page doesn't declare coss ui's
-                  theme variables (such as --background, --primary and --info),
-                  so the theme may not show. Install coss ui's theme, then
-                  reload.
+                  Bridge 在运行，但这个页面没有声明 coss ui 的主题变量（例如
+                  --background、--primary 和
+                  --info），所以主题可能显示不出来。请装上 coss ui
+                  的主题，然后重新加载。
                 </AlertDescription>
               </Alert>
             )}
             {status === "missing" && (
               <Alert variant="error">
-                <AlertTitle>Bridge not found</AlertTitle>
+                <AlertTitle>没有找到 Bridge</AlertTitle>
                 <AlertDescription>
                   <p>
-                    No answer from {new URL(src).origin}. Add the bridge script
-                    to your app and reload. Apps that block framing
-                    (X-Frame-Options or a frame-ancestors CSP) can't be
-                    previewed.
+                    {new URL(src).origin} 没有回应。请把 Bridge
+                    脚本加到应用里并重新加载。禁止被嵌入的应用（X-Frame-Options
+                    或 frame-ancestors CSP）无法预览。
                   </p>
                   <Setup />
                 </AlertDescription>
@@ -282,7 +285,7 @@ export function CustomPreview() {
             key={reloads}
             ref={frame}
             src={src}
-            title="Custom preview"
+            title="自定义预览"
             onLoad={() => setLoaded({ origin: new URL(src).origin })}
             className="min-h-0 w-full flex-1 rounded-xl border bg-background"
           />

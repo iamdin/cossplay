@@ -15,17 +15,17 @@ const OTP_SLOT_KEYS = Array.from(
 export default function Particle() {
   return (
     <Field className="items-center">
-      <FieldLabel>Verification code</FieldLabel>
+      <FieldLabel>验证码</FieldLabel>
       <OTPField length={OTP_LENGTH}>
         {OTP_SLOT_KEYS.map((slotKey, index) => (
           <OTPFieldInput
             key={slotKey}
-            aria-label={`Character ${index + 1} of ${OTP_LENGTH}`}
+            aria-label={`第 ${index + 1} 位，共 ${OTP_LENGTH} 位`}
           />
         ))}
       </OTPField>
       <FieldDescription>
-        Enter the {OTP_LENGTH}-digit code sent to your email.
+        输入发到邮箱的 {OTP_LENGTH} 位验证码。
       </FieldDescription>
     </Field>
   )

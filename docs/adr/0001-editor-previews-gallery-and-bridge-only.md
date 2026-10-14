@@ -1,8 +1,8 @@
-# The editor previews its own gallery and bridge-enabled apps, never coss.com
+# Editor 只预览自己的 Gallery 和带 Bridge 的应用，从不预览 coss.com
 
-The web editor's preview shows only our gallery (built from real coss ui components) and custom previews of apps that include our bridge script, such as a developer's localhost. It does not frame coss.com/ui: browsers block a page from styling a cross-origin frame, so coss.com could only be themed by proxying it through our domain (republishing someone else's site) or by requiring the extension. Editing live sites such as coss.com is the extension's job, through Chrome's side panel.
+网页 Editor 的 Preview 只显示我们的 Gallery（用真实 coss ui 组件搭建）以及包含 Bridge 脚本的应用的自定义预览，例如开发者的 localhost。它不嵌入 coss.com/ui：浏览器不允许一个页面去给跨源框架上样式，所以要给 coss.com 换主题，只能把它代理到我们的域名（等于用我们的名字重新发布别人的站点），或者要求安装扩展。编辑 coss.com 这类线上站点是 Extension 的事，通过 Chrome 的侧边栏。
 
-## Considered Options
+## 考虑过的方案
 
-- **Proxy coss.com through our domain and inject the bridge**: rejected; it serves coss's pages under our name, needs their consent, and breaks when their site changes.
-- **Use the extension as the bridge for any framed site**: rejected for now; it ties the web editor's main preview to an install, and the side panel already covers live sites.
+- **把 coss.com 代理到我们的域名并注入 Bridge**：否决。这等于用我们的名字提供 coss 的页面，需要他们同意，而且他们的站点一变就会坏。
+- **用扩展当任意被嵌入站点的 Bridge**：目前否决。这会把网页 Editor 的主预览绑到一次安装上，而侧边栏已经覆盖了线上站点。

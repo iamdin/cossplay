@@ -1,4 +1,4 @@
-// Run against the documented local upstream clone, never a moving remote URL.
+// 对着文档里的本地上游克隆跑，不要对着会变的远程 URL。
 
 import { execFileSync } from "node:child_process"
 import fs from "node:fs"

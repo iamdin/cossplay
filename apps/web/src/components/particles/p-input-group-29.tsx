@@ -17,13 +17,13 @@ import { ArrowRightIcon, MicIcon } from "lucide-react"
 export default function Particle() {
   return (
     <InputGroup>
-      <InputGroupTextarea placeholder="Type a message…" />
+      <InputGroupTextarea placeholder="输入消息…" />
       <InputGroupAddon align="block-end">
         <Tooltip>
           <TooltipTrigger
             render={
               <Button
-                aria-label="Voice message"
+                aria-label="语音消息"
                 className="rounded-full"
                 size="icon-sm"
                 variant="ghost"
@@ -32,16 +32,16 @@ export default function Particle() {
           >
             <MicIcon />
           </TooltipTrigger>
-          <TooltipPopup>Record voice message</TooltipPopup>
+          <TooltipPopup>录制语音</TooltipPopup>
         </Tooltip>
         <InputGroupText className="ml-auto text-muted-foreground text-xs">
-          Press Enter to send
+          按 Enter 发送
         </InputGroupText>
         <Tooltip>
           <TooltipTrigger
             render={
               <Button
-                aria-label="Send message"
+                aria-label="发送消息"
                 className="rounded-full"
                 size="icon-sm"
               />
@@ -49,7 +49,7 @@ export default function Particle() {
           >
             <ArrowRightIcon />
           </TooltipTrigger>
-          <TooltipPopup>Send</TooltipPopup>
+          <TooltipPopup>发送</TooltipPopup>
         </Tooltip>
       </InputGroupAddon>
     </InputGroup>

@@ -1,7 +1,6 @@
 import pLimit from "p-limit"
 
-// Serializes USER-origin sheet replacement. `installed` only changes once the worker
-// acknowledges it, so a failed replacement still knows which sheet to remove later.
+// 串行替换 USER 来源的样式表。`installed` 只在 worker 确认后才变，失败时仍知道以后要卸哪一张。
 export function cssInstaller(
   send: (css: string, previous: string) => Promise<void>,
   settled: () => void
@@ -9,7 +8,7 @@ export function cssInstaller(
   let installed = "",
     requested = ""
   const queue = pLimit(1)
-  // Detection must know whether USER CSS is, or is about to be, applied to computed styles.
+  // 检测必须知道 USER CSS 是否已经、或即将作用到计算样式上。
   const active = () => requested !== "" || installed !== ""
   function install(css: string) {
     if (requested === css) return
@@ -21,7 +20,7 @@ export function cssInstaller(
           installed = css
         }
       } catch (error) {
-        // Allow an identical later request to retry unless a newer one is already queued.
+        // 允许之后相同的请求重试，除非已经排了更新的一次。
         if (requested === css) requested = installed
         console.error("Cossplay CSS injection failed", error)
       }

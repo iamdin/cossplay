@@ -16,24 +16,22 @@ export default function Particle() {
   return (
     <Popover>
       <PopoverTrigger render={<Button variant="outline" />}>
-        Open Popover
+        打开气泡
       </PopoverTrigger>
       <PopoverPopup className="w-80">
         <div className="mb-4">
-          <PopoverTitle className="text-base">Send us feedback</PopoverTitle>
-          <PopoverDescription>
-            Let us know how we can improve.
-          </PopoverDescription>
+          <PopoverTitle className="text-base">给我们反馈</PopoverTitle>
+          <PopoverDescription>告诉我们能怎么改进。</PopoverDescription>
         </div>
         <Form className="flex w-full flex-col gap-4">
           <Field>
             <Textarea
-              aria-label="Send feedback"
+              aria-label="发送反馈"
               id="feedback"
-              placeholder="How can we improve?"
+              placeholder="我们能怎么改进？"
             />
           </Field>
-          <Button type="submit">Send feedback</Button>
+          <Button type="submit">发送反馈</Button>
         </Form>
       </PopoverPopup>
     </Popover>

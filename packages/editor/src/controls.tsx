@@ -30,7 +30,29 @@ import tailwindColors from "./tailwind-colors.json"
 export const title = (key: string) =>
   key.replaceAll("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())
 
-/** Collapsible group, labelled by a small chip like tweakcn's. */
+const groupLabels: Record<string, string> = {
+  Primary: "主色",
+  Secondary: "次色",
+  Accent: "强调",
+  Base: "基础",
+  Card: "卡片",
+  Popover: "弹出层",
+  Muted: "柔和",
+  Destructive: "危险",
+  Info: "信息",
+  Success: "成功",
+  Warning: "警告",
+  "Border & Input": "边框与输入",
+  Charts: "图表",
+  Sidebar: "侧栏",
+  Code: "代码",
+  "Sidebar Primary": "侧栏主色",
+  "Sidebar Accent": "侧栏强调",
+}
+/** 分组与对比度条目的显示名；键仍是 token 分组名。 */
+export const groupLabel = (group: string) => groupLabels[group] ?? group
+
+/** 可折叠分组，小标签样式同 tweakcn。 */
 export function Section({
   label,
   count,
@@ -56,7 +78,7 @@ export function Section({
   )
 }
 
-/** A text field that follows `value` except while focused, and reports only valid drafts. */
+/** 聚焦时保留草稿，失焦后跟回 `value`，只上报合法值。 */
 function useDraft(value: string) {
   const [draft, setDraft] = useState(value)
   const focused = useRef(false)
@@ -75,7 +97,7 @@ function useDraft(value: string) {
   }
 }
 
-/** Tailwind v4's palette, one row per color. */
+/** Tailwind v4 色板，每种颜色一行。 */
 function TailwindPalette({
   value,
   onPick,
@@ -136,20 +158,20 @@ export function ColorControl({
   const channels =
     format === "oklch"
       ? [
-          { name: "Lightness", value: oklch.l, max: 1, step: 0.001 },
-          { name: "Chroma", value: oklch.c, max: 0.4, step: 0.001 },
-          { name: "Hue", value: oklch.h ?? 0, max: 360, step: 1 },
+          { name: "明度", value: oklch.l, max: 1, step: 0.001 },
+          { name: "彩度", value: oklch.c, max: 0.4, step: 0.001 },
+          { name: "色相", value: oklch.h ?? 0, max: 360, step: 1 },
         ]
       : format === "rgb"
         ? [
-            { name: "Red", value: parsed.r * 255, max: 255, step: 1 },
-            { name: "Green", value: parsed.g * 255, max: 255, step: 1 },
-            { name: "Blue", value: parsed.b * 255, max: 255, step: 1 },
+            { name: "红", value: parsed.r * 255, max: 255, step: 1 },
+            { name: "绿", value: parsed.g * 255, max: 255, step: 1 },
+            { name: "蓝", value: parsed.b * 255, max: 255, step: 1 },
           ]
         : [
-            { name: "Hue", value: hsl.h ?? 0, max: 360, step: 1 },
-            { name: "Saturation", value: hsl.s, max: 1, step: 0.001 },
-            { name: "Lightness", value: hsl.l, max: 1, step: 0.001 },
+            { name: "色相", value: hsl.h ?? 0, max: 360, step: 1 },
+            { name: "饱和度", value: hsl.s, max: 1, step: 0.001 },
+            { name: "明度", value: hsl.l, max: 1, step: 0.001 },
           ]
   const changeChannel = (index: number, n: number) => {
     const v = channels.map((c, i) => (i === index ? n : c.value))
@@ -167,7 +189,7 @@ export function ColorControl({
       <div className="flex items-center gap-2">
         <input
           type="color"
-          aria-label={`${name} picker`}
+          aria-label={`${name} 拾色器`}
           className="size-7 shrink-0 cursor-pointer rounded-md border bg-background p-0.5"
           value={formatColor(value, "hex").slice(0, 7)}
           onChange={(e) => {
@@ -186,7 +208,7 @@ export function ColorControl({
         <Input
           id={`value-${token}`}
           data-token={token}
-          aria-label={`${name} value`}
+          aria-label={`${name} 的值`}
           aria-invalid={!validValue(token, draft)}
           size="sm"
           className="w-36 shrink-0 font-mono text-xs sm:text-xs"
@@ -209,8 +231,8 @@ export function ColorControl({
               <Button
                 size="icon-xs"
                 variant="ghost"
-                aria-label={`${name} Tailwind colors`}
-                title="Tailwind colors"
+                aria-label={`${name} Tailwind 色板`}
+                title="Tailwind 色板"
               />
             }
           >
@@ -220,7 +242,7 @@ export function ColorControl({
             <TailwindPalette
               value={value}
               onPick={(color) =>
-                // Keeps the token's opacity, as the picker and sliders do.
+                // 与拾色器、滑杆一样，保留该 token 的不透明度。
                 onChange(
                   alpha < 1 ? color.replace(/\)$/, ` / ${alpha})`) : color
                 )
@@ -231,9 +253,9 @@ export function ColorControl({
         <Button
           size="icon-xs"
           variant="ghost"
-          aria-label={`${name} channels`}
+          aria-label={`${name} 通道`}
           aria-expanded={expanded}
-          title="Channels & opacity"
+          title="通道与不透明度"
           onClick={() => setExpanded(!expanded)}
         >
           <SlidersHorizontal />
@@ -262,10 +284,10 @@ export function ColorControl({
           </label>
         ))}
         <label className="mt-1 flex items-center gap-1.5">
-          <span className="w-16">Opacity</span>
+          <span className="w-16">不透明度</span>
           <input
             type="range"
-            aria-label={`${name} opacity`}
+            aria-label={`${name} 不透明度`}
             className="h-5 min-w-0 flex-1 accent-primary"
             min={0}
             max={1}
@@ -288,17 +310,17 @@ export function ColorControl({
           <Button
             size="xs"
             variant="outline"
-            aria-label={`${name} copy color`}
+            aria-label={`复制 ${name} 颜色`}
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(shown)
-                setCopyStatus("Copied")
+                setCopyStatus("已复制")
               } catch {
-                setCopyStatus("Copy failed — focus Chrome and retry")
+                setCopyStatus("复制失败，请聚焦 Chrome 后重试")
               }
             }}
           >
-            Copy color
+            复制颜色
           </Button>
           <span role="status">{copyStatus}</span>
         </div>
@@ -318,7 +340,7 @@ export function NumericControl({
 }) {
   const config = numericControls[token]!
   const { draft, setDraft, focus, blur } = useDraft(value)
-  // Imported px/em units stay in the text field; the slider uses its labelled unit.
+  // 导入的 px/em 留在文本框；滑杆用控件自己的单位。
   const numeric = Number.isFinite(Number.parseFloat(value))
     ? Number.parseFloat(value)
     : 0
@@ -340,7 +362,7 @@ export function NumericControl({
       <div className="flex items-center gap-2.5">
         <input
           type="range"
-          aria-label={`${name} slider`}
+          aria-label={`${name} 滑杆`}
           className="h-5 min-w-0 flex-1 accent-primary"
           min={Math.min(config.min, sliderValue)}
           max={Math.max(config.max, sliderValue)}
@@ -351,7 +373,7 @@ export function NumericControl({
         <Input
           id={`value-${token}`}
           data-token={token}
-          aria-label={`${name} value`}
+          aria-label={`${name} 的值`}
           aria-invalid={!validValue(token, normalize(draft))}
           size="sm"
           className="w-20 font-mono text-xs sm:text-xs [&_input]:text-right"
@@ -381,6 +403,14 @@ const categories = [
   "display",
   "handwriting",
 ]
+const categoryLabels: Record<string, string> = {
+  all: "全部",
+  "sans serif": "无衬线",
+  serif: "衬线",
+  monospace: "等宽",
+  display: "展示",
+  handwriting: "手写",
+}
 export function FontControl({
   token,
   value,
@@ -395,7 +425,7 @@ export function FontControl({
   const { draft, setDraft, focus, blur } = useDraft(value)
   const [category, setCategory] = useState("all")
   const [loading, setLoading] = useState(false)
-  // A newly typed Google font loads on blur; the token itself already changed while typing.
+  // 新输入的 Google 字体在失焦时加载；token 在输入过程中已经改过。
   const focusedValue = useRef(value)
   const family = familyOf(draft)
   const matches = fonts
@@ -428,13 +458,16 @@ export function FontControl({
           {name}
         </label>
         <Select
-          items={categories.map((c) => ({ value: c, label: title(c) }))}
+          items={categories.map((c) => ({
+            value: c,
+            label: categoryLabels[c],
+          }))}
           value={category}
           onValueChange={(value) => value && setCategory(value)}
         >
           <SelectTrigger
             size="sm"
-            aria-label={`${name} font category`}
+            aria-label={`${name} 字体类别`}
             className="w-32 min-w-0 text-sm"
           >
             <SelectValue />
@@ -442,7 +475,7 @@ export function FontControl({
           <SelectPopup className="ui-chrome">
             {categories.map((c) => (
               <SelectItem key={c} value={c}>
-                {title(c)}
+                {categoryLabels[c]}
               </SelectItem>
             ))}
           </SelectPopup>
@@ -452,7 +485,7 @@ export function FontControl({
         className="text-sm"
         id={`value-${token}`}
         data-token={token}
-        aria-label={`${name} value`}
+        aria-label={`${name} 的值`}
         aria-invalid={!validValue(token, draft)}
         list={`fonts-${token}`}
         size="sm"
@@ -485,7 +518,7 @@ export function FontControl({
         className="my-2 overflow-hidden border border-dashed p-2.5 text-sm [overflow-wrap:anywhere]"
         style={{ fontFamily: value }}
       >
-        The quick brown fox · 0123456789
+        永字八法 · Aa 0123456789
       </div>
       <Button
         size="xs"
@@ -493,7 +526,7 @@ export function FontControl({
         disabled={!known || loading}
         onClick={load}
       >
-        {loading ? "Loading font…" : "Load Google font"}
+        {loading ? "正在加载字体…" : "加载 Google 字体"}
       </Button>
     </div>
   )

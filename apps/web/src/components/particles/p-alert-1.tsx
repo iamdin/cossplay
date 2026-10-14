@@ -7,9 +7,9 @@ import {
 export default function Particle() {
   return (
     <Alert>
-      <AlertTitle>Heads up!</AlertTitle>
+      <AlertTitle>注意</AlertTitle>
       <AlertDescription>
-        <p>Describe what can be done about it here.</p>
+        <p>在这里说明可以怎么处理。</p>
       </AlertDescription>
     </Alert>
   )

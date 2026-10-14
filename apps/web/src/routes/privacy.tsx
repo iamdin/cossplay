@@ -6,11 +6,11 @@ import styles from "@/styles/landing.css?url"
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy · Cossplay" },
+      { title: "隐私 · Cossplay" },
       {
         name: "description",
         content:
-          "Cossplay's privacy policy: no accounts, no data collection, themes stay in your browser.",
+          "Cossplay 的隐私政策：没有账户，不收集数据，主题留在你的浏览器里。",
       },
     ],
     links: [{ rel: "stylesheet", href: styles }],
@@ -38,56 +38,52 @@ function Privacy() {
         </nav>
       </header>
       <main className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <h1 className="font-semibold text-3xl tracking-tight">Privacy</h1>
+        <h1 className="font-semibold text-3xl tracking-tight">隐私</h1>
         <p className="mt-3 text-muted-foreground">
-          Last updated October 7, 2026
+          最近更新：2026 年 10 月 7 日
         </p>
         <p className="mt-6">
-          Cossplay has no accounts and no server of its own. It does not
-          collect, sell or share personal data.
+          Cossplay
+          没有账户，也没有自己的服务器。它不收集、不出售、不分享个人数据。
         </p>
 
-        <Part title="Chrome extension">
+        <Part title="Chrome 扩展">
           <p>
-            The extension reads the CSS theme variables of the page you open it
-            on, so it can show and edit them, and writes your edited variables
-            back into that page. This happens locally in your browser.
+            扩展读取你打开它的页面上的 CSS
+            主题变量，以便显示和编辑，再把改过的变量写回该页面。这些都发生在你的浏览器本地。
           </p>
           <p>
-            Your themes, edit history and loaded fonts are saved per website in
-            Chrome's extension storage on your device. They are never sent
-            anywhere. Uninstalling the extension deletes them.
+            主题、编辑历史和已加载的字体按网站存在你设备上的 Chrome
+            扩展存储里。它们不会被发送到任何地方。卸载扩展即删除它们。
           </p>
           <p>
-            To read a page's theme, the extension may download that page's own
-            stylesheets, including ones served from another domain, without
-            cookies. Otherwise it makes network requests only when you ask:
-            Google Fonts when you load a font, and the URL you enter when you
-            import a theme. It has no analytics or tracking.
+            为了读取页面主题，扩展可能会下载该页面自己的样式表，包括来自其他域名的，且不带
+            cookie。除此之外，只有在你要求时才会发网络请求：加载字体时请求
+            Google Fonts，导入主题时请求你填的 URL。没有分析和追踪。
           </p>
         </Part>
 
-        <Part title="Website and web editor">
+        <Part title="网站和网页 Editor">
           <p>
-            The editor at cossplay.vercel.app saves your theme in your browser's
-            local storage. Loading a font requests its stylesheet from Google
-            Fonts; importing from a URL fetches that URL.
+            cossplay.vercel.app 上的 Editor
+            把主题存在浏览器的本地存储里。加载字体会向 Google Fonts
+            请求样式表；从 URL 导入则会拉取该 URL。
           </p>
           <p>
-            The website uses Vercel Web Analytics to count page views. It uses
-            no cookies and does not identify individual visitors.
+            网站用 Vercel Web Analytics 统计页面浏览。它不用
+            cookie，也不识别单个访客。
           </p>
           <p>
-            The bridge script you can add to your own app only exchanges theme
-            CSS with the Cossplay editor when your app is open in the editor's
-            custom preview. It sends nothing elsewhere.
+            你可以加到自己应用里的 Bridge 脚本，只在应用打开于 Editor
+            的自定义预览时，与 Cossplay Editor 交换主题
+            CSS。它不会把数据发到别处。
           </p>
         </Part>
 
-        <Part title="Contact">
+        <Part title="联系">
           <p>
-            Questions about privacy: email the developer address listed on
-            Cossplay's Chrome Web Store page.
+            隐私问题：请发邮件到 Cossplay 的 Chrome
+            网上应用店页面上列出的开发者地址。
           </p>
         </Part>
       </main>

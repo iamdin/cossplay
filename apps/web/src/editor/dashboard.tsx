@@ -40,45 +40,45 @@ import {
 import { Person } from "@/editor/cards"
 
 const nav = [
-  ["Dashboard", HomeIcon],
-  ["Inbox", InboxIcon],
-  ["Projects", FolderIcon],
-  ["Reports", BarChart3Icon],
-  ["Team", UsersIcon],
-  ["Settings", SettingsIcon],
+  ["仪表盘", HomeIcon],
+  ["收件箱", InboxIcon],
+  ["项目", FolderIcon],
+  ["报告", BarChart3Icon],
+  ["团队", UsersIcon],
+  ["设置", SettingsIcon],
 ] as const
 
 const stats = [
-  ["Revenue", "$45,231", "+20.1%", "success"],
-  ["New customers", "1,234", "-4.3%", "error"],
-  ["Active accounts", "45,678", "+12.5%", "success"],
-  ["Growth rate", "4.5%", "+0.4%", "info"],
+  ["收入", "$45,231", "+20.1%", "success"],
+  ["新客户", "1,234", "-4.3%", "error"],
+  ["活跃账户", "45,678", "+12.5%", "success"],
+  ["增长率", "4.5%", "+0.4%", "info"],
 ] as const
 
 const tone = {
-  Done: "success",
-  "In progress": "info",
-  Review: "warning",
-  Blocked: "error",
+  完成: "success",
+  进行中: "info",
+  审阅: "warning",
+  受阻: "error",
 } as const
 
 const rows: [string, string, keyof typeof tone, string][] = [
-  ["Cover page", "Design", "Done", "Eddie Lake"],
-  ["Table of contents", "Content", "In progress", "Jamik Tashpulatov"],
-  ["Executive summary", "Content", "Review", "Eddie Lake"],
-  ["Technical approach", "Engineering", "Blocked", "Emily Whalen"],
-  ["Risk management", "Planning", "In progress", "Jamik Tashpulatov"],
-  ["Pricing", "Finance", "Done", "Emily Whalen"],
+  ["封面", "设计", "完成", "埃迪"],
+  ["目录", "内容", "进行中", "贾米克"],
+  ["摘要", "内容", "审阅", "埃迪"],
+  ["技术方案", "工程", "受阻", "艾米莉"],
+  ["风险管理", "规划", "进行中", "贾米克"],
+  ["定价", "财务", "完成", "艾米莉"],
 ]
 
 const activity = [
-  ["Olivia Martin", "Approved the pricing section", "2m"],
-  ["Jackson Lee", "Commented on the cover page", "1h"],
-  ["Isabella Nguyen", "Moved risk management to review", "3h"],
-  ["William Kim", "Invited two new members", "1d"],
+  ["林晓", "通过了定价一节", "2 分钟"],
+  ["陈远", "评论了封面", "1 小时"],
+  ["阮安", "把风险管理移到审阅", "3 小时"],
+  ["金伟", "邀请了两位新成员", "1 天"],
 ]
 
-// An app dashboard (sidebar, header, stats, table, activity) without charts.
+// 应用仪表盘（侧栏、顶栏、统计、表格、动态），不含图表。
 export function Dashboard() {
   return (
     <div className="flex min-h-full">
@@ -87,7 +87,7 @@ export function Dashboard() {
           <span className="grid size-6 place-items-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground text-xs">
             A
           </span>
-          Acme Inc.
+          Acme 公司
         </div>
         {nav.map(([label, Icon], i) => (
           <a
@@ -104,23 +104,23 @@ export function Dashboard() {
           </a>
         ))}
         <Person
-          name="Shad CN"
+          name="沙德"
           detail="m@example.com"
           className="mt-auto rounded-md border border-sidebar-border p-2"
         />
       </aside>
       <div className="min-w-0 flex-1">
         <header className="flex items-center gap-2 border-b px-4 py-3">
-          <h1 className="mr-auto font-semibold">Documents</h1>
+          <h1 className="mr-auto font-semibold">文档</h1>
           <InputGroup className="@lg:flex hidden w-48">
             <InputGroupAddon>
               <SearchIcon aria-hidden="true" />
             </InputGroupAddon>
-            <InputGroupInput aria-label="Search" placeholder="Search…" />
+            <InputGroupInput aria-label="搜索" placeholder="搜索…" />
           </InputGroup>
           <Button>
             <PlusIcon />
-            Quick create
+            快速创建
           </Button>
         </header>
         <div className="flex flex-col gap-4 p-4">
@@ -142,23 +142,23 @@ export function Dashboard() {
           <div className="grid @5xl:grid-cols-[1fr_20rem] gap-4">
             <CardFrame className="min-w-0">
               <CardFrameHeader>
-                <CardFrameTitle>Outline</CardFrameTitle>
+                <CardFrameTitle>大纲</CardFrameTitle>
                 <CardFrameDescription>
-                  Sections of the proposal and who owns them.
+                  提案的各节以及负责人。
                 </CardFrameDescription>
                 <CardFrameAction>
                   <Button variant="outline" size="sm">
-                    Customize columns
+                    自定义列
                   </Button>
                 </CardFrameAction>
               </CardFrameHeader>
               <Table variant="card">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Section</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Reviewer</TableHead>
+                    <TableHead>章节</TableHead>
+                    <TableHead>类型</TableHead>
+                    <TableHead>状态</TableHead>
+                    <TableHead>审阅人</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -181,8 +181,8 @@ export function Dashboard() {
             </CardFrame>
             <Card>
               <CardHeader>
-                <CardTitle>Recent activity</CardTitle>
-                <CardDescription>What your team did today.</CardDescription>
+                <CardTitle>最近动态</CardTitle>
+                <CardDescription>团队今天做了什么。</CardDescription>
               </CardHeader>
               <CardPanel className="flex flex-col gap-4">
                 {activity.map(([name, action, time]) => (

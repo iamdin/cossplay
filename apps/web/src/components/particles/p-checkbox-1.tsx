@@ -5,7 +5,7 @@ export default function Particle() {
   return (
     <Label>
       <Checkbox />
-      Accept terms and conditions
+      接受条款
     </Label>
   )
 }

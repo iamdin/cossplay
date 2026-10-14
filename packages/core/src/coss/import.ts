@@ -1,9 +1,8 @@
 import postcss from "postcss"
 import { importOverrides, type Mode, type Overrides } from "./theme"
 
-// Theme CSS or registry JSON pasted or fetched by the panel. Kept out of the barrel so the
-// content script and worker bundles do not include postcss.
-// Only custom properties under :root, :host, .dark, [data-theme] or @theme are read.
+// 面板粘贴或拉取的主题 CSS / 注册表 JSON。不放进 barrel，这样 content script 和 worker 不会带上 postcss。
+// 只读 :root、:host、.dark、[data-theme] 或 @theme 下的自定义属性。
 export function parseCss(input: string): Overrides {
   const modes: Record<Mode, Record<string, string>> = { light: {}, dark: {} }
   postcss.parse(input).walkDecls(/^--/, (decl) => {
@@ -32,7 +31,7 @@ export function parseCss(input: string): Overrides {
   return importOverrides(modes)
 }
 export function importTheme(input: string): Overrides {
-  if (input.length > 2_000_000) throw Error("Theme is too large")
+  if (input.length > 2_000_000) throw Error("主题太大")
   if (input.trim().startsWith("{")) return importOverrides(JSON.parse(input))
   return parseCss(input)
 }

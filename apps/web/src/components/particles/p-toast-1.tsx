@@ -8,13 +8,13 @@ export default function Particle() {
     <Button
       onClick={() => {
         toastManager.add({
-          description: "Monday, January 3rd at 6:00pm",
-          title: "Event has been created",
+          description: "1 月 3 日星期一 18:00",
+          title: "活动已创建",
         })
       }}
       variant="outline"
     >
-      Default Toast
+      默认吐司
     </Button>
   )
 }

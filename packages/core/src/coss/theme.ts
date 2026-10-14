@@ -1,7 +1,6 @@
-// coss ui's theme variables (packages/ui/src/styles/globals.css) plus tweakcn's shared fields, as
-// in Shadify. coss values come from scripts/sync-coss-defaults.ts; tweakcn defaults, presets and
-// HSL presets from a frozen tweakcn revision (scripts/sync-tweakcn.mjs). A page's detected values
-// take precedence over both.
+// coss ui 的主题变量（packages/ui/src/styles/globals.css）加上 tweakcn 的共用字段，做法同
+// Shadify。coss 的值来自 scripts/sync-coss-defaults.ts；tweakcn 的默认、预设和 HSL
+// 预设来自冻结的 tweakcn 修订（scripts/sync-tweakcn.mjs）。页面检测到的值优先于两者。
 
 import { converter } from "culori"
 import {
@@ -90,7 +89,7 @@ export const groups: Record<string, ColorToken[]> = {
   ],
   Code: ["code", "code-foreground", "code-highlight"],
 }
-// coss draws semantic foregrounds as text on the page (badges, alerts), not on the solid color.
+// coss 把语义前景画成页面上的文字（徽章、提示），不是画在纯色上。
 export const contrastPairs: {
   label: string
   foreground: Token
@@ -163,7 +162,7 @@ export function validValue(key: Token, value: string) {
 }
 function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value))
-    throw Error("Expected a theme object")
+    throw Error("需要一个主题对象")
   return value as Record<string, unknown>
 }
 const tokenName = (raw: string) =>
@@ -173,8 +172,8 @@ const tokenName = (raw: string) =>
     .replace(/^tracking-normal$/, "letter-spacing")
     .replace(/^shadow-x$/, "shadow-offset-x")
     .replace(/^shadow-y$/, "shadow-offset-y") as Token
-// Keeps recognized tokens with concrete values. var(), color-mix() and --alpha() sources are skipped:
-// they only make sense against the stylesheet they came from.
+// 只保留有具体值的已知 token。var()、color-mix() 和 --alpha() 的来源会跳过：
+// 它们只在原来的样式表里才有意义。
 function readTokens(value: unknown): Partial<Record<Token, string>> {
   const result: Partial<Record<Token, string>> = {}
   for (const [raw, v] of Object.entries(record(value))) {
@@ -188,8 +187,8 @@ function readTokens(value: unknown): Partial<Record<Token, string>> {
   }
   return result
 }
-// Imported themes and presets only override what they define; everything else stays the page's own.
-// Shared tokens declared once apply to both modes.
+// 导入的主题和预设只覆盖它们定义的部分；其余仍是页面自己的。
+// 只声明一次的共用 token 两种模式都生效。
 export function importOverrides(value: unknown): Overrides {
   const data = record(value)
   const source = record(data.styles ?? data.cssVars ?? data)
@@ -201,7 +200,7 @@ export function importOverrides(value: unknown): Overrides {
     !Object.keys(dark).length &&
     !Object.keys(shared).length
   )
-    throw Error("No recognized coss theme tokens")
+    throw Error("没有识别到 coss 主题 token")
   const common = Object.fromEntries(
     Object.entries({ ...shared, ...light }).filter(([key]) =>
       isCommon(key as Token)
@@ -218,9 +217,9 @@ export function importOverrides(value: unknown): Overrides {
         dark: fromShadcn(result.dark, "dark"),
       }
 }
-// shadcn/tweakcn themes have no coss-only tokens, and their destructive-foreground is text on the
-// solid color. coss uses destructive-foreground as colored text on the page (the destructive hue
-// at coss's own text lightness) and derives code blocks from the surface colors.
+// shadcn/tweakcn 主题没有 coss 专有 token，它们的 destructive-foreground 是纯色上的文字。
+// coss 把 destructive-foreground 用作页面上的彩色文字（destructive 色相，明度用 coss 自己的正文明度），
+// 代码块则从表面色推导。
 function fromShadcn(t: Partial<Record<Token, string>>, mode: Mode) {
   const r = { ...t }
   delete r["destructive-foreground"]
@@ -242,10 +241,10 @@ export const presets = reference.presets as Record<
   string,
   { label: string; styles: Record<Mode, Record<string, string>> }
 >
-// "default" is coss's own theme; preset ids are tweakcn's.
+// "default" 是 coss 自己的主题；预设 id 是 tweakcn 的。
 export function presetOverrides(id: string): Overrides {
   if (id === "default") return clone(defaults)
-  if (!Object.hasOwn(presets, id)) throw Error("Unknown preset")
+  if (!Object.hasOwn(presets, id)) throw Error("未知预设")
   return importOverrides(presets[id])
 }
 export function adjustTheme(
@@ -255,7 +254,7 @@ export function adjustTheme(
   lightness: number
 ): Theme {
   const theme = clone(base)
-  // HSL round trips clamp to sRGB; the neutral adjustment must keep wide-gamut oklch colors exact.
+  // HSL 往返会被夹到 sRGB；中性调整必须保持宽色域 oklch 颜色不变。
   if (hue === 0 && saturation === 1 && lightness === 1) return theme
   for (const mode of ["light", "dark"] as const)
     for (const key of colorTokens)
@@ -267,7 +266,7 @@ export function adjustTheme(
       )
   return theme
 }
-// tweakcn's shadow scale: one layer from the shadow controls, plus a second layer for sm and up.
+// tweakcn 的阴影比例：一层来自阴影控件，sm 及以上再加第二层。
 export function shadows(styles: Record<Token, string>): Record<string, string> {
   const x = styles["shadow-offset-x"],
     y = styles["shadow-offset-y"],
@@ -293,7 +292,7 @@ export function shadows(styles: Record<Token, string>): Record<string, string> {
     "shadow-2xl": first(2.5),
   }
 }
-// CSS variables for the overridden tokens, colors written in the page's own format.
+// 被覆盖 token 的 CSS 变量，颜色按页面自己的格式写回。
 export function variables(
   styles: Record<Token, string>,
   overrides: Partial<Record<Token, string>>,
@@ -312,8 +311,8 @@ export function variables(
           ? `0${unit}`
           : styles[key]
     }
-  // coss components use Tailwind's fixed `--radius-2xl: 1rem` for cards, dialogs and popovers.
-  // Derived like coss derives sm/md/lg/xl (a fixed offset): 1rem at coss's default 0.625rem.
+  // coss 组件给卡片、对话框和弹出层用 Tailwind 固定的 `--radius-2xl: 1rem`。
+  // 推导方式和 coss 推导 sm/md/lg/xl 一样（固定偏移）：coss 默认 0.625rem 时是 1rem。
   if ("radius" in overrides) result["radius-2xl"] = "calc(var(--radius) + 6px)"
   if ("letter-spacing" in overrides) {
     result["tracking-normal"] = result["letter-spacing"]
@@ -335,7 +334,7 @@ export function variables(
     })
   return result
 }
-// The same shape as coss ui's globals.css, so it can replace that file's theme section.
+// 形状与 coss ui 的 globals.css 相同，可以替换该文件的主题段。
 export function themeCss(theme: Theme, format: ColorFormat): string {
   const block = (
     selector: string,
@@ -466,13 +465,13 @@ export function exportLayout(
     .join(" ")
   return `import type { ReactNode } from "react";\n${imports ? `import { ${imports} } from "next/font/google";\n` : ""}import "./globals.css";\n\n${definitions}\n\nexport default function RootLayout({ children }: { children: ReactNode }) {\n  return (\n    <html lang="en">\n      <body className={\`${classes} relative font-sans\`}>\n        <div className="isolate relative flex min-h-svh flex-col">{children}</div>\n      </body>\n    </html>\n  );\n}\n`
 }
-// The site's static shadcn registry: one item per preset (applied to coss ui's defaults) plus an
-// index. The web build writes them to /r/themes/<name>.json.
+// 站点的静态 shadcn 注册表：每个预设一项（套在 coss ui 默认值上），外加索引。
+// 网页构建把它们写到 /r/themes/<name>.json。
 export const registryUrl = "https://cossplay.vercel.app/r/themes"
 export function presetRegistry() {
   const items = ["default", ...Object.keys(presets)].map((id) => {
     const overrides = presetOverrides(id)
-    const title = id === "default" ? "Default coss" : presets[id].label
+    const title = id === "default" ? "coss 默认" : presets[id].label
     return {
       ...registryTheme(
         {
@@ -482,7 +481,7 @@ export function presetRegistry() {
         id
       ),
       title,
-      description: `The ${title} theme for coss ui, from Cossplay.`,
+      description: `${title}：适用于 coss ui 的主题，来自 Cossplay。`,
     }
   })
   return {

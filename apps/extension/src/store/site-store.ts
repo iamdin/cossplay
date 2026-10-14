@@ -13,13 +13,12 @@ import { editsPending, setHost, usePanelStore } from "@cossplay/editor/store"
 import { storage } from "@wxt-dev/storage"
 
 /**
- * Connects the panel to the active tab. Site state is shared through extension storage and
- * written only by the service worker; `detection` is the tab document's own theme.
+ * 把面板接到当前标签。站点状态经扩展存储共享，只有 service worker 会写；
+ * `detection` 是该标签文档自己的主题。
  */
 const set = usePanelStore.setState
 const get = usePanelStore.getState
-// The panel edits the active tab of its own window. Each tab load aborts the previous one,
-// and async work checks its signal before any observable update.
+// 面板编辑自己窗口里的当前标签。每次加载标签都会中止上一次，异步工作在可见更新前先看信号。
 let windowId: number | null = null
 let tabId: number | null = null
 let loading: AbortController | null = null
@@ -39,20 +38,19 @@ setHost({
 
 let inspector: chrome.runtime.Port | null = null
 
-/** Inspect mode on the tab follows the panel's toggle while the port stays connected. */
+/** 端口连着时，标签上的检查模式跟着面板的开关。 */
 function inspect(on: boolean) {
   inspector?.disconnect()
   inspector = null
   if (!on || tabId === null) return
   const port = chrome.tabs.connect(tabId, { name: inspectorPort })
   port.onMessage.addListener(({ token }: InspectorPick) => focusControl(token))
-  // The tab ended it (Escape), went away, or has no content script to connect to.
+  // 标签结束了检查（Escape）、标签没了，或没有 content script 可连。
   port.onDisconnect.addListener(() => {
     const error = chrome.runtime.lastError?.message
     if (inspector !== port) return
     set({ inspecting: false })
-    if (error)
-      set({ error: `Inspect is unavailable here; reload the page. (${error})` })
+    if (error) set({ error: `这里无法检查，请刷新页面。（${error}）` })
   })
   inspector = port
 }
@@ -68,14 +66,14 @@ async function loadTab(id: number) {
     if (signal.aborted) return
     if (!tab.url?.startsWith("http")) {
       set({
-        status: "Open an HTTP(S) website to edit its theme.",
+        status: "请打开一个 HTTP(S) 网站来编辑它的主题。",
         site: null,
         detection: null,
       })
       return
     }
-    set({ status: "Reading the original theme…", error: "" })
-    // MV3's content script can finish loading after tabs.onUpdated reports complete.
+    set({ status: "正在读取原始主题…", error: "" })
+    // MV3 的 content script 可能在 tabs.onUpdated 报 complete 之后才加载完。
     let response: { detection: Detection } | undefined
     for (let attempt = 0; attempt < 12; attempt++) {
       if (signal.aborted) return
@@ -83,7 +81,7 @@ async function loadTab(id: number) {
         response = await content.sendMessage("inspect", undefined, id)
         break
       } catch (error) {
-        // tabs.sendMessage gets no response until the content script has loaded.
+        // content script 加载完之前，tabs.sendMessage 得不到回应。
         if (attempt === 11 || !String(error).includes("No response"))
           throw error
         await new Promise((resolve) => setTimeout(resolve, 150))
@@ -94,7 +92,7 @@ async function loadTab(id: number) {
     const origin = new URL(tab.url).origin
     const site = await stored(origin)
     if (signal.aborted) return
-    // Another panel (or window) may change the same origin.
+    // 另一个面板（或窗口）可能改同一个 origin。
     unwatchSite?.()
     unwatchSite = storage.watch(siteKey(origin), (value) => {
       if (!editsPending() && get().site?.origin === origin)
@@ -104,24 +102,22 @@ async function loadTab(id: number) {
       site,
       detection,
       mode: site.previewMode ?? detection.mode,
-      status: detection.detected
-        ? "Original theme detected"
-        : "No coss variables detected",
+      status: detection.detected ? "已检测到原始主题" : "未检测到 coss 变量",
     })
   } catch (e) {
     if (!signal.aborted)
       set({
-        error: `${String(e)}. Reload the page after installing the extension.`,
-        status: "Cannot connect to this page",
+        error: `${String(e)}。安装扩展后请刷新页面。`,
+        status: "无法连接此页面",
         site: null,
         detection: null,
       })
   }
 }
 
-/** Follows the active tab of the panel's window and storage changes; returns a cleanup. */
+/** 跟随面板窗口的当前标签和存储变化；返回清理函数。 */
 export function connect() {
-  set({ status: "Connecting to this tab…" })
+  set({ status: "正在连接此标签页…" })
   chrome.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     if (!tabs[0]) return
     windowId = tabs[0].windowId
