@@ -60,10 +60,8 @@ import {
   groupLabel,
   NumericControl,
   Section,
+  title,
 } from "./controls"
-
-export { groupLabel }
-
 import { ExportDialog, ImportDialog, McpDialog } from "./dialogs"
 import { InspectToggle } from "./inspect"
 import {
@@ -80,6 +78,8 @@ import {
   usePanelStore,
   useTheme,
 } from "./store"
+
+export { groupLabel, title }
 
 const hslControls = [
   { key: "hue", label: "色相偏移", min: -180, max: 180, step: 1 },
@@ -404,7 +404,7 @@ export function PanelSections() {
   const search = usePanelStore((s) => s.search)
   const [issuesOnly, setIssuesOnly] = useState(false)
   const matches = (group: string, key: string) =>
-    `${groupLabel(group)} ${group} ${key}`
+    `${groupLabel(group)} ${title(key)} ${group} ${key}`
       .toLowerCase()
       .includes(search.toLowerCase())
   return (

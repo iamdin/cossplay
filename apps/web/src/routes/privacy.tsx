@@ -63,10 +63,10 @@ function Privacy() {
           </p>
         </Part>
 
-        <Part title="网站和网页 Editor">
+        <Part title="网站和网页编辑器">
           <p>
-            cossplay.vercel.app 上的 Editor
-            把主题存在浏览器的本地存储里。加载字体会向 Google Fonts
+            cossplay.vercel.app
+            上的编辑器把主题存在浏览器的本地存储里。加载字体会向 Google Fonts
             请求样式表；从 URL 导入则会拉取该 URL。
           </p>
           <p>
@@ -74,9 +74,8 @@ function Privacy() {
             cookie，也不识别单个访客。
           </p>
           <p>
-            你可以加到自己应用里的 Bridge 脚本，只在应用打开于 Editor
-            的自定义预览时，与 Cossplay Editor 交换主题
-            CSS。它不会把数据发到别处。
+            你可以加到自己应用里的桥接脚本，只在应用打开于编辑器的自定义预览时，与
+            Cossplay 编辑器交换主题 CSS。它不会把数据发到别处。
           </p>
         </Part>
 

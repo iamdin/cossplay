@@ -32,16 +32,16 @@ Cossplay 从 Chrome 的侧边栏实时编辑用 coss ui 搭建的网站（或任
 - 43 个预设：coss ui 的默认主题和 42 个 tweakcn 预设。可以逐个切换或随机。
 - 用 HEX、OKLCH、HSL 或 RGB 改色，带拾色器、Tailwind 色板、通道滑杆和不透明度。写回时用站点自己的颜色格式。
 - 浅色和深色分开编辑；可以在页面上预览任一模式。
-- 检查：在页面上悬停元素，看它用了哪些主题 token，点一个即可编辑。
+- 检查：在页面上悬停元素，看它用了哪些主题令牌（token），点一个即可编辑。
 - 全局色相、饱和度和明度调整。
 - 排版：带 Google Fonts 搜索的字体栈，以及字距。
 - 15 组颜色对的 WCAG 对比度检查。
 - 每次编辑都可撤销和重做。
 - 从 tweakcn 或 shadcn 注册表 URL、粘贴的 CSS 或 JSON、或文件导入主题。
-- 导出 Tailwind v4（OKLCH）或 v3（HSL）CSS、注册表 JSON、token JSON、Tailwind v3 配置或 Next.js 字体布局。未改动的预设还会显示 shadcn CLI 安装命令。
+- 导出 Tailwind v4（OKLCH）或 v3（HSL）CSS、注册表 JSON、令牌 JSON、Tailwind v3 配置或 Next.js 字体布局。未改动的预设还会显示 shadcn CLI 安装命令。
 - 按站点保存，带开关；再次回来时，在页面绘制前恢复。
 
-只注入你编辑过的 token；其余仍跟着站点。什么都不会上传：主题留在 Chrome 的本地扩展存储里，没有账户，也没有服务器。
+只注入你编辑过的令牌；其余仍跟着站点。什么都不会上传：主题留在 Chrome 的本地扩展存储里，没有账户，也没有服务器。
 
 同一个编辑器也可以不装扩展，在 https://cossplay.vercel.app/editor 使用。
 

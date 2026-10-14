@@ -41,7 +41,7 @@ import styles from "@/styles/editor.css?url"
 export const Route = createFileRoute("/editor")({
   head: () => ({
     meta: [
-      { title: "Editor — Cossplay" },
+      { title: "编辑器 — Cossplay" },
       {
         name: "description",
         content:

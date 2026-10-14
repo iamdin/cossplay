@@ -100,13 +100,13 @@ const ways = [
   {
     icon: CodeIcon,
     title: "在浏览器里",
-    body: "打开 Editor，给真实 coss ui 组件的 Gallery 换主题：卡片、仪表盘、邮件、营销页和应用页。不用安装。",
+    body: "打开编辑器，给真实 coss ui 组件的图库换主题：卡片、仪表盘、邮件、营销页和应用页。不用安装。",
     action: (
       <a
         href="/editor"
         className="inline-flex items-center gap-1 font-medium text-sm hover:underline"
       >
-        打开 Editor <ArrowRightIcon className="size-4" />
+        打开编辑器 <ArrowRightIcon className="size-4" />
       </a>
     ),
   },
@@ -122,8 +122,8 @@ const ways = [
   },
   {
     icon: PaletteIcon,
-    title: "在 Editor 里预览你自己的应用",
-    body: "开发时加一个 script 标签，Editor 的「自定义」标签就会在控件旁边实时给你正在运行的应用换主题。",
+    title: "在编辑器里预览你自己的应用",
+    body: "开发时加一个 script 标签，编辑器的「自定义」标签就会在控件旁边实时给你正在运行的应用换主题。",
     action: (
       <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs">
         {`<script src="${site}/bridge.js">`}
@@ -169,7 +169,7 @@ const formats = [
   "Tailwind v4 · OKLCH",
   "Tailwind v3 · HSL",
   "shadcn 注册表 JSON",
-  "Token JSON",
+  "令牌 JSON",
   "tailwind.config.js",
   "Next.js 字体",
 ]
@@ -181,7 +181,7 @@ const faqs = [
   },
   {
     q: "主题存在哪里？",
-    a: "只在你的浏览器里。Editor 用本地存储，扩展用 Chrome 的扩展存储。不会发到服务器。",
+    a: "只在你的浏览器里。编辑器用本地存储，扩展用 Chrome 的扩展存储。不会发到服务器。",
   },
   {
     q: "只能用于 coss ui 吗？",
@@ -237,7 +237,7 @@ function Landing() {
             </a>
           </div>
           <Button size="sm" className="ml-auto" render={<a href="/editor" />}>
-            打开 Editor
+            打开编辑器
           </Button>
         </nav>
       </header>
@@ -258,7 +258,7 @@ function Landing() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button size="lg" render={<a href="/editor" />}>
-                打开 Editor
+                打开编辑器
                 <ArrowRightIcon />
               </Button>
               <AddToChrome />
@@ -271,7 +271,7 @@ function Landing() {
           id="ways"
           eyebrow="怎么用"
           title="主题在哪，就在哪改"
-          lede="一个 Editor，三个地方都能用。Cossplay 只覆盖你改过的变量，其余仍跟着你的 CSS。"
+          lede="一个编辑器，三个地方都能用。Cossplay 只覆盖你改过的变量，其余仍跟着你的 CSS。"
         >
           <div className="grid gap-4 md:grid-cols-3">
             {ways.map((way) => (
@@ -292,7 +292,7 @@ function Landing() {
             src="/screenshot.webp"
             width="1280"
             height="800"
-            alt="用 Ocean Breeze 预设换过主题的 coss.com/ui；检查器显示 Get started 按钮的 token，Cossplay 侧边栏打开了 Primary 的通道滑杆"
+            alt="用 Ocean Breeze 预设换过主题的 coss.com/ui；检查器显示 Get started 按钮用到的令牌，Cossplay 侧边栏打开了主色的通道滑杆"
             className="mt-10 w-full rounded-2xl border shadow-xl/5"
             loading="lazy"
           />
@@ -365,7 +365,7 @@ function Landing() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button size="lg" render={<a href="/editor" />}>
-              打开 Editor
+              打开编辑器
               <ArrowRightIcon />
             </Button>
             <AddToChrome />

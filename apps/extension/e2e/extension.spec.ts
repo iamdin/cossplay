@@ -226,7 +226,7 @@ test.describe("side panel", () => {
     const preset = await primary()
 
     await panel
-      .getByRole("button", { name: "Primary Tailwind 色板", exact: true })
+      .getByRole("button", { name: "主色 Tailwind 色板", exact: true })
       .click()
     const red = panel.getByRole("button", { name: "red-500", exact: true })
     // 色板要放得进面板。
