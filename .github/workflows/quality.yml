@@ -44,12 +44,9 @@ jobs:
       - run: pnpm run test
       - run: pnpm run build
       - name: Install Playwright Chromium
-        run: |
-          # No --with-deps: the runner user cannot sudo. Chromium libraries are
-          # installed on the host, same as the pie and vibest runners.
-          browsers="${RUNNER_WORKSPACE}/../.cossplay-ci-cache/ms-playwright"
-          mkdir -p "$browsers"
-          echo "PLAYWRIGHT_BROWSERS_PATH=${browsers}" >> "$GITHUB_ENV"
-          PLAYWRIGHT_BROWSERS_PATH="$browsers" pnpm --filter @cossplay/extension exec playwright install chromium
+        # No --with-deps: the runner user cannot sudo. Chromium libraries are
+        # already on the host. Install into the default cache; turbo does not
+        # forward PLAYWRIGHT_BROWSERS_PATH into test:e2e.
+        run: pnpm --filter @cossplay/extension exec playwright install chromium
       # The extension loads only in headed Chromium, so it runs on a virtual display.
       - run: xvfb-run -a pnpm run test:e2e
