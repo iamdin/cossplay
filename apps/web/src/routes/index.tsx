@@ -293,7 +293,7 @@ function Landing() {
             src="/screenshot.webp"
             width="1280"
             height="800"
-            alt="coss.com/ui themed with the Ocean Breeze preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
+            alt="coss.com/ui themed with the Catppuccin preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
             className="mt-10 w-full rounded-2xl border shadow-xl/5"
             loading="lazy"
           />
