@@ -36,7 +36,7 @@ import { type CSSProperties, useEffect, useMemo, useState } from "react"
 // Brand-named presets stay out of the marketing page.
 const shown = [
   "default",
-  "violet-bloom",
+  "modern-minimal",
   "doom-64",
   "catppuccin",
   "kodama-grove",
@@ -64,7 +64,7 @@ function loadFont(stack: string | undefined) {
 
 /** coss ui components re-themed in place by a preset, as the editor and extension do. */
 export function ThemeDemo() {
-  const [id, setId] = useState("violet-bloom")
+  const [id, setId] = useState("modern-minimal")
   const [dark, setDark] = useState(false)
   const mode = dark ? "dark" : "light"
   const style = useMemo(() => {
