@@ -59,6 +59,11 @@ const tabs: [string, string, ComponentType][] = [
   ["palette", "Color Palette", Palette],
 ]
 const pages: [string, string, ComponentType][] = [...particleTabs, ...tabs]
+// Every label the button can show, so its width stays on the widest one.
+const particleMenuLabels = [
+  "Particles",
+  ...particleTabs.map(([, label]) => label),
+]
 
 const widthKey = "cossplay:panel-width"
 
@@ -69,6 +74,7 @@ function Editor() {
   const status = usePanelStore((s) => s.status)
   const [tab, setTab] = useState(particleTabs[0][0])
   const particle = particleTabs.find(([value]) => value === tab)
+  const particleLabel = particle?.[1] ?? "Particles"
   const [full, setFull] = useState(false)
   const [width, setWidth] = useState<number>()
   useEffect(() => {
@@ -178,12 +184,25 @@ function Editor() {
                   <MenuTrigger
                     render={
                       <Button
+                        aria-label={particleLabel}
                         variant={particle ? "secondary" : "ghost"}
                         size="sm"
                       />
                     }
                   >
-                    {particle ? particle[1] : "Particles"}
+                    <span className="grid">
+                      {particleMenuLabels.map((label) => (
+                        <span
+                          key={label}
+                          className={cn(
+                            "col-start-1 row-start-1",
+                            label !== particleLabel && "invisible"
+                          )}
+                        >
+                          {label}
+                        </span>
+                      ))}
+                    </span>
                     <ChevronDownIcon />
                   </MenuTrigger>
                   <MenuPopup className="ui-chrome" align="start">
