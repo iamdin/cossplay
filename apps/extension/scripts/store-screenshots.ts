@@ -3,6 +3,7 @@
 // a real capture of the side panel at its docked width; as in e2e, only the docking is stood in
 // for (the panel's "active tab of its window" query returns the site's tab).
 // Run from apps/extension after `pnpm build`: node scripts/store-screenshots.ts
+// The landing editor shot (same Catppuccin preset as screenshot 3): node scripts/store-screenshots.ts --editor [url]
 import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
@@ -15,6 +16,36 @@ const [W, H, PANEL] = [1280, 800, 400]
 // Classic scrollbars take layout width and leave a gutter in the 1280px frame.
 const hideScrollbars =
   "::-webkit-scrollbar{width:0!important;height:0!important}"
+
+// Homepage pair: the extension shot is screenshot-3; this is the browser editor beside it.
+if (process.argv.includes("--editor")) {
+  const flag = process.argv.indexOf("--editor")
+  const url = process.argv[flag + 1]?.startsWith("http")
+    ? process.argv[flag + 1]
+    : "http://127.0.0.1:5173/editor"
+  const browser = await chromium.launch({
+    headless: true,
+    args: ["--no-sandbox"],
+  })
+  const page = await browser.newPage({ viewport: { width: W, height: H } })
+  await page.goto(url, { waitUntil: "networkidle" })
+  await page.addStyleTag({ content: hideScrollbars })
+  const trigger = page.getByRole("combobox", { name: "Theme preset" })
+  await trigger.waitFor()
+  await page.waitForFunction(
+    () => !document.querySelector('[aria-label="Theme preset"]:disabled')
+  )
+  await trigger.click()
+  await page.getByPlaceholder("Search presets…").fill("Catppuccin")
+  await page.getByRole("option", { name: "Catppuccin", exact: true }).click()
+  await page.waitForTimeout(800)
+  await page.evaluate(() => document.fonts.ready)
+  await page.screenshot({
+    path: path.resolve(import.meta.dirname, "../../web/public/editor.png"),
+  })
+  await browser.close()
+  process.exit(0)
+}
 
 const ctx = await chromium.launchPersistentContext(
   fs.mkdtempSync(path.join(os.tmpdir(), "cossplay-store-")),
