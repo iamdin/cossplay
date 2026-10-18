@@ -108,10 +108,14 @@ test("shadcn themes map onto coss token semantics", () => {
   assert.equal(coss.light["destructive-foreground"], "#b00")
 })
 
-test("the 8bitcn Pacman preset uses the shadcn mapping path", () => {
-  assert.equal(presets.pacman.label, "Pacman")
-  assert.equal(presets.pacman.styles.light["font-sans"], '"Press Start 2P"')
-  const overrides = presetOverrides("pacman")
+test("the Doodle UI preset uses the shadcn mapping path", () => {
+  assert.equal("pacman" in presets, false)
+  assert.equal(presets.doodle.label, "Doodle")
+  assert.equal(
+    presets.doodle.styles.light["font-sans"],
+    '"Neucha", ui-rounded, "Comic Sans MS", cursive, sans-serif'
+  )
+  const overrides = presetOverrides("doodle")
   for (const mode of ["light", "dark"] as const) {
     const oklch = converter("oklch")
     const fg = oklch(parseColor(overrides[mode]["destructive-foreground"]!))!
@@ -122,23 +126,28 @@ test("the 8bitcn Pacman preset uses the shadcn mapping path", () => {
     )
     assert.ok(
       Math.abs(
-        fg.h! - oklch(parseColor(presets.pacman.styles[mode].destructive))!.h!
+        fg.h! - oklch(parseColor(presets.doodle.styles[mode].destructive))!.h!
       ) < 0.5
     )
-    assert.equal(overrides[mode].code, presets.pacman.styles[mode].card)
+    assert.equal(overrides[mode].code, presets.doodle.styles[mode].card)
     assert.equal(
       overrides[mode]["code-foreground"],
-      presets.pacman.styles[mode]["card-foreground"]
+      presets.doodle.styles[mode]["card-foreground"]
     )
     assert.equal(
       overrides[mode]["code-highlight"],
-      presets.pacman.styles[mode].muted
+      presets.doodle.styles[mode].muted
     )
-    assert.equal(overrides[mode]["font-sans"], '"Press Start 2P"')
-    assert.equal(overrides[mode]["font-serif"], '"Press Start 2P"')
-    assert.equal(overrides[mode]["font-mono"], '"Press Start 2P"')
-    assert.equal(overrides[mode].radius, "0rem")
-    assert.equal(overrides[mode]["letter-spacing"], "0.05rem")
+    assert.equal(
+      overrides[mode]["font-sans"],
+      '"Neucha", ui-rounded, "Comic Sans MS", cursive, sans-serif'
+    )
+    assert.equal(
+      overrides[mode]["font-serif"],
+      '"Cabin Sketch", "Neucha", ui-rounded, cursive, sans-serif'
+    )
+    assert.equal("font-mono" in overrides[mode], false)
+    assert.equal(overrides[mode].radius, "0.5rem")
     assert.equal("info" in overrides[mode], false)
     assert.equal("success" in overrides[mode], false)
     assert.equal("warning" in overrides[mode], false)

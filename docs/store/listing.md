@@ -29,7 +29,7 @@ Cossplay live-edits the theme of a website built with coss ui (or any site that 
 
 Open a coss ui site, click the Cossplay icon and the side panel reads the site's own theme: colors on :root, .dark and [data-theme], plus fonts, radius, spacing, letter spacing and shadows.
 
-- 44 presets: coss ui's default theme, 42 tweakcn presets, and 8bitcn's Pacman preset. Step through them or shuffle.
+- 44 presets: coss ui's default theme, 42 tweakcn presets, and Doodle UI's Doodle preset. Step through them or shuffle.
 - Color editing in HEX, OKLCH, HSL or RGB, with a color picker, Tailwind palette, channel sliders and opacity. Values are written back in the site's own color format.
 - Light and dark mode, edited separately; preview either mode on the page.
 - Inspect: hover an element on the page to see which theme tokens it uses, click one to edit it.
@@ -45,7 +45,7 @@ Only the tokens you edit are injected; everything else keeps following the site.
 
 The same editor runs without the extension at https://cossplay.vercel.app/editor.
 
-Not affiliated with coss, tweakcn, 8bitcn or shadcn/ui. Presets come from tweakcn (Apache-2.0) and 8bitcn (MIT).
+Not affiliated with coss, tweakcn, Doodle UI or shadcn/ui. Presets come from tweakcn (Apache-2.0) and Doodle UI (MIT).
 ```
 
 **Category**: Developer Tools

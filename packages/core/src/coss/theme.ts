@@ -1,11 +1,10 @@
 // coss ui's theme variables (packages/ui/src/styles/globals.css) plus tweakcn's shared fields, as
 // in Shadify. coss values come from scripts/sync-coss-defaults.ts; tweakcn defaults, presets and
-// HSL presets from a frozen tweakcn revision (scripts/sync-tweakcn.mjs). The 8bitcn Pacman preset
+// HSL presets from a frozen tweakcn revision (scripts/sync-tweakcn.mjs). The Doodle UI preset
 // is merged in the same shape and mapped by importOverrides / fromShadcn. A page's detected values
 // take precedence over both.
 
 import { converter } from "culori"
-import eightBit from "./8bitcn.json"
 import {
   adjustColor,
   type ColorFormat,
@@ -14,6 +13,7 @@ import {
   sourceFormat,
 } from "./colors"
 import coss from "./defaults.json"
+import doodle from "./doodle.json"
 import reference from "./tweakcn.json"
 
 export type Mode = "light" | "dark"
@@ -242,7 +242,7 @@ function fromShadcn(t: Partial<Record<Token, string>>, mode: Mode) {
 }
 export const presets = {
   ...reference.presets,
-  ...eightBit.presets,
+  ...doodle.presets,
 } as Record<
   string,
   { label: string; styles: Record<Mode, Record<string, string>> }

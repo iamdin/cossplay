@@ -28,15 +28,15 @@ export function Footer() {
             </a>{" "}
             (Apache-2.0) and{" "}
             <a
-              href="https://github.com/TheOrcDev/8bitcn-ui"
+              href="https://github.com/KareemGhorab/doodle-ui"
               className="underline hover:text-foreground"
             >
-              8bitcn
+              Doodle UI
             </a>{" "}
             (MIT)
           </span>
           <span>
-            Not affiliated with coss, Cal.com, tweakcn, 8bitcn or shadcn/ui.
+            Not affiliated with coss, Cal.com, tweakcn, Doodle UI or shadcn/ui.
           </span>
         </div>
       </div>

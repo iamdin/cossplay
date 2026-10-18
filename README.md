@@ -10,7 +10,7 @@ A Chrome extension that live-edits the theme variables of any website built with
 | Tokens | coss `globals.css`: 41 colors (including info / success / warning / code), plus tweakcn's shared fields: `font-sans` / `font-serif` / `font-mono`, `radius`, `letter-spacing`, `spacing`, shadow color / opacity / blur / spread / offset. |
 | Color editing | Grouped colors with search; HEX / OKLCH / HSL / RGB input, color picker, channel sliders, opacity and copy. Values are written back in the site's own color format. |
 | Light / dark | Colors are edited per mode; shared fields edit both. Preview either mode on the page. |
-| Presets | 42 tweakcn presets and 8bitcn's Pacman preset, plus coss's default theme; reset to the preset or to the site's original theme. Presets only override the tokens they define. |
+| Presets | 42 tweakcn presets and Doodle UI's Doodle preset, plus coss's default theme; reset to the preset or to the site's original theme. Presets only override the tokens they define. |
 | Adjustments | Global HSL hue shift, saturation and lightness scale (15 presets), sidebar color sync. |
 | Typography | Free-form font stacks with Google font search by category, explicit font loading (site CSP may block it), letter spacing. |
 | Contrast | WCAG checks for 15 coss color pairs, with an issues-only view. |
@@ -58,4 +58,4 @@ pnpm + Turborepo monorepo:
 
 ## Credits
 
-Presets, defaults and the theme data shape come from [tweakcn](https://github.com/jnsahaj/tweakcn) (Apache-2.0, see `licenses/tweakcn.txt`). The Pacman preset comes from [8bitcn](https://github.com/TheOrcDev/8bitcn-ui) (MIT, see `licenses/8bitcn.txt`). Not affiliated with coss, tweakcn, 8bitcn or shadcn/ui.
+Presets, defaults and the theme data shape come from [tweakcn](https://github.com/jnsahaj/tweakcn) (Apache-2.0, see `licenses/tweakcn.txt`). The Doodle preset comes from [Doodle UI](https://github.com/KareemGhorab/doodle-ui) (MIT, see `licenses/doodle-ui.txt`). Not affiliated with coss, tweakcn, Doodle UI or shadcn/ui.

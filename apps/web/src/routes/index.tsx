@@ -23,7 +23,7 @@ import styles from "@/styles/landing.css?url"
 const site = "https://cossplay.vercel.app"
 const title = "Cossplay: live theme editor for coss ui"
 const description =
-  "Theme coss ui apps live: 42 tweakcn presets plus 8bitcn Pacman, colors, fonts, radius and contrast checks, in the browser or in Chrome's side panel on your own site. Export Tailwind CSS or install with the shadcn CLI."
+  "Theme coss ui apps live: 42 tweakcn presets plus Doodle UI, colors, fonts, radius and contrast checks, in the browser or in Chrome's side panel on your own site. Export Tailwind CSS or install with the shadcn CLI."
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -136,7 +136,7 @@ const features = [
   {
     icon: PaletteIcon,
     title: "43 presets, coss-aware",
-    body: "Every tweakcn preset, 8bitcn's Pacman preset, and coss ui's default, mapped onto coss tokens like info, success, warning and code. Search, step through or shuffle them.",
+    body: "Every tweakcn preset, Doodle UI's Doodle preset, and coss ui's default, mapped onto coss tokens like info, success, warning and code. Search, step through or shuffle them.",
   },
   {
     icon: SquareDashedMousePointerIcon,
@@ -189,7 +189,7 @@ const faqs = [
   },
   {
     q: "Is this an official coss project?",
-    a: "No. Cossplay is an independent project. Presets come from tweakcn (Apache-2.0) and 8bitcn (MIT).",
+    a: "No. Cossplay is an independent project. Presets come from tweakcn (Apache-2.0) and Doodle UI (MIT).",
   },
 ]
 
