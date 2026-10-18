@@ -194,7 +194,7 @@ const faqs = [
 ]
 
 function CliCommand() {
-  const command = `npx shadcn@latest add ${site}/r/themes/violet-bloom.json`
+  const command = `npx shadcn@latest add ${site}/r/themes/modern-minimal.json`
   const [copied, setCopied] = useState(false)
   return (
     <div className="flex items-center gap-2 rounded-xl border bg-card p-2 pl-4 font-mono text-sm shadow-xs">
