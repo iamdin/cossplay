@@ -10,6 +10,8 @@ import { usePanelStore } from "@cossplay/editor/store"
 import { Button } from "@cossplay/ui/components/button"
 import {
   Menu,
+  MenuGroup,
+  MenuGroupLabel,
   MenuPopup,
   MenuRadioGroup,
   MenuRadioItem,
@@ -25,16 +27,15 @@ import { ToastProvider } from "@cossplay/ui/components/toast"
 import { cn } from "@cossplay/ui/lib/utils"
 import { createFileRoute } from "@tanstack/react-router"
 import { ChevronDownIcon, Maximize2Icon, Minimize2Icon } from "lucide-react"
-import { type ComponentType, useEffect, useState } from "react"
-import { Application } from "@/editor/application"
-import { Cards } from "@/editor/cards"
+import { useEffect, useState } from "react"
 import { CustomPreview } from "@/editor/custom"
-import { Dashboard } from "@/editor/dashboard"
-import { Components, Typography } from "@/editor/gallery"
+import {
+  ParticleGallery,
+  particleCategories,
+  Typography,
+} from "@/editor/gallery"
 import { connect } from "@/editor/host"
 import { PreviewInspector } from "@/editor/inspect"
-import { Mail } from "@/editor/mail"
-import { Marketing } from "@/editor/marketing"
 import { Palette } from "@/editor/palette"
 import styles from "@/styles/editor.css?url"
 
@@ -55,20 +56,37 @@ export const Route = createFileRoute("/editor")({
 
 const bar = "ui-chrome flex h-14 shrink-0 items-center gap-1 border-b px-3"
 
-// Preview pages, like tweakcn's; the rest sit in a "More" menu so the tabs fit.
-const pages: [string, string, ComponentType][] = [
-  ["cards", "Cards", Cards],
-  ["dashboard", "Dashboard", Dashboard],
-  ["marketing", "Marketing", Marketing],
-  ["application", "Application", Application],
-  ["components", "Components", Components],
-  ["custom", "Custom", CustomPreview],
-]
-const more: [string, string, ComponentType][] = [
-  ["mail", "Mail", Mail],
-  ["typography", "Typography", Typography],
-  ["palette", "Color Palette", Palette],
-]
+const pages = [
+  { id: "custom", label: "Custom", Page: CustomPreview },
+  { id: "typography", label: "Typography", Page: Typography },
+  { id: "palette", label: "Color Palette", Page: Palette },
+] as const
+
+type PreviewPage = (typeof pages)[number]["id"]
+
+function isPreviewPage(value: string): value is PreviewPage {
+  return pages.some((item) => item.id === value)
+}
+
+// Catalog labels set the button width. "Particles" is only the resting caption.
+function WidestLabel({
+  labels,
+  current,
+}: {
+  labels: readonly string[]
+  current: string
+}) {
+  return (
+    <span className="grid">
+      {labels.map((label) => (
+        <span key={label} className="invisible col-start-1 row-start-1">
+          {label}
+        </span>
+      ))}
+      <span className="col-start-1 row-start-1">{current}</span>
+    </span>
+  )
+}
 
 const widthKey = "cossplay:panel-width"
 
@@ -77,7 +95,13 @@ function Editor() {
   useEffect(connect, [])
   useUndoShortcuts()
   const status = usePanelStore((s) => s.status)
-  const [tab, setTab] = useState("cards")
+  const initialCategory = particleCategories[0]?.id
+  const [page, setPage] = useState<PreviewPage | null>(
+    initialCategory ? null : "custom"
+  )
+  const [categoryId, setCategoryId] = useState(initialCategory ?? "")
+  const category = particleCategories.find((item) => item.id === categoryId)
+  const particleLabel = page === null && category ? category.label : "Particles"
   const [full, setFull] = useState(false)
   const [width, setWidth] = useState<number>()
   useEffect(() => {
@@ -104,7 +128,6 @@ function Editor() {
       localStorage.setItem(widthKey, String(clamped))
     } catch {}
   }
-  const overflow = more.find(([value]) => value === tab)
   return (
     <ToastProvider>
       <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
@@ -179,40 +202,59 @@ function Editor() {
               <ImportExport />
             </div>
             <Tabs
-              value={tab}
-              onValueChange={setTab}
+              value={page ?? ""}
+              onValueChange={(value) => {
+                if (isPreviewPage(value)) setPage(value)
+              }}
               className="flex min-h-0 flex-1 flex-col gap-0"
             >
               <div className="ui-chrome flex shrink-0 flex-wrap items-center gap-2 px-4 pt-3 pb-1">
-                <TabsList aria-label="Preview">
-                  {pages.map(([value, label]) => (
-                    <TabsTab key={value} value={value}>
-                      {label}
-                    </TabsTab>
-                  ))}
-                </TabsList>
                 <Menu>
                   <MenuTrigger
                     render={
                       <Button
-                        variant={overflow ? "secondary" : "ghost"}
+                        aria-label={particleLabel}
+                        variant={page === null ? "secondary" : "ghost"}
                         size="sm"
                       />
                     }
                   >
-                    {overflow?.[1] ?? "More"}
+                    <WidestLabel
+                      labels={particleCategories.map((item) => item.label)}
+                      current={particleLabel}
+                    />
                     <ChevronDownIcon />
                   </MenuTrigger>
                   <MenuPopup className="ui-chrome" align="start">
-                    <MenuRadioGroup value={tab} onValueChange={setTab}>
-                      {more.map(([value, label]) => (
-                        <MenuRadioItem key={value} value={value} closeOnClick>
-                          {label}
-                        </MenuRadioItem>
-                      ))}
-                    </MenuRadioGroup>
+                    <MenuGroup>
+                      <MenuGroupLabel>Particles</MenuGroupLabel>
+                      <MenuRadioGroup
+                        value={page === null ? categoryId : ""}
+                        onValueChange={(id) => {
+                          setCategoryId(id)
+                          setPage(null)
+                        }}
+                      >
+                        {particleCategories.map((item) => (
+                          <MenuRadioItem
+                            key={item.id}
+                            value={item.id}
+                            closeOnClick
+                          >
+                            {item.label}
+                          </MenuRadioItem>
+                        ))}
+                      </MenuRadioGroup>
+                    </MenuGroup>
                   </MenuPopup>
                 </Menu>
+                <TabsList aria-label="Preview">
+                  {pages.map((item) => (
+                    <TabsTab key={item.id} value={item.id}>
+                      {item.label}
+                    </TabsTab>
+                  ))}
+                </TabsList>
                 <Button
                   variant="ghost"
                   size="icon-sm"
@@ -224,19 +266,24 @@ function Editor() {
                   {full ? <Minimize2Icon /> : <Maximize2Icon />}
                 </Button>
               </div>
-              {[...pages, ...more].map(([value, , Page]) => (
+              {page === null ? (
+                <div className="@container min-h-0 flex-1 overflow-y-auto">
+                  <ParticleGallery key={categoryId} category={categoryId} />
+                </div>
+              ) : null}
+              {pages.map((item) => (
                 <TabsPanel
-                  key={value}
-                  value={value}
+                  key={item.id}
+                  value={item.id}
                   // The custom preview's frame keeps the user's app state across tab switches.
-                  keepMounted={value === "custom"}
+                  keepMounted={item.id === "custom"}
                   className={
-                    value === "custom"
+                    item.id === "custom"
                       ? "min-h-0 flex-1"
                       : "@container min-h-0 flex-1 overflow-y-auto"
                   }
                 >
-                  <Page />
+                  <item.Page />
                 </TabsPanel>
               ))}
             </Tabs>

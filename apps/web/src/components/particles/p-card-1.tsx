@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@cossplay/ui/components/button"
 import {
   Card,
@@ -34,7 +36,10 @@ export default function Particle() {
         <CardDescription>Deploy your new project in one-click.</CardDescription>
       </CardHeader>
       <CardPanel>
-        <Form className="flex w-full flex-col gap-4">
+        <Form
+          className="flex w-full flex-col gap-4"
+          onSubmit={(event) => event.preventDefault()}
+        >
           <Field>
             <FieldLabel>Name</FieldLabel>
             <Input placeholder="Name of your project" type="text" />

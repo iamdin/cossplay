@@ -1,109 +1,69 @@
 import type { ComponentType } from "react"
-import Accordion from "@/components/particles/p-accordion-1"
-import Alert from "@/components/particles/p-alert-1"
-import Avatar from "@/components/particles/p-avatar-1"
-import Badge from "@/components/particles/p-badge-1"
-import Button from "@/components/particles/p-button-1"
-import Card from "@/components/particles/p-card-1"
-import Checkbox from "@/components/particles/p-checkbox-1"
-import Dialog from "@/components/particles/p-dialog-1"
-import Input from "@/components/particles/p-input-1"
-import Menu from "@/components/particles/p-menu-1"
-import Popover from "@/components/particles/p-popover-1"
-import Progress from "@/components/particles/p-progress-1"
-import RadioGroup from "@/components/particles/p-radio-group-1"
-import Select from "@/components/particles/p-select-1"
-import Separator from "@/components/particles/p-separator-1"
-import Slider from "@/components/particles/p-slider-1"
-import Switch from "@/components/particles/p-switch-1"
-import Table from "@/components/particles/p-table-1"
-import Tabs from "@/components/particles/p-tabs-1"
-import Textarea from "@/components/particles/p-textarea-1"
-import Toast from "@/components/particles/p-toast-1"
-import Toggle from "@/components/particles/p-toggle-1"
-import Tooltip from "@/components/particles/p-tooltip-1"
 
-// One coss ui particle per common component, grouped so every color token shows up somewhere.
-const groups: [string, [string, ComponentType][]][] = [
-  [
-    "Actions",
-    [
-      ["Button", Button],
-      ["Toggle", Toggle],
-    ],
-  ],
-  [
-    "Forms",
-    [
-      ["Input", Input],
-      ["Textarea", Textarea],
-      ["Select", Select],
-      ["Checkbox", Checkbox],
-      ["Radio Group", RadioGroup],
-      ["Switch", Switch],
-      ["Slider", Slider],
-    ],
-  ],
-  [
-    "Display",
-    [
-      ["Card", Card],
-      ["Badge", Badge],
-      ["Avatar", Avatar],
-      ["Table", Table],
-      ["Separator", Separator],
-    ],
-  ],
-  [
-    "Feedback",
-    [
-      ["Alert", Alert],
-      ["Progress", Progress],
-      ["Toast", Toast],
-    ],
-  ],
-  [
-    "Overlays",
-    [
-      ["Dialog", Dialog],
-      ["Popover", Popover],
-      ["Menu", Menu],
-      ["Tooltip", Tooltip],
-    ],
-  ],
-  [
-    "Navigation",
-    [
-      ["Tabs", Tabs],
-      ["Accordion", Accordion],
-    ],
-  ],
-]
+type ParticleModule = { default: ComponentType }
 
-export function Components() {
+// Whatever `shadcn add @coss/p-*` wrote into this folder.
+const modules = import.meta.glob<ParticleModule>(
+  "../components/particles/p-*.tsx",
+  { eager: true }
+)
+
+// Registry files are `p-<name>-<number>`. Anything else is not a particle type.
+function categoryOf(name: string) {
+  const match = /^p-(.+)-\d+$/.exec(name)
+  return match?.[1]?.replaceAll("-", " ") ?? null
+}
+
+function titleCase(category: string) {
+  return category.replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+type ParticleItem = { name: string; Particle: ComponentType }
+
+export type ParticleCategory = {
+  id: string
+  label: string
+  items: ParticleItem[]
+}
+
+const grouped = new Map<string, ParticleItem[]>()
+for (const [path, mod] of Object.entries(modules).sort(([a], [b]) =>
+  (a.split("/").pop() ?? a).localeCompare(b.split("/").pop() ?? b, undefined, {
+    numeric: true,
+  })
+)) {
+  const name = path
+    .split("/")
+    .pop()
+    ?.replace(/\.tsx$/, "")
+  const id = name ? categoryOf(name) : null
+  if (!name || !id) continue
+  const items = grouped.get(id) ?? []
+  items.push({ name, Particle: mod.default })
+  grouped.set(id, items)
+}
+
+export const particleCategories: ParticleCategory[] = [...grouped].map(
+  ([id, items]) => ({ id, label: titleCase(id), items })
+)
+
+export function ParticleGallery({ category }: { category: string }) {
+  const items = particleCategories.find((group) => group.id === category)?.items
+  if (!items) return null
   return (
-    <div className="space-y-8 px-4 pt-2 pb-6">
-      {groups.map(([group, items]) => (
-        <section key={group}>
-          <h2 className="mb-3 font-medium text-muted-foreground text-xs uppercase tracking-wide">
-            {group}
-          </h2>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(18rem,1fr))] gap-4">
-            {items.map(([name, Particle]) => (
-              <figure
-                key={name}
-                className="flex min-h-48 flex-col rounded-xl border bg-card"
-              >
-                <figcaption className="border-b px-4 py-2 text-muted-foreground text-xs">
-                  {name}
-                </figcaption>
-                <div className="flex flex-1 items-center justify-center p-6">
-                  <Particle />
-                </div>
-              </figure>
-            ))}
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-4 px-4 pt-2 pb-6">
+      {items.map(({ name, Particle }) => (
+        <figure
+          key={name}
+          className="flex min-h-48 min-w-0 flex-col rounded-xl border bg-card"
+        >
+          <figcaption className="border-b px-4 py-2 font-mono text-muted-foreground text-xs">
+            {name}
+          </figcaption>
+          <div className="flex flex-1 items-center justify-center overflow-x-auto p-6">
+            <Particle />
           </div>
-        </section>
+        </figure>
       ))}
     </div>
   )
