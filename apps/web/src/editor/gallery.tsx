@@ -8,30 +8,48 @@ const modules = import.meta.glob<ParticleModule>(
   { eager: true }
 )
 
+// Registry files are `p-<name>-<number>`. Anything else is not a particle type.
 function categoryOf(name: string) {
-  const parts = name.split("-").slice(1)
-  const last = parts.at(-1)
-  if (last && /^\d+$/.test(last)) parts.pop()
-  return parts.join(" ")
+  const match = /^p-(.+)-\d+$/.exec(name)
+  return match?.[1]?.replaceAll("-", " ") ?? null
 }
-
-const particles = Object.entries(modules)
-  .map(([path, mod]) => {
-    const name =
-      path
-        .split("/")
-        .pop()
-        ?.replace(/\.tsx$/, "") ?? path
-    return { name, category: categoryOf(name), Particle: mod.default }
-  })
-  .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
 
 function titleCase(category: string) {
   return category.replace(/\b\w/g, (letter) => letter.toUpperCase())
 }
 
-function ParticleType({ category }: { category: string }) {
-  const items = particles.filter((particle) => particle.category === category)
+type ParticleItem = { name: string; Particle: ComponentType }
+
+export type ParticleCategory = {
+  id: string
+  label: string
+  items: ParticleItem[]
+}
+
+const grouped = new Map<string, ParticleItem[]>()
+for (const [path, mod] of Object.entries(modules).sort(([a], [b]) =>
+  (a.split("/").pop() ?? a).localeCompare(b.split("/").pop() ?? b, undefined, {
+    numeric: true,
+  })
+)) {
+  const name = path
+    .split("/")
+    .pop()
+    ?.replace(/\.tsx$/, "")
+  const id = name ? categoryOf(name) : null
+  if (!name || !id) continue
+  const items = grouped.get(id) ?? []
+  items.push({ name, Particle: mod.default })
+  grouped.set(id, items)
+}
+
+export const particleCategories: ParticleCategory[] = [...grouped].map(
+  ([id, items]) => ({ id, label: titleCase(id), items })
+)
+
+export function ParticleGallery({ category }: { category: string }) {
+  const items = particleCategories.find((group) => group.id === category)?.items
+  if (!items) return null
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-4 px-4 pt-2 pb-6">
       {items.map(({ name, Particle }) => (
@@ -50,17 +68,6 @@ function ParticleType({ category }: { category: string }) {
     </div>
   )
 }
-
-// One tab per installed particle type, in filename order.
-export const particleTabs: [string, string, ComponentType][] = [
-  ...new Set(particles.map((particle) => particle.category)),
-].map((category) => [
-  category,
-  titleCase(category),
-  function ParticleTab() {
-    return <ParticleType category={category} />
-  },
-])
 
 export function Typography() {
   return (

@@ -27,9 +27,13 @@ import { ToastProvider } from "@cossplay/ui/components/toast"
 import { cn } from "@cossplay/ui/lib/utils"
 import { createFileRoute } from "@tanstack/react-router"
 import { ChevronDownIcon, Maximize2Icon, Minimize2Icon } from "lucide-react"
-import { type ComponentType, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { CustomPreview } from "@/editor/custom"
-import { particleTabs, Typography } from "@/editor/gallery"
+import {
+  ParticleGallery,
+  particleCategories,
+  Typography,
+} from "@/editor/gallery"
 import { connect } from "@/editor/host"
 import { PreviewInspector } from "@/editor/inspect"
 import { Palette } from "@/editor/palette"
@@ -52,18 +56,37 @@ export const Route = createFileRoute("/editor")({
 
 const bar = "ui-chrome flex h-14 shrink-0 items-center gap-1 border-b px-3"
 
-// Particle types share one menu. These three stay as tabs beside it.
-const tabs: [string, string, ComponentType][] = [
-  ["custom", "Custom", CustomPreview],
-  ["typography", "Typography", Typography],
-  ["palette", "Color Palette", Palette],
-]
-const pages: [string, string, ComponentType][] = [...particleTabs, ...tabs]
-// Every label the button can show, so its width stays on the widest one.
-const particleMenuLabels = [
-  "Particles",
-  ...particleTabs.map(([, label]) => label),
-]
+const pages = [
+  { id: "custom", label: "Custom", Page: CustomPreview },
+  { id: "typography", label: "Typography", Page: Typography },
+  { id: "palette", label: "Color Palette", Page: Palette },
+] as const
+
+type PreviewPage = (typeof pages)[number]["id"]
+
+function isPreviewPage(value: string): value is PreviewPage {
+  return pages.some((item) => item.id === value)
+}
+
+// Catalog labels set the button width. "Particles" is only the resting caption.
+function WidestLabel({
+  labels,
+  current,
+}: {
+  labels: readonly string[]
+  current: string
+}) {
+  return (
+    <span className="grid">
+      {labels.map((label) => (
+        <span key={label} className="invisible col-start-1 row-start-1">
+          {label}
+        </span>
+      ))}
+      <span className="col-start-1 row-start-1">{current}</span>
+    </span>
+  )
+}
 
 const widthKey = "cossplay:panel-width"
 
@@ -72,9 +95,13 @@ function Editor() {
   useEffect(connect, [])
   useUndoShortcuts()
   const status = usePanelStore((s) => s.status)
-  const [tab, setTab] = useState(particleTabs[0][0])
-  const particle = particleTabs.find(([value]) => value === tab)
-  const particleLabel = particle?.[1] ?? "Particles"
+  const initialCategory = particleCategories[0]?.id
+  const [page, setPage] = useState<PreviewPage | null>(
+    initialCategory ? null : "custom"
+  )
+  const [categoryId, setCategoryId] = useState(initialCategory ?? "")
+  const category = particleCategories.find((item) => item.id === categoryId)
+  const particleLabel = page === null && category ? category.label : "Particles"
   const [full, setFull] = useState(false)
   const [width, setWidth] = useState<number>()
   useEffect(() => {
@@ -175,8 +202,10 @@ function Editor() {
               <ImportExport />
             </div>
             <Tabs
-              value={tab}
-              onValueChange={setTab}
+              value={page ?? ""}
+              onValueChange={(value) => {
+                if (isPreviewPage(value)) setPage(value)
+              }}
               className="flex min-h-0 flex-1 flex-col gap-0"
             >
               <div className="ui-chrome flex shrink-0 flex-wrap items-center gap-2 px-4 pt-3 pb-1">
@@ -185,33 +214,34 @@ function Editor() {
                     render={
                       <Button
                         aria-label={particleLabel}
-                        variant={particle ? "secondary" : "ghost"}
+                        variant={page === null ? "secondary" : "ghost"}
                         size="sm"
                       />
                     }
                   >
-                    <span className="grid">
-                      {particleMenuLabels.map((label) => (
-                        <span
-                          key={label}
-                          className={cn(
-                            "col-start-1 row-start-1",
-                            label !== particleLabel && "invisible"
-                          )}
-                        >
-                          {label}
-                        </span>
-                      ))}
-                    </span>
+                    <WidestLabel
+                      labels={particleCategories.map((item) => item.label)}
+                      current={particleLabel}
+                    />
                     <ChevronDownIcon />
                   </MenuTrigger>
                   <MenuPopup className="ui-chrome" align="start">
                     <MenuGroup>
                       <MenuGroupLabel>Particles</MenuGroupLabel>
-                      <MenuRadioGroup value={tab} onValueChange={setTab}>
-                        {particleTabs.map(([value, label]) => (
-                          <MenuRadioItem key={value} value={value} closeOnClick>
-                            {label}
+                      <MenuRadioGroup
+                        value={page === null ? categoryId : ""}
+                        onValueChange={(id) => {
+                          setCategoryId(id)
+                          setPage(null)
+                        }}
+                      >
+                        {particleCategories.map((item) => (
+                          <MenuRadioItem
+                            key={item.id}
+                            value={item.id}
+                            closeOnClick
+                          >
+                            {item.label}
                           </MenuRadioItem>
                         ))}
                       </MenuRadioGroup>
@@ -219,9 +249,9 @@ function Editor() {
                   </MenuPopup>
                 </Menu>
                 <TabsList aria-label="Preview">
-                  {tabs.map(([value, label]) => (
-                    <TabsTab key={value} value={value}>
-                      {label}
+                  {pages.map((item) => (
+                    <TabsTab key={item.id} value={item.id}>
+                      {item.label}
                     </TabsTab>
                   ))}
                 </TabsList>
@@ -236,19 +266,24 @@ function Editor() {
                   {full ? <Minimize2Icon /> : <Maximize2Icon />}
                 </Button>
               </div>
-              {pages.map(([value, , Page]) => (
+              {page === null ? (
+                <div className="@container min-h-0 flex-1 overflow-y-auto">
+                  <ParticleGallery key={categoryId} category={categoryId} />
+                </div>
+              ) : null}
+              {pages.map((item) => (
                 <TabsPanel
-                  key={value}
-                  value={value}
+                  key={item.id}
+                  value={item.id}
                   // The custom preview's frame keeps the user's app state across tab switches.
-                  keepMounted={value === "custom"}
+                  keepMounted={item.id === "custom"}
                   className={
-                    value === "custom"
+                    item.id === "custom"
                       ? "min-h-0 flex-1"
                       : "@container min-h-0 flex-1 overflow-y-auto"
                   }
                 >
-                  <Page />
+                  <item.Page />
                 </TabsPanel>
               ))}
             </Tabs>
