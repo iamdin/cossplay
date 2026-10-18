@@ -26,15 +26,10 @@ import { cn } from "@cossplay/ui/lib/utils"
 import { createFileRoute } from "@tanstack/react-router"
 import { ChevronDownIcon, Maximize2Icon, Minimize2Icon } from "lucide-react"
 import { type ComponentType, useEffect, useState } from "react"
-import { Application } from "@/editor/application"
-import { Cards } from "@/editor/cards"
 import { CustomPreview } from "@/editor/custom"
-import { Dashboard } from "@/editor/dashboard"
-import { Components, Typography } from "@/editor/gallery"
+import { Cards, Forms, Overlays, Particles, Typography } from "@/editor/gallery"
 import { connect } from "@/editor/host"
 import { PreviewInspector } from "@/editor/inspect"
-import { Mail } from "@/editor/mail"
-import { Marketing } from "@/editor/marketing"
 import { Palette } from "@/editor/palette"
 import styles from "@/styles/editor.css?url"
 
@@ -55,17 +50,15 @@ export const Route = createFileRoute("/editor")({
 
 const bar = "ui-chrome flex h-14 shrink-0 items-center gap-1 border-b px-3"
 
-// Preview pages, like tweakcn's; the rest sit in a "More" menu so the tabs fit.
+// Preview pages are coss ui particles. Typography and the palette stay handwritten.
 const pages: [string, string, ComponentType][] = [
+  ["particles", "Particles", Particles],
   ["cards", "Cards", Cards],
-  ["dashboard", "Dashboard", Dashboard],
-  ["marketing", "Marketing", Marketing],
-  ["application", "Application", Application],
-  ["components", "Components", Components],
+  ["forms", "Forms", Forms],
+  ["overlays", "Overlays", Overlays],
   ["custom", "Custom", CustomPreview],
 ]
 const more: [string, string, ComponentType][] = [
-  ["mail", "Mail", Mail],
   ["typography", "Typography", Typography],
   ["palette", "Color Palette", Palette],
 ]
@@ -77,7 +70,7 @@ function Editor() {
   useEffect(connect, [])
   useUndoShortcuts()
   const status = usePanelStore((s) => s.status)
-  const [tab, setTab] = useState("cards")
+  const [tab, setTab] = useState("particles")
   const [full, setFull] = useState(false)
   const [width, setWidth] = useState<number>()
   useEffect(() => {

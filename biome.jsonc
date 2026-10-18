@@ -51,6 +51,23 @@
           }
         }
       }
+    },
+    {
+      // coss ui particles installed by the shadcn CLI. Don't restyle them to satisfy lint.
+      "includes": ["apps/web/src/components/particles/**"],
+      "linter": {
+        "rules": {
+          "a11y": "off",
+          "nursery": {
+            "useSortedClasses": "off"
+          },
+          "suspicious": {
+            "noArrayIndexKey": "off",
+            "noDoubleEquals": "off",
+            "noExplicitAny": "off"
+          }
+        }
+      }
     }
   ],
   "javascript": {

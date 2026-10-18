@@ -1,0 +1,18 @@
+import { Input } from "@cossplay/ui/components/input"
+import { Label } from "@cossplay/ui/components/label"
+import { useId } from "react"
+
+export default function Particle() {
+  const id = useId()
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="inline-flex w-full items-center justify-between gap-2">
+        <Label htmlFor={id}>Email</Label>
+        <Label className="font-normal text-muted-foreground" render={<span />}>
+          Optional
+        </Label>
+      </div>
+      <Input id={id} placeholder="Email" type="email" />
+    </div>
+  )
+}
