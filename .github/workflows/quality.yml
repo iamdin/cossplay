@@ -6,12 +6,32 @@ on:
   pull_request:
     branches: ['main']
 
+permissions:
+  contents: read
+
+env:
+  CI: "true"
+
+# A newer commit makes older runs for the same PR or branch obsolete. Cancel it
+# before it consumes another slot on the single self-hosted runner.
+concurrency:
+  group: quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     name: Check
-    runs-on: ubuntu-latest
+    # Pull request events still appear in Actions for other authors, but the job
+    # is skipped before GitHub assigns it to the self-hosted runner.
+    if: >-
+      github.event_name == 'push' ||
+      contains(fromJSON(vars.TRUSTED_PR_AUTHORS || '[]'), github.event.pull_request.user.login)
+    runs-on: [self-hosted, Linux, X64, ubuntu-24.04, rn, cossplay]
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -23,6 +43,10 @@ jobs:
       - run: pnpm run check:type
       - run: pnpm run test
       - run: pnpm run build
-      - run: pnpm --filter @cossplay/extension exec playwright install --with-deps chromium
+      - name: Install Playwright Chromium
+        # No --with-deps: the runner user cannot sudo. Chromium libraries are
+        # already on the host. Install into the default cache; turbo does not
+        # forward PLAYWRIGHT_BROWSERS_PATH into test:e2e.
+        run: pnpm --filter @cossplay/extension exec playwright install chromium
       # The extension loads only in headed Chromium, so it runs on a virtual display.
       - run: xvfb-run -a pnpm run test:e2e
