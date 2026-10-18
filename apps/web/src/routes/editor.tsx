@@ -9,6 +9,15 @@ import {
 import { usePanelStore } from "@cossplay/editor/store"
 import { Button } from "@cossplay/ui/components/button"
 import {
+  Menu,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuPopup,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuTrigger,
+} from "@cossplay/ui/components/menu"
+import {
   Tabs,
   TabsList,
   TabsPanel,
@@ -17,7 +26,7 @@ import {
 import { ToastProvider } from "@cossplay/ui/components/toast"
 import { cn } from "@cossplay/ui/lib/utils"
 import { createFileRoute } from "@tanstack/react-router"
-import { Maximize2Icon, Minimize2Icon } from "lucide-react"
+import { ChevronDownIcon, Maximize2Icon, Minimize2Icon } from "lucide-react"
 import { type ComponentType, useEffect, useState } from "react"
 import { CustomPreview } from "@/editor/custom"
 import { particleTabs, Typography } from "@/editor/gallery"
@@ -43,13 +52,13 @@ export const Route = createFileRoute("/editor")({
 
 const bar = "ui-chrome flex h-14 shrink-0 items-center gap-1 border-b px-3"
 
-// One tab per installed particle type. The three previews below are not particles.
-const pages: [string, string, ComponentType][] = [
-  ...particleTabs,
+// Particle types share one menu. These three stay as tabs beside it.
+const tabs: [string, string, ComponentType][] = [
   ["custom", "Custom", CustomPreview],
   ["typography", "Typography", Typography],
   ["palette", "Color Palette", Palette],
 ]
+const pages: [string, string, ComponentType][] = [...particleTabs, ...tabs]
 
 const widthKey = "cossplay:panel-width"
 
@@ -58,7 +67,8 @@ function Editor() {
   useEffect(connect, [])
   useUndoShortcuts()
   const status = usePanelStore((s) => s.status)
-  const [tab, setTab] = useState(pages[0][0])
+  const [tab, setTab] = useState(particleTabs[0][0])
+  const particle = particleTabs.find(([value]) => value === tab)
   const [full, setFull] = useState(false)
   const [width, setWidth] = useState<number>()
   useEffect(() => {
@@ -163,12 +173,34 @@ function Editor() {
               onValueChange={setTab}
               className="flex min-h-0 flex-1 flex-col gap-0"
             >
-              <div className="ui-chrome flex shrink-0 items-start gap-2 px-4 pt-3 pb-1">
-                <TabsList
-                  aria-label="Preview"
-                  className="h-auto w-auto max-w-full flex-1 flex-wrap justify-start"
-                >
-                  {pages.map(([value, label]) => (
+              <div className="ui-chrome flex shrink-0 flex-wrap items-center gap-2 px-4 pt-3 pb-1">
+                <Menu>
+                  <MenuTrigger
+                    render={
+                      <Button
+                        variant={particle ? "secondary" : "ghost"}
+                        size="sm"
+                      />
+                    }
+                  >
+                    {particle ? particle[1] : "Particles"}
+                    <ChevronDownIcon />
+                  </MenuTrigger>
+                  <MenuPopup className="ui-chrome" align="start">
+                    <MenuGroup>
+                      <MenuGroupLabel>Particles</MenuGroupLabel>
+                      <MenuRadioGroup value={tab} onValueChange={setTab}>
+                        {particleTabs.map(([value, label]) => (
+                          <MenuRadioItem key={value} value={value} closeOnClick>
+                            {label}
+                          </MenuRadioItem>
+                        ))}
+                      </MenuRadioGroup>
+                    </MenuGroup>
+                  </MenuPopup>
+                </Menu>
+                <TabsList aria-label="Preview">
+                  {tabs.map(([value, label]) => (
                     <TabsTab key={value} value={value}>
                       {label}
                     </TabsTab>
