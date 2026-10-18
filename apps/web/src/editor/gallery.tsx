@@ -26,93 +26,41 @@ const particles = Object.entries(modules)
   })
   .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
 
-function Gallery({ categories }: { categories?: readonly string[] }) {
-  const shown = categories
-    ? particles.filter((particle) => categories.includes(particle.category))
-    : particles
-  const groups: [string, typeof particles][] = []
-  for (const particle of shown) {
-    const group = groups.find(([category]) => category === particle.category)
-    if (group) group[1].push(particle)
-    else groups.push([particle.category, [particle]])
-  }
+function titleCase(category: string) {
+  return category.replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+function ParticleType({ category }: { category: string }) {
+  const items = particles.filter((particle) => particle.category === category)
   return (
-    <div className="space-y-8 px-4 pt-2 pb-6">
-      {groups.map(([category, items]) => (
-        <section key={category}>
-          <h2 className="mb-3 font-medium text-muted-foreground text-xs uppercase tracking-wide">
-            {category}
-          </h2>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-4">
-            {items.map(({ name, Particle }) => (
-              <figure
-                key={name}
-                className="flex min-h-48 min-w-0 flex-col rounded-xl border bg-card"
-              >
-                <figcaption className="border-b px-4 py-2 font-mono text-muted-foreground text-xs">
-                  {name}
-                </figcaption>
-                <div className="flex flex-1 items-center justify-center overflow-x-auto p-6">
-                  <Particle />
-                </div>
-              </figure>
-            ))}
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-4 px-4 pt-2 pb-6">
+      {items.map(({ name, Particle }) => (
+        <figure
+          key={name}
+          className="flex min-h-48 min-w-0 flex-col rounded-xl border bg-card"
+        >
+          <figcaption className="border-b px-4 py-2 font-mono text-muted-foreground text-xs">
+            {name}
+          </figcaption>
+          <div className="flex flex-1 items-center justify-center overflow-x-auto p-6">
+            <Particle />
           </div>
-        </section>
+        </figure>
       ))}
     </div>
   )
 }
 
-export function Particles() {
-  return <Gallery />
-}
-
-export function Cards() {
-  return (
-    <Gallery categories={["card", "empty", "meter", "table", "progress"]} />
-  )
-}
-
-export function Forms() {
-  return (
-    <Gallery
-      categories={[
-        "input",
-        "input group",
-        "textarea",
-        "select",
-        "combobox",
-        "checkbox",
-        "radio group",
-        "switch",
-        "slider",
-        "otp field",
-        "field",
-        "form",
-        "kbd",
-      ]}
-    />
-  )
-}
-
-export function Overlays() {
-  return (
-    <Gallery
-      categories={[
-        "dialog",
-        "menu",
-        "popover",
-        "toast",
-        "tooltip",
-        "alert",
-        "scroll area",
-        "accordion",
-        "tabs",
-      ]}
-    />
-  )
-}
+// One tab per installed particle type, in filename order.
+export const particleTabs: [string, string, ComponentType][] = [
+  ...new Set(particles.map((particle) => particle.category)),
+].map((category) => [
+  category,
+  titleCase(category),
+  function ParticleTab() {
+    return <ParticleType category={category} />
+  },
+])
 
 export function Typography() {
   return (

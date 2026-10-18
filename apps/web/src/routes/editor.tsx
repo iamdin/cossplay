@@ -9,13 +9,6 @@ import {
 import { usePanelStore } from "@cossplay/editor/store"
 import { Button } from "@cossplay/ui/components/button"
 import {
-  Menu,
-  MenuPopup,
-  MenuRadioGroup,
-  MenuRadioItem,
-  MenuTrigger,
-} from "@cossplay/ui/components/menu"
-import {
   Tabs,
   TabsList,
   TabsPanel,
@@ -24,10 +17,10 @@ import {
 import { ToastProvider } from "@cossplay/ui/components/toast"
 import { cn } from "@cossplay/ui/lib/utils"
 import { createFileRoute } from "@tanstack/react-router"
-import { ChevronDownIcon, Maximize2Icon, Minimize2Icon } from "lucide-react"
+import { Maximize2Icon, Minimize2Icon } from "lucide-react"
 import { type ComponentType, useEffect, useState } from "react"
 import { CustomPreview } from "@/editor/custom"
-import { Cards, Forms, Overlays, Particles, Typography } from "@/editor/gallery"
+import { particleTabs, Typography } from "@/editor/gallery"
 import { connect } from "@/editor/host"
 import { PreviewInspector } from "@/editor/inspect"
 import { Palette } from "@/editor/palette"
@@ -50,15 +43,10 @@ export const Route = createFileRoute("/editor")({
 
 const bar = "ui-chrome flex h-14 shrink-0 items-center gap-1 border-b px-3"
 
-// Preview pages are coss ui particles. Typography and the palette stay handwritten.
+// One tab per installed particle type. The three previews below are not particles.
 const pages: [string, string, ComponentType][] = [
-  ["particles", "Particles", Particles],
-  ["cards", "Cards", Cards],
-  ["forms", "Forms", Forms],
-  ["overlays", "Overlays", Overlays],
+  ...particleTabs,
   ["custom", "Custom", CustomPreview],
-]
-const more: [string, string, ComponentType][] = [
   ["typography", "Typography", Typography],
   ["palette", "Color Palette", Palette],
 ]
@@ -70,7 +58,7 @@ function Editor() {
   useEffect(connect, [])
   useUndoShortcuts()
   const status = usePanelStore((s) => s.status)
-  const [tab, setTab] = useState("particles")
+  const [tab, setTab] = useState(pages[0][0])
   const [full, setFull] = useState(false)
   const [width, setWidth] = useState<number>()
   useEffect(() => {
@@ -97,7 +85,6 @@ function Editor() {
       localStorage.setItem(widthKey, String(clamped))
     } catch {}
   }
-  const overflow = more.find(([value]) => value === tab)
   return (
     <ToastProvider>
       <div className="flex h-dvh flex-col overflow-hidden bg-background text-foreground">
@@ -176,36 +163,17 @@ function Editor() {
               onValueChange={setTab}
               className="flex min-h-0 flex-1 flex-col gap-0"
             >
-              <div className="ui-chrome flex shrink-0 flex-wrap items-center gap-2 px-4 pt-3 pb-1">
-                <TabsList aria-label="Preview">
+              <div className="ui-chrome flex shrink-0 items-start gap-2 px-4 pt-3 pb-1">
+                <TabsList
+                  aria-label="Preview"
+                  className="h-auto w-auto max-w-full flex-1 flex-wrap justify-start"
+                >
                   {pages.map(([value, label]) => (
                     <TabsTab key={value} value={value}>
                       {label}
                     </TabsTab>
                   ))}
                 </TabsList>
-                <Menu>
-                  <MenuTrigger
-                    render={
-                      <Button
-                        variant={overflow ? "secondary" : "ghost"}
-                        size="sm"
-                      />
-                    }
-                  >
-                    {overflow?.[1] ?? "More"}
-                    <ChevronDownIcon />
-                  </MenuTrigger>
-                  <MenuPopup className="ui-chrome" align="start">
-                    <MenuRadioGroup value={tab} onValueChange={setTab}>
-                      {more.map(([value, label]) => (
-                        <MenuRadioItem key={value} value={value} closeOnClick>
-                          {label}
-                        </MenuRadioItem>
-                      ))}
-                    </MenuRadioGroup>
-                  </MenuPopup>
-                </Menu>
                 <Button
                   variant="ghost"
                   size="icon-sm"
@@ -217,7 +185,7 @@ function Editor() {
                   {full ? <Minimize2Icon /> : <Maximize2Icon />}
                 </Button>
               </div>
-              {[...pages, ...more].map(([value, , Page]) => (
+              {pages.map(([value, , Page]) => (
                 <TabsPanel
                   key={value}
                   value={value}
