@@ -15,7 +15,7 @@ One named theme variable, such as `primary`, `destructive-foreground` or `radius
 _Avoid_: Variable, CSS var
 
 **Preset**:
-A ready-made theme from tweakcn, mapped onto coss ui's tokens, or coss ui's own default.
+A ready-made theme from tweakcn or 8bitcn, mapped onto coss ui's tokens, or coss ui's own default.
 _Avoid_: Template
 
 **Override**:

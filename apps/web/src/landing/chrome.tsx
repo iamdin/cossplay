@@ -26,9 +26,18 @@ export function Footer() {
             >
               tweakcn
             </a>{" "}
-            (Apache-2.0)
+            (Apache-2.0) and{" "}
+            <a
+              href="https://github.com/TheOrcDev/8bitcn-ui"
+              className="underline hover:text-foreground"
+            >
+              8bitcn
+            </a>{" "}
+            (MIT)
           </span>
-          <span>Not affiliated with coss, Cal.com, tweakcn or shadcn/ui.</span>
+          <span>
+            Not affiliated with coss, Cal.com, tweakcn, 8bitcn or shadcn/ui.
+          </span>
         </div>
       </div>
     </footer>

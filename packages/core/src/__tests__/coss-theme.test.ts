@@ -108,6 +108,43 @@ test("shadcn themes map onto coss token semantics", () => {
   assert.equal(coss.light["destructive-foreground"], "#b00")
 })
 
+test("the 8bitcn Pacman preset uses the shadcn mapping path", () => {
+  assert.equal(presets.pacman.label, "Pacman")
+  assert.equal(presets.pacman.styles.light["font-sans"], '"Press Start 2P"')
+  const overrides = presetOverrides("pacman")
+  for (const mode of ["light", "dark"] as const) {
+    const oklch = converter("oklch")
+    const fg = oklch(parseColor(overrides[mode]["destructive-foreground"]!))!
+    assert.ok(
+      Math.abs(
+        fg.l - oklch(parseColor(defaults[mode]["destructive-foreground"]))!.l
+      ) < 0.001
+    )
+    assert.ok(
+      Math.abs(
+        fg.h! - oklch(parseColor(presets.pacman.styles[mode].destructive))!.h!
+      ) < 0.5
+    )
+    assert.equal(overrides[mode].code, presets.pacman.styles[mode].card)
+    assert.equal(
+      overrides[mode]["code-foreground"],
+      presets.pacman.styles[mode]["card-foreground"]
+    )
+    assert.equal(
+      overrides[mode]["code-highlight"],
+      presets.pacman.styles[mode].muted
+    )
+    assert.equal(overrides[mode]["font-sans"], '"Press Start 2P"')
+    assert.equal(overrides[mode]["font-serif"], '"Press Start 2P"')
+    assert.equal(overrides[mode]["font-mono"], '"Press Start 2P"')
+    assert.equal(overrides[mode].radius, "0rem")
+    assert.equal(overrides[mode]["letter-spacing"], "0.05rem")
+    assert.equal("info" in overrides[mode], false)
+    assert.equal("success" in overrides[mode], false)
+    assert.equal("warning" in overrides[mode], false)
+  }
+})
+
 test("color formats round trip with alpha, including computed color-mix results", () => {
   for (const input of [
     "0 0% 100%",
