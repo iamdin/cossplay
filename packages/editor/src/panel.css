@@ -1,3 +1,12 @@
 @import "@cossplay/ui/globals.css";
 
 @source ".";
+
+/* Extension document only; the editor page does not load this file. */
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
