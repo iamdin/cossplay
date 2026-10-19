@@ -133,10 +133,10 @@ function MarqueeRow({
   onSelect: (id: string) => void
 }) {
   return (
-    <div className="overflow-hidden motion-reduce:overflow-x-auto">
+    <div className="relative h-10 w-full min-w-0 overflow-hidden">
       <div
         className={cn(
-          "flex w-max focus-within:[animation-play-state:paused] hover:[animation-play-state:paused]",
+          "absolute inset-y-0 left-0 flex w-max items-center focus-within:[animation-play-state:paused] hover:[animation-play-state:paused]",
           reverse
             ? "motion-safe:animate-marquee-reverse"
             : "motion-safe:animate-marquee"
@@ -174,7 +174,7 @@ export function ThemeChips({
   onSelect: (id: string) => void
 }) {
   return (
-    <div className="mt-12 flex flex-col gap-2 overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,#000_4rem,#000_calc(100%-4rem),transparent)]">
+    <div className="mt-12 flex w-full min-w-0 max-w-full flex-col gap-2 overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,#000_4rem,#000_calc(100%-4rem),transparent)]">
       {rows.map((presets, row) => (
         <MarqueeRow
           key={presets[0]}

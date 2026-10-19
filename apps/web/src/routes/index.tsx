@@ -253,26 +253,26 @@ function Screenshot({
       <Dialog>
         <DialogTrigger
           aria-label={`View ${caption} larger`}
-          className="block w-full cursor-zoom-in"
+          className="block w-full min-w-0 cursor-zoom-in overflow-hidden"
         >
           <img
             src={src}
             width={1280}
             height={800}
             alt={alt}
-            className="w-full rounded-2xl border shadow-xl/5"
+            className="aspect-[8/5] h-auto w-full max-w-full rounded-2xl border object-cover shadow-xl/5"
             loading="lazy"
           />
         </DialogTrigger>
         <DialogPopup
           bottomStickOnMobile={false}
-          className="w-[min(72rem,calc(100vw-2rem))] max-w-none p-3"
+          className="max-h-[calc(100dvh-2rem)] w-[min(72rem,calc(100vw-2rem))] max-w-none overflow-y-auto p-3"
         >
           <DialogTitle className="sr-only">{caption}</DialogTitle>
           <img
             src={src}
             alt={alt}
-            className="mt-8 h-auto max-h-[85vh] w-full rounded-xl object-contain"
+            className="mt-8 h-auto max-h-[80vh] w-full rounded-xl object-contain"
           />
         </DialogPopup>
       </Dialog>
@@ -287,7 +287,7 @@ function Landing() {
   const { id, setId, style } = useLandingTheme()
   return (
     <div
-      className="min-h-dvh bg-background text-foreground"
+      className="min-h-dvh overflow-x-clip bg-background text-foreground"
       style={{ ...style, fontFamily: "var(--font-sans)" }}
     >
       <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
@@ -340,7 +340,7 @@ function Landing() {
         </section>
         <ThemeChips id={id} onSelect={setId} />
 
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mx-auto min-w-0 max-w-6xl px-4 sm:px-6">
           <Section
             id="ways"
             eyebrow="How to use"
@@ -362,7 +362,7 @@ function Landing() {
                 </div>
               ))}
             </div>
-            <div className="mt-10 grid items-start gap-4 lg:grid-cols-2">
+            <div className="mt-10 grid min-w-0 items-start gap-4 lg:grid-cols-2">
               {shots.map((shot) => (
                 <Screenshot key={shot.src} {...shot} />
               ))}
