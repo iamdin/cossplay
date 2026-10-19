@@ -79,22 +79,31 @@ export function ThemeDemo() {
 
   return (
     <div className="overflow-hidden rounded-2xl border bg-card shadow-xl/5">
-      <div className="flex flex-wrap items-center gap-1.5 border-b bg-muted/50 p-2">
-        {shown.map((preset) => (
-          <Button
-            key={preset}
-            size="xs"
-            variant={preset === id ? "default" : "ghost"}
-            aria-pressed={preset === id}
-            onClick={() => setId(preset)}
-          >
-            {label(preset)}
-          </Button>
-        ))}
+      <div className="flex items-center gap-1.5 border-b bg-muted/50 p-1.5">
+        <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto overflow-y-hidden pr-11 [mask-image:linear-gradient(to_right,#000_calc(100%-2.75rem),transparent)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {shown.map((preset) => (
+            <Button
+              key={preset}
+              size="xs"
+              variant={preset === id ? "default" : "ghost"}
+              aria-pressed={preset === id}
+              className="shrink-0"
+              onClick={(event) => {
+                setId(preset)
+                event.currentTarget.scrollIntoView({
+                  block: "nearest",
+                  inline: "nearest",
+                })
+              }}
+            >
+              {label(preset)}
+            </Button>
+          ))}
+        </div>
         <Button
           size="icon-xs"
           variant="outline"
-          className="ml-auto"
+          className="shrink-0"
           aria-label={dark ? "Light mode" : "Dark mode"}
           onClick={() => setDark(!dark)}
         >
@@ -104,14 +113,14 @@ export function ThemeDemo() {
       <div className={cn(dark && "dark")}>
         <div
           style={{ ...style, fontFamily: "var(--font-sans)" }}
-          className="grid gap-4 bg-background p-4 text-foreground transition-colors sm:grid-cols-2 sm:p-6"
+          className="grid items-stretch gap-4 bg-background p-4 text-foreground transition-colors sm:grid-cols-2 sm:p-5"
         >
-          <Card>
+          <Card className="h-full">
             <CardHeader>
               <CardTitle>Create an account</CardTitle>
               <CardDescription>Start your 14-day trial.</CardDescription>
             </CardHeader>
-            <CardPanel className="flex flex-col gap-3">
+            <CardPanel className="flex flex-1 flex-col gap-3">
               <Field>
                 <FieldLabel>Email</FieldLabel>
                 <Input
@@ -124,48 +133,48 @@ export function ThemeDemo() {
                 <Switch defaultChecked />
                 Send me product updates
               </Label>
-              <div className="flex gap-2">
+              <div className="mt-auto flex gap-2 pt-1">
                 <Button className="flex-1">Sign up</Button>
-                <Button variant="outline">Log in</Button>
+                <Button variant="outline" className="flex-1">
+                  Log in
+                </Button>
               </div>
             </CardPanel>
           </Card>
-          <div className="flex flex-col gap-4">
-            <Card>
-              <CardHeader>
-                <CardDescription>Monthly revenue</CardDescription>
-                <CardTitle className="text-2xl">$48,210</CardTitle>
-              </CardHeader>
-              <CardPanel className="flex flex-col gap-3">
-                <div className="flex flex-wrap gap-1.5">
-                  <Badge variant="success">+12.4%</Badge>
-                  <Badge variant="info">Q3</Badge>
-                  <Badge variant="warning">2 pending</Badge>
-                  <Badge variant="secondary">USD</Badge>
-                </div>
-                <Progress value={68} aria-label="Demo goal">
-                  <ProgressTrack>
-                    <ProgressIndicator />
-                  </ProgressTrack>
-                </Progress>
-                <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                  <Avatar className="size-6">
-                    <AvatarFallback className="text-xs">AK</AvatarFallback>
-                  </Avatar>
-                  68% of the quarter's goal
-                </div>
-              </CardPanel>
-            </Card>
-            <Alert variant="info">
-              <InfoIcon />
-              <AlertTitle>Deploy finished</AlertTitle>
-              <AlertDescription>
-                <span className="flex items-center gap-1">
-                  <CheckIcon className="size-3.5" /> All checks passed.
-                </span>
-              </AlertDescription>
-            </Alert>
-          </div>
+          <Card className="h-full">
+            <CardHeader>
+              <CardDescription>Monthly revenue</CardDescription>
+              <CardTitle className="text-2xl">$48,210</CardTitle>
+            </CardHeader>
+            <CardPanel className="flex flex-1 flex-col gap-3">
+              <div className="flex flex-wrap gap-1.5">
+                <Badge variant="success">+12.4%</Badge>
+                <Badge variant="info">Q3</Badge>
+                <Badge variant="warning">2 pending</Badge>
+                <Badge variant="secondary">USD</Badge>
+              </div>
+              <Progress value={68} aria-label="Demo goal">
+                <ProgressTrack>
+                  <ProgressIndicator />
+                </ProgressTrack>
+              </Progress>
+              <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                <Avatar className="size-6">
+                  <AvatarFallback className="text-xs">AK</AvatarFallback>
+                </Avatar>
+                68% of the quarter's goal
+              </div>
+              <Alert variant="info" className="mt-auto">
+                <InfoIcon />
+                <AlertTitle>Deploy finished</AlertTitle>
+                <AlertDescription>
+                  <span className="flex items-center gap-1">
+                    <CheckIcon className="size-3.5" /> All checks passed.
+                  </span>
+                </AlertDescription>
+              </Alert>
+            </CardPanel>
+          </Card>
         </div>
       </div>
     </div>
