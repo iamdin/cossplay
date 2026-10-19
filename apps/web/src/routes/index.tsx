@@ -1,5 +1,11 @@
 import { Badge } from "@cossplay/ui/components/badge"
 import { Button } from "@cossplay/ui/components/button"
+import {
+  Dialog,
+  DialogPopup,
+  DialogTitle,
+  DialogTrigger,
+} from "@cossplay/ui/components/dialog"
 import { createFileRoute } from "@tanstack/react-router"
 import {
   ArrowRightIcon,
@@ -9,7 +15,6 @@ import {
   ContrastIcon,
   CopyIcon,
   HistoryIcon,
-  LockIcon,
   PaletteIcon,
   PanelRightIcon,
   SquareDashedMousePointerIcon,
@@ -17,7 +22,7 @@ import {
 } from "lucide-react"
 import { type ReactNode, useState } from "react"
 import { Footer, Logo } from "@/landing/chrome"
-import { ThemeDemo } from "@/landing/demo"
+import { ThemeChips, useLandingTheme } from "@/landing/demo"
 import styles from "@/styles/landing.css?url"
 
 const site = "https://cossplay.vercel.app"
@@ -219,9 +224,72 @@ function CliCommand() {
   )
 }
 
-function Landing() {
+const checks = ["No account", "In your browser", "Export to Tailwind"]
+
+const shots = [
+  {
+    src: "/editor.webp",
+    caption: "Editor",
+    alt: "Cossplay editor themed with the Mono preset; the color panel is on the left and the component gallery is on the right",
+  },
+  {
+    src: "/screenshot.webp",
+    caption: "Chrome extension",
+    alt: "coss.com/ui themed with the Mono preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open",
+  },
+]
+
+function Screenshot({
+  src,
+  alt,
+  caption,
+}: {
+  src: string
+  alt: string
+  caption: string
+}) {
   return (
-    <div className="min-h-dvh bg-background text-foreground">
+    <figure className="min-w-0">
+      <Dialog>
+        <DialogTrigger
+          aria-label={`View ${caption} larger`}
+          className="block w-full cursor-zoom-in"
+        >
+          <img
+            src={src}
+            width={1280}
+            height={800}
+            alt={alt}
+            className="w-full rounded-2xl border shadow-xl/5"
+            loading="lazy"
+          />
+        </DialogTrigger>
+        <DialogPopup
+          bottomStickOnMobile={false}
+          className="w-[min(72rem,calc(100vw-2rem))] max-w-none p-3"
+        >
+          <DialogTitle className="sr-only">{caption}</DialogTitle>
+          <img
+            src={src}
+            alt={alt}
+            className="mt-8 h-auto max-h-[85vh] w-full rounded-xl object-contain"
+          />
+        </DialogPopup>
+      </Dialog>
+      <figcaption className="mt-3 text-muted-foreground text-sm">
+        {caption}
+      </figcaption>
+    </figure>
+  )
+}
+
+function Landing() {
+  const { id, setId, style } = useLandingTheme()
+  return (
+    <div
+      className="min-h-dvh bg-background text-foreground"
+      style={{ ...style, fontFamily: "var(--font-sans)" }}
+    >
       <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
         <nav className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
           <Logo />
@@ -242,154 +310,137 @@ function Landing() {
         </nav>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid items-center gap-12 pt-16 pb-8 sm:pt-24 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-          <div>
-            <Badge variant="outline" className="gap-1.5">
-              <LockIcon className="size-3" />
-              Free · no account · runs in your browser
-            </Badge>
-            <h1 className="mt-5 text-balance font-semibold text-4xl tracking-tight sm:text-5xl">
-              Theme your coss ui app, live.
-            </h1>
-            <p className="mt-5 text-pretty text-lg text-muted-foreground">
-              Try 42 presets, tune colors, fonts and radius, and watch real
-              components change as you go. Then export Tailwind CSS or install
-              the theme with the shadcn CLI.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button size="lg" render={<a href="/editor" />}>
-                Open the editor
-                <ArrowRightIcon />
-              </Button>
-              <AddToChrome />
-            </div>
-          </div>
-          <ThemeDemo />
-        </div>
-
-        <Section
-          id="ways"
-          eyebrow="How to use"
-          title="Wherever your theme lives"
-          lede="One editor, three places to use it. Cossplay only overrides the variables you change; everything else keeps following your CSS."
-        >
-          <div className="grid gap-4 md:grid-cols-3">
-            {ways.map((way) => (
-              <div
-                key={way.title}
-                className="flex flex-col gap-3 rounded-2xl border bg-card p-6"
-              >
-                <way.icon className="size-5 text-muted-foreground" />
-                <h3 className="font-semibold">{way.title}</h3>
-                <p className="flex-1 text-muted-foreground text-sm">
-                  {way.body}
-                </p>
-                <div>{way.action}</div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-10 grid items-start gap-4 lg:grid-cols-2">
-            <figure className="min-w-0">
-              <img
-                src="/editor.webp"
-                width="1280"
-                height="800"
-                alt="Cossplay editor themed with the Mono preset; the color panel is on the left and the component gallery is on the right"
-                className="w-full rounded-2xl border shadow-xl/5"
-                loading="lazy"
-              />
-              <figcaption className="mt-3 text-muted-foreground text-sm">
-                Editor
-              </figcaption>
-            </figure>
-            <figure className="min-w-0">
-              <img
-                src="/screenshot.webp"
-                width="1280"
-                height="800"
-                alt="coss.com/ui themed with the Mono preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
-                className="w-full rounded-2xl border shadow-xl/5"
-                loading="lazy"
-              />
-              <figcaption className="mt-3 text-muted-foreground text-sm">
-                Chrome extension
-              </figcaption>
-            </figure>
-          </div>
-        </Section>
-
-        <Section
-          id="features"
-          eyebrow="Features"
-          title="Everything a theme needs"
-          lede="Built on coss ui's own token set, including the info, success, warning and code colors that shadcn themes don't have."
-        >
-          <div className="grid gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
-              <div key={feature.title} className="bg-card p-6">
-                <feature.icon className="size-5 text-muted-foreground" />
-                <h3 className="mt-4 font-semibold">{feature.title}</h3>
-                <p className="mt-2 text-muted-foreground text-sm">
-                  {feature.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        <Section
-          id="ship"
-          eyebrow="Ship it"
-          title="From preset to your codebase in one command"
-          lede="Every preset is a shadcn registry item. Install it with the CLI, connect shadcn's MCP server to your editor, or copy the CSS in the format your project uses."
-        >
-          <div className="grid gap-8 lg:grid-cols-2">
-            <div className="flex min-w-0 flex-col gap-3">
-              <CliCommand />
-              <p className="text-muted-foreground text-sm">
-                Edited a theme? Copy or download it from Export instead.
-              </p>
-            </div>
-            <div className="flex flex-wrap content-start gap-2">
-              {formats.map((format) => (
-                <Badge key={format} variant="secondary" size="lg">
-                  {format}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </Section>
-
-        <Section
-          id="faq"
-          eyebrow="FAQ"
-          title="Questions"
-          lede="The short version: free, local, and independent."
-        >
-          <dl className="grid gap-8 sm:grid-cols-2">
-            {faqs.map((faq) => (
-              <div key={faq.q}>
-                <dt className="font-semibold">{faq.q}</dt>
-                <dd className="mt-2 text-muted-foreground">{faq.a}</dd>
-              </div>
-            ))}
-          </dl>
-        </Section>
-
-        <div className="mb-20 rounded-3xl border bg-muted/50 px-6 py-16 text-center">
-          <h2 className="text-balance font-semibold text-3xl tracking-tight">
-            Let your coss ui app play dress-up.
-          </h2>
-          <p className="mt-3 text-muted-foreground">
-            Pick a preset and see it on real components in seconds.
+      <main>
+        <section className="mx-auto max-w-3xl px-4 pt-16 text-center sm:pt-24">
+          <h1 className="text-balance font-semibold text-5xl tracking-tight sm:text-6xl lg:text-7xl">
+            Theme your coss ui app,{" "}
+            <span className="font-serif text-primary italic">live.</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-pretty text-lg text-muted-foreground">
+            Tune colors, type and radius on real components, then take the theme
+            with you.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button size="lg" render={<a href="/editor" />}>
               Open the editor
               <ArrowRightIcon />
             </Button>
-            <AddToChrome />
+            <Button size="lg" variant="outline" render={<a href="#ship" />}>
+              Install a preset
+            </Button>
+          </div>
+          <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-muted-foreground text-sm">
+            {checks.map((check) => (
+              <li key={check} className="inline-flex items-center gap-1.5">
+                <CheckIcon className="size-3.5" />
+                {check}
+              </li>
+            ))}
+          </ul>
+        </section>
+        <ThemeChips id={id} onSelect={setId} />
+
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <Section
+            id="ways"
+            eyebrow="How to use"
+            title="Wherever your theme lives"
+            lede="One editor, three places to use it. Cossplay only overrides the variables you change; everything else keeps following your CSS."
+          >
+            <div className="grid gap-4 md:grid-cols-3">
+              {ways.map((way) => (
+                <div
+                  key={way.title}
+                  className="flex flex-col gap-3 rounded-2xl border bg-card p-6"
+                >
+                  <way.icon className="size-5 text-muted-foreground" />
+                  <h3 className="font-semibold">{way.title}</h3>
+                  <p className="flex-1 text-muted-foreground text-sm">
+                    {way.body}
+                  </p>
+                  <div>{way.action}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-10 grid items-start gap-4 lg:grid-cols-2">
+              {shots.map((shot) => (
+                <Screenshot key={shot.src} {...shot} />
+              ))}
+            </div>
+          </Section>
+
+          <Section
+            id="features"
+            eyebrow="Features"
+            title="Everything a theme needs"
+            lede="Built on coss ui's own token set, including the info, success, warning and code colors that shadcn themes don't have."
+          >
+            <div className="grid gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-2 lg:grid-cols-3">
+              {features.map((feature) => (
+                <div key={feature.title} className="bg-card p-6">
+                  <feature.icon className="size-5 text-muted-foreground" />
+                  <h3 className="mt-4 font-semibold">{feature.title}</h3>
+                  <p className="mt-2 text-muted-foreground text-sm">
+                    {feature.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          <Section
+            id="ship"
+            eyebrow="Ship it"
+            title="From preset to your codebase in one command"
+            lede="Every preset is a shadcn registry item. Install it with the CLI, connect shadcn's MCP server to your editor, or copy the CSS in the format your project uses."
+          >
+            <div className="grid gap-8 lg:grid-cols-2">
+              <div className="flex min-w-0 flex-col gap-3">
+                <CliCommand />
+                <p className="text-muted-foreground text-sm">
+                  Edited a theme? Copy or download it from Export instead.
+                </p>
+              </div>
+              <div className="flex flex-wrap content-start gap-2">
+                {formats.map((format) => (
+                  <Badge key={format} variant="secondary" size="lg">
+                    {format}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </Section>
+
+          <Section
+            id="faq"
+            eyebrow="FAQ"
+            title="Questions"
+            lede="The short version: free, local, and independent."
+          >
+            <dl className="grid gap-8 sm:grid-cols-2">
+              {faqs.map((faq) => (
+                <div key={faq.q}>
+                  <dt className="font-semibold">{faq.q}</dt>
+                  <dd className="mt-2 text-muted-foreground">{faq.a}</dd>
+                </div>
+              ))}
+            </dl>
+          </Section>
+
+          <div className="mb-20 rounded-3xl border bg-muted/50 px-6 py-16 text-center">
+            <h2 className="text-balance font-semibold text-3xl tracking-tight">
+              Let your coss ui app play dress-up.
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Pick a preset and see it on real components in seconds.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button size="lg" render={<a href="/editor" />}>
+                Open the editor
+                <ArrowRightIcon />
+              </Button>
+              <AddToChrome />
+            </div>
           </div>
         </div>
       </main>

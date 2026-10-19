@@ -5,55 +5,29 @@ import {
   presets,
   variables,
 } from "@cossplay/core/coss"
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@cossplay/ui/components/alert"
-import { Avatar, AvatarFallback } from "@cossplay/ui/components/avatar"
-import { Badge } from "@cossplay/ui/components/badge"
-import { Button } from "@cossplay/ui/components/button"
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardPanel,
-  CardTitle,
-} from "@cossplay/ui/components/card"
-import { Field, FieldLabel } from "@cossplay/ui/components/field"
-import { Input } from "@cossplay/ui/components/input"
-import { Label } from "@cossplay/ui/components/label"
-import {
-  Progress,
-  ProgressIndicator,
-  ProgressTrack,
-} from "@cossplay/ui/components/progress"
-import { Switch } from "@cossplay/ui/components/switch"
 import { cn } from "@cossplay/ui/lib/utils"
-import { CheckIcon, InfoIcon, MoonIcon, SunIcon } from "lucide-react"
 import { type CSSProperties, useEffect, useMemo, useState } from "react"
 
-// Brand-named presets stay out of the marketing page.
+// Brand-named presets stay off the marketing page.
+const brands = new Set(["t3-chat", "twitter", "supabase", "vercel", "claude"])
+const featured = ["default", "modern-minimal", "mono"]
 const shown = [
-  "default",
-  "modern-minimal",
-  "doom-64",
-  "catppuccin",
-  "kodama-grove",
-  "neo-brutalism",
-  "vintage-paper",
-  "cosmic-night",
-  "bubblegum",
-  "ocean-breeze",
+  ...featured,
+  ...Object.keys(presets).filter(
+    (id) => !brands.has(id) && !featured.includes(id)
+  ),
 ]
-const label = (id: string) =>
+
+export const presetLabel = (id: string) =>
   id === "default" ? "coss ui" : (presets[id]?.label ?? id)
 
 const loadedFonts = new Set<string>()
-/** Loads a preset's Google font for the demo; system and Geist stacks need nothing. */
+
+/** Loads a preset's Google font. Geist is already on the page. */
 function loadFont(stack: string | undefined) {
   const family = stack?.split(",")[0].replaceAll(/['"]/g, "").trim()
-  if (!family || /^(Geist|ui-|system-ui|Courier New)/.test(family)) return
+  if (!family || /^(Geist|ui-|system-ui|Courier New|Georgia)/.test(family))
+    return
   if (loadedFonts.has(family)) return
   loadedFonts.add(family)
   const link = document.createElement("link")
@@ -62,112 +36,154 @@ function loadFont(stack: string | undefined) {
   document.head.append(link)
 }
 
-/** coss ui components re-themed in place by a preset, as the editor and extension do. */
-export function ThemeDemo() {
-  const [id, setId] = useState("modern-minimal")
-  const [dark, setDark] = useState(false)
-  const mode = dark ? "dark" : "light"
+/** The page ships Geist Variable; preset stacks say "Geist". */
+function hosted(stack: string) {
+  const named = stack
+    .replaceAll("Geist Mono Variable", "\u0000")
+    .replaceAll("Geist Variable", "\u0001")
+    .replaceAll("Geist Mono", "\u0000")
+    .replaceAll("Geist", "\u0001")
+    .replaceAll("\u0000", "Geist Mono Variable")
+    .replaceAll("\u0001", "Geist Variable")
+  // coss's own sans token is the generic Tailwind stack. The site draws that as Geist.
+  if (named.replaceAll('"', "").startsWith("ui-sans-serif"))
+    return '"Geist Variable", ui-sans-serif, system-ui, sans-serif'
+  return named
+}
+
+const dotTokens = ["primary", "secondary", "accent"] as const
+
+function swatches(id: string) {
+  const light = effective(defaults, presetOverrides(id)).light
+  return dotTokens.map((token) => ({ token, color: light[token] }))
+}
+
+/** Preset variables for the whole landing, not a nested preview. */
+export function useLandingTheme(initial = "default") {
+  const [id, setId] = useState(initial)
   const style = useMemo(() => {
     const overrides = presetOverrides(id)
     const theme = effective(defaults, overrides)
-    const vars = variables(theme[mode], overrides[mode])
+    const vars = variables(theme.light, overrides.light)
+    for (const key of ["font-sans", "font-serif", "font-mono"] as const) {
+      if (vars[key]) vars[key] = hosted(vars[key])
+    }
     return Object.fromEntries(
       Object.entries(vars).map(([key, value]) => [`--${key}`, value])
     ) as CSSProperties
-  }, [id, mode])
-  useEffect(() => loadFont(presetOverrides(id).light["font-sans"]), [id])
+  }, [id])
+  useEffect(() => {
+    const light = presetOverrides(id).light
+    loadFont(light["font-sans"])
+    loadFont(light["font-serif"])
+  }, [id])
+  return { id, setId, style }
+}
 
+function Chip({
+  preset,
+  selected,
+  onSelect,
+  tabIndex,
+}: {
+  preset: string
+  selected: boolean
+  onSelect: (id: string) => void
+  tabIndex?: number
+}) {
   return (
-    <div className="overflow-hidden rounded-2xl border bg-card shadow-xl/5">
-      <div className="flex flex-wrap items-center gap-1.5 border-b bg-muted/50 p-2">
-        {shown.map((preset) => (
-          <Button
-            key={preset}
-            size="xs"
-            variant={preset === id ? "default" : "ghost"}
-            aria-pressed={preset === id}
-            onClick={() => setId(preset)}
-          >
-            {label(preset)}
-          </Button>
+    <button
+      type="button"
+      tabIndex={tabIndex}
+      aria-pressed={selected}
+      className={cn(
+        "inline-flex shrink-0 items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-foreground text-sm shadow-xs",
+        selected && "border-primary bg-primary/8"
+      )}
+      onClick={() => onSelect(preset)}
+    >
+      <span className="flex items-center gap-1" aria-hidden>
+        {swatches(preset).map((dot) => (
+          <span
+            key={dot.token}
+            className="size-2.5 rounded-full ring-1 ring-foreground/15"
+            style={{ backgroundColor: dot.color }}
+          />
         ))}
-        <Button
-          size="icon-xs"
-          variant="outline"
-          className="ml-auto"
-          aria-label={dark ? "Light mode" : "Dark mode"}
-          onClick={() => setDark(!dark)}
-        >
-          {dark ? <SunIcon /> : <MoonIcon />}
-        </Button>
-      </div>
-      <div className={cn(dark && "dark")}>
-        <div
-          style={{ ...style, fontFamily: "var(--font-sans)" }}
-          className="grid gap-4 bg-background p-4 text-foreground transition-colors sm:grid-cols-2 sm:p-6"
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Create an account</CardTitle>
-              <CardDescription>Start your 14-day trial.</CardDescription>
-            </CardHeader>
-            <CardPanel className="flex flex-col gap-3">
-              <Field>
-                <FieldLabel>Email</FieldLabel>
-                <Input
-                  type="email"
-                  placeholder="you@example.com"
-                  aria-label="Demo email"
+      </span>
+      {presetLabel(preset)}
+    </button>
+  )
+}
+
+const marqueeRows = 3
+const rows = Array.from({ length: marqueeRows }, (_, row) =>
+  shown.filter((_, index) => index % marqueeRows === row)
+)
+
+function MarqueeRow({
+  presets,
+  reverse,
+  selected,
+  onSelect,
+}: {
+  presets: string[]
+  reverse: boolean
+  selected: string
+  onSelect: (id: string) => void
+}) {
+  return (
+    <div className="overflow-hidden motion-reduce:overflow-x-auto">
+      <div
+        className={cn(
+          "flex w-max focus-within:[animation-play-state:paused] hover:[animation-play-state:paused]",
+          reverse
+            ? "motion-safe:animate-marquee-reverse"
+            : "motion-safe:animate-marquee"
+        )}
+      >
+        {[0, 1].map((copy) => (
+          <div
+            key={copy}
+            className="flex"
+            aria-hidden={copy === 1 ? true : undefined}
+          >
+            {presets.map((preset) => (
+              <div key={preset} className="pr-2">
+                <Chip
+                  preset={preset}
+                  selected={preset === selected}
+                  onSelect={onSelect}
+                  tabIndex={copy === 1 ? -1 : undefined}
                 />
-              </Field>
-              <Label className="font-normal">
-                <Switch defaultChecked />
-                Send me product updates
-              </Label>
-              <div className="flex gap-2">
-                <Button className="flex-1">Sign up</Button>
-                <Button variant="outline">Log in</Button>
               </div>
-            </CardPanel>
-          </Card>
-          <div className="flex flex-col gap-4">
-            <Card>
-              <CardHeader>
-                <CardDescription>Monthly revenue</CardDescription>
-                <CardTitle className="text-2xl">$48,210</CardTitle>
-              </CardHeader>
-              <CardPanel className="flex flex-col gap-3">
-                <div className="flex flex-wrap gap-1.5">
-                  <Badge variant="success">+12.4%</Badge>
-                  <Badge variant="info">Q3</Badge>
-                  <Badge variant="warning">2 pending</Badge>
-                  <Badge variant="secondary">USD</Badge>
-                </div>
-                <Progress value={68} aria-label="Demo goal">
-                  <ProgressTrack>
-                    <ProgressIndicator />
-                  </ProgressTrack>
-                </Progress>
-                <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                  <Avatar className="size-6">
-                    <AvatarFallback className="text-xs">AK</AvatarFallback>
-                  </Avatar>
-                  68% of the quarter's goal
-                </div>
-              </CardPanel>
-            </Card>
-            <Alert variant="info">
-              <InfoIcon />
-              <AlertTitle>Deploy finished</AlertTitle>
-              <AlertDescription>
-                <span className="flex items-center gap-1">
-                  <CheckIcon className="size-3.5" /> All checks passed.
-                </span>
-              </AlertDescription>
-            </Alert>
+            ))}
           </div>
-        </div>
+        ))}
       </div>
+    </div>
+  )
+}
+
+/** Three fading rows that scroll in alternate directions. Clicking a chip rethemes the page. */
+export function ThemeChips({
+  id,
+  onSelect,
+}: {
+  id: string
+  onSelect: (id: string) => void
+}) {
+  return (
+    <div className="mt-12 flex flex-col gap-2 overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,#000_4rem,#000_calc(100%-4rem),transparent)]">
+      {rows.map((presets, row) => (
+        <MarqueeRow
+          key={presets[0]}
+          presets={presets}
+          reverse={row % 2 === 1}
+          selected={id}
+          onSelect={onSelect}
+        />
+      ))}
     </div>
   )
 }

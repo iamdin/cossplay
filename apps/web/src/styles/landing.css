@@ -2,3 +2,17 @@
 
 @source "../routes";
 @source "../landing";
+
+@theme {
+  --animate-marquee: landing-marquee 42s linear infinite;
+  --animate-marquee-reverse: landing-marquee 42s linear infinite reverse;
+
+  @keyframes landing-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
