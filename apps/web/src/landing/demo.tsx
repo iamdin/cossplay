@@ -80,7 +80,92 @@ export function useLandingTheme(initial = "default") {
   return { id, setId, style }
 }
 
-/** One fading row of preset chips. Clicking one rethemes the page. */
+function Chip({
+  preset,
+  selected,
+  onSelect,
+  tabIndex,
+}: {
+  preset: string
+  selected: boolean
+  onSelect: (id: string) => void
+  tabIndex?: number
+}) {
+  return (
+    <button
+      type="button"
+      tabIndex={tabIndex}
+      aria-pressed={selected}
+      className={cn(
+        "inline-flex shrink-0 items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-foreground text-sm shadow-xs",
+        selected && "border-primary bg-primary/8"
+      )}
+      onClick={() => onSelect(preset)}
+    >
+      <span className="flex items-center gap-1" aria-hidden>
+        {swatches(preset).map((dot) => (
+          <span
+            key={dot.token}
+            className="size-2.5 rounded-full ring-1 ring-foreground/15"
+            style={{ backgroundColor: dot.color }}
+          />
+        ))}
+      </span>
+      {presetLabel(preset)}
+    </button>
+  )
+}
+
+const marqueeRows = 3
+const rows = Array.from({ length: marqueeRows }, (_, row) =>
+  shown.filter((_, index) => index % marqueeRows === row)
+)
+
+function MarqueeRow({
+  presets,
+  reverse,
+  selected,
+  onSelect,
+}: {
+  presets: string[]
+  reverse: boolean
+  selected: string
+  onSelect: (id: string) => void
+}) {
+  return (
+    <div className="overflow-hidden motion-reduce:overflow-x-auto">
+      <div
+        className={cn(
+          "flex w-max focus-within:[animation-play-state:paused] hover:[animation-play-state:paused]",
+          reverse
+            ? "motion-safe:animate-marquee-reverse"
+            : "motion-safe:animate-marquee"
+        )}
+      >
+        {[0, 1].map((copy) => (
+          <div
+            key={copy}
+            className="flex"
+            aria-hidden={copy === 1 ? true : undefined}
+          >
+            {presets.map((preset) => (
+              <div key={preset} className="pr-2">
+                <Chip
+                  preset={preset}
+                  selected={preset === selected}
+                  onSelect={onSelect}
+                  tabIndex={copy === 1 ? -1 : undefined}
+                />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** Three fading rows that scroll in alternate directions. Clicking a chip rethemes the page. */
 export function ThemeChips({
   id,
   onSelect,
@@ -89,38 +174,16 @@ export function ThemeChips({
   onSelect: (id: string) => void
 }) {
   return (
-    <div className="mt-12">
-      <div className="flex flex-nowrap items-center gap-2 overflow-x-auto px-4 py-1 [mask-image:linear-gradient(to_right,transparent,#000_4rem,#000_calc(100%-4rem),transparent)] [scrollbar-width:none] sm:px-6 [&::-webkit-scrollbar]:hidden">
-        {shown.map((preset) => (
-          <button
-            key={preset}
-            type="button"
-            aria-pressed={preset === id}
-            className={cn(
-              "inline-flex shrink-0 items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-foreground text-sm shadow-xs",
-              preset === id && "border-primary bg-primary/8"
-            )}
-            onClick={(event) => {
-              onSelect(preset)
-              event.currentTarget.scrollIntoView({
-                block: "nearest",
-                inline: "center",
-              })
-            }}
-          >
-            <span className="flex items-center gap-1" aria-hidden>
-              {swatches(preset).map((dot) => (
-                <span
-                  key={dot.token}
-                  className="size-2.5 rounded-full ring-1 ring-foreground/15"
-                  style={{ backgroundColor: dot.color }}
-                />
-              ))}
-            </span>
-            {presetLabel(preset)}
-          </button>
-        ))}
-      </div>
+    <div className="mt-12 flex flex-col gap-2 overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,#000_4rem,#000_calc(100%-4rem),transparent)]">
+      {rows.map((presets, row) => (
+        <MarqueeRow
+          key={presets[0]}
+          presets={presets}
+          reverse={row % 2 === 1}
+          selected={id}
+          onSelect={onSelect}
+        />
+      ))}
     </div>
   )
 }

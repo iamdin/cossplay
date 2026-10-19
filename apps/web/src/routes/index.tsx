@@ -1,5 +1,11 @@
 import { Badge } from "@cossplay/ui/components/badge"
 import { Button } from "@cossplay/ui/components/button"
+import {
+  Dialog,
+  DialogPopup,
+  DialogTitle,
+  DialogTrigger,
+} from "@cossplay/ui/components/dialog"
 import { createFileRoute } from "@tanstack/react-router"
 import {
   ArrowRightIcon,
@@ -220,6 +226,63 @@ function CliCommand() {
 
 const checks = ["No account", "In your browser", "Export to Tailwind"]
 
+const shots = [
+  {
+    src: "/editor.webp",
+    caption: "Editor",
+    alt: "Cossplay editor themed with the Mono preset; the color panel is on the left and the component gallery is on the right",
+  },
+  {
+    src: "/screenshot.webp",
+    caption: "Chrome extension",
+    alt: "coss.com/ui themed with the Mono preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open",
+  },
+]
+
+function Screenshot({
+  src,
+  alt,
+  caption,
+}: {
+  src: string
+  alt: string
+  caption: string
+}) {
+  return (
+    <figure className="min-w-0">
+      <Dialog>
+        <DialogTrigger
+          aria-label={`View ${caption} larger`}
+          className="block w-full cursor-zoom-in"
+        >
+          <img
+            src={src}
+            width={1280}
+            height={800}
+            alt={alt}
+            className="w-full rounded-2xl border shadow-xl/5"
+            loading="lazy"
+          />
+        </DialogTrigger>
+        <DialogPopup
+          bottomStickOnMobile={false}
+          className="w-[min(72rem,calc(100vw-2rem))] max-w-none p-3"
+        >
+          <DialogTitle className="sr-only">{caption}</DialogTitle>
+          <img
+            src={src}
+            alt={alt}
+            className="mt-8 h-auto max-h-[85vh] w-full rounded-xl object-contain"
+          />
+        </DialogPopup>
+      </Dialog>
+      <figcaption className="mt-3 text-muted-foreground text-sm">
+        {caption}
+      </figcaption>
+    </figure>
+  )
+}
+
 function Landing() {
   const { id, setId, style } = useLandingTheme()
   return (
@@ -300,32 +363,9 @@ function Landing() {
               ))}
             </div>
             <div className="mt-10 grid items-start gap-4 lg:grid-cols-2">
-              <figure className="min-w-0">
-                <img
-                  src="/editor.webp"
-                  width="1280"
-                  height="800"
-                  alt="Cossplay editor themed with the Mono preset; the color panel is on the left and the component gallery is on the right"
-                  className="w-full rounded-2xl border shadow-xl/5"
-                  loading="lazy"
-                />
-                <figcaption className="mt-3 text-muted-foreground text-sm">
-                  Editor
-                </figcaption>
-              </figure>
-              <figure className="min-w-0">
-                <img
-                  src="/screenshot.webp"
-                  width="1280"
-                  height="800"
-                  alt="coss.com/ui themed with the Mono preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
-                  className="w-full rounded-2xl border shadow-xl/5"
-                  loading="lazy"
-                />
-                <figcaption className="mt-3 text-muted-foreground text-sm">
-                  Chrome extension
-                </figcaption>
-              </figure>
+              {shots.map((shot) => (
+                <Screenshot key={shot.src} {...shot} />
+              ))}
             </div>
           </Section>
 
