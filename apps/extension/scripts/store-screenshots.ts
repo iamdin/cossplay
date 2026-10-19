@@ -3,6 +3,7 @@
 // a real capture of the side panel at its docked width; as in e2e, only the docking is stood in
 // for (the panel's "active tab of its window" query returns the site's tab).
 // Run from apps/extension after `pnpm build`: node scripts/store-screenshots.ts
+// The landing editor shot (same Mono preset as screenshot 3): node scripts/store-screenshots.ts --editor [url]
 import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
@@ -12,6 +13,41 @@ const SITE = "https://coss.com/ui"
 const out = path.resolve(import.meta.dirname, "../../../docs/store")
 const ext = path.resolve(import.meta.dirname, "../dist")
 const [W, H, PANEL] = [1280, 800, 400]
+// Classic scrollbars take layout width and leave a gutter in the 1280px frame.
+const hideScrollbars =
+  "::-webkit-scrollbar{width:0!important;height:0!important}"
+// Label in tweakcn.json (id `mono`). Both landing shots use it.
+const landingPreset = "Mono"
+
+// Homepage pair: the extension shot is screenshot-3; this is the browser editor beside it.
+if (process.argv.includes("--editor")) {
+  const flag = process.argv.indexOf("--editor")
+  const url = process.argv[flag + 1]?.startsWith("http")
+    ? process.argv[flag + 1]
+    : "http://127.0.0.1:5173/editor"
+  const browser = await chromium.launch({
+    headless: true,
+    args: ["--no-sandbox"],
+  })
+  const page = await browser.newPage({ viewport: { width: W, height: H } })
+  await page.goto(url, { waitUntil: "networkidle" })
+  await page.addStyleTag({ content: hideScrollbars })
+  const trigger = page.getByRole("combobox", { name: "Theme preset" })
+  await trigger.waitFor()
+  await page.waitForFunction(
+    () => !document.querySelector('[aria-label="Theme preset"]:disabled')
+  )
+  await trigger.click()
+  await page.getByPlaceholder("Search presets…").fill(landingPreset)
+  await page.getByRole("option", { name: landingPreset, exact: true }).click()
+  await page.waitForTimeout(800)
+  await page.evaluate(() => document.fonts.ready)
+  await page.screenshot({
+    path: path.resolve(import.meta.dirname, "../../web/public/editor.png"),
+  })
+  await browser.close()
+  process.exit(0)
+}
 
 const ctx = await chromium.launchPersistentContext(
   fs.mkdtempSync(path.join(os.tmpdir(), "cossplay-store-")),
@@ -26,6 +62,7 @@ const extId = sw.url().split("/")[2]
 const site = await ctx.newPage()
 await site.setViewportSize({ width: W - PANEL - 1, height: H })
 await site.goto(SITE, { waitUntil: "networkidle" })
+await site.addStyleTag({ content: hideScrollbars })
 // Opened before the panel: a tab activated later would become the panel's target.
 const frame = await ctx.newPage()
 await frame.setViewportSize({ width: W, height: H })
@@ -39,6 +76,7 @@ await panel.addInitScript((url) => {
     )) as typeof chrome.tabs.query
 }, SITE)
 await panel.goto(`chrome-extension://${extId}/sidepanel.html`)
+await panel.addStyleTag({ content: hideScrollbars })
 const trigger = panel.getByRole("combobox", { name: "Theme preset" })
 await trigger.waitFor()
 await panel.waitForFunction(
@@ -59,7 +97,7 @@ async function shot(name: string) {
     panel.screenshot(),
   ])
   await frame.setContent(
-    `<body style="margin:0;display:flex;background:#d4d4d8;gap:1px"><img src="data:image/png;base64,${left.toString("base64")}"><img src="data:image/png;base64,${right.toString("base64")}"></body>`
+    `<body style="margin:0;display:flex;background:#d4d4d8;gap:1px;overflow:hidden"><img style="display:block" src="data:image/png;base64,${left.toString("base64")}"><img style="display:block" src="data:image/png;base64,${right.toString("base64")}"></body>`
   )
   await frame.screenshot({ path: path.join(out, `${name}.png`) })
 }
@@ -86,7 +124,7 @@ await panel.keyboard.press("Escape")
 
 // 3. Inspect: hover an element on the site to see and edit the tokens it uses.
 await panel.getByRole("button", { name: "Preview light" }).click()
-await preset("Ocean Breeze")
+await preset(landingPreset)
 await panel.getByRole("button", { name: "Inspect" }).click()
 await site.getByRole("link", { name: "Get started" }).hover()
 await site.locator("cossplay-inspector .card").waitFor()

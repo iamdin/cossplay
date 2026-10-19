@@ -289,14 +289,34 @@ function Landing() {
               </div>
             ))}
           </div>
-          <img
-            src="/screenshot.webp"
-            width="1280"
-            height="800"
-            alt="coss.com/ui themed with the Ocean Breeze preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
-            className="mt-10 w-full rounded-2xl border shadow-xl/5"
-            loading="lazy"
-          />
+          <div className="mt-10 grid items-start gap-4 lg:grid-cols-2">
+            <figure className="min-w-0">
+              <img
+                src="/editor.webp"
+                width="1280"
+                height="800"
+                alt="Cossplay editor themed with the Mono preset; the color panel is on the left and the component gallery is on the right"
+                className="w-full rounded-2xl border shadow-xl/5"
+                loading="lazy"
+              />
+              <figcaption className="mt-3 text-muted-foreground text-sm">
+                Editor
+              </figcaption>
+            </figure>
+            <figure className="min-w-0">
+              <img
+                src="/screenshot.webp"
+                width="1280"
+                height="800"
+                alt="coss.com/ui themed with the Mono preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
+                className="w-full rounded-2xl border shadow-xl/5"
+                loading="lazy"
+              />
+              <figcaption className="mt-3 text-muted-foreground text-sm">
+                Chrome extension
+              </figcaption>
+            </figure>
+          </div>
         </Section>
 
         <Section
