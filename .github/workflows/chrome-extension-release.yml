@@ -56,8 +56,18 @@ jobs:
 
       - name: Package extension
         run: |
-          cd apps/extension/dist
-          zip -r ../cossplay-${RELEASE_TAG}.zip .
+          python3 - <<'PY'
+          import os
+          import zipfile
+
+          root = "apps/extension/dist"
+          output = f"apps/extension/cossplay-{os.environ['RELEASE_TAG']}.zip"
+          with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+              for dirpath, _dirnames, filenames in os.walk(root):
+                  for filename in filenames:
+                      path = os.path.join(dirpath, filename)
+                      archive.write(path, os.path.relpath(path, root).replace(os.sep, "/"))
+          PY
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
