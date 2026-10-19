@@ -3,7 +3,7 @@
 // a real capture of the side panel at its docked width; as in e2e, only the docking is stood in
 // for (the panel's "active tab of its window" query returns the site's tab).
 // Run from apps/extension after `pnpm build`: node scripts/store-screenshots.ts
-// The landing editor shot (same Catppuccin preset as screenshot 3): node scripts/store-screenshots.ts --editor [url]
+// The landing editor shot (same Mono preset as screenshot 3): node scripts/store-screenshots.ts --editor [url]
 import fs from "node:fs"
 import os from "node:os"
 import path from "node:path"
@@ -16,6 +16,8 @@ const [W, H, PANEL] = [1280, 800, 400]
 // Classic scrollbars take layout width and leave a gutter in the 1280px frame.
 const hideScrollbars =
   "::-webkit-scrollbar{width:0!important;height:0!important}"
+// Label in tweakcn.json (id `mono`). Both landing shots use it.
+const landingPreset = "Mono"
 
 // Homepage pair: the extension shot is screenshot-3; this is the browser editor beside it.
 if (process.argv.includes("--editor")) {
@@ -36,8 +38,8 @@ if (process.argv.includes("--editor")) {
     () => !document.querySelector('[aria-label="Theme preset"]:disabled')
   )
   await trigger.click()
-  await page.getByPlaceholder("Search presets…").fill("Catppuccin")
-  await page.getByRole("option", { name: "Catppuccin", exact: true }).click()
+  await page.getByPlaceholder("Search presets…").fill(landingPreset)
+  await page.getByRole("option", { name: landingPreset, exact: true }).click()
   await page.waitForTimeout(800)
   await page.evaluate(() => document.fonts.ready)
   await page.screenshot({
@@ -122,7 +124,7 @@ await panel.keyboard.press("Escape")
 
 // 3. Inspect: hover an element on the site to see and edit the tokens it uses.
 await panel.getByRole("button", { name: "Preview light" }).click()
-await preset("Catppuccin")
+await preset(landingPreset)
 await panel.getByRole("button", { name: "Inspect" }).click()
 await site.getByRole("link", { name: "Get started" }).hover()
 await site.locator("cossplay-inspector .card").waitFor()

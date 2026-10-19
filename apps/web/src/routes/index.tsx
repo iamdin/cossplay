@@ -295,7 +295,7 @@ function Landing() {
                 src="/editor.webp"
                 width="1280"
                 height="800"
-                alt="Cossplay editor themed with the Catppuccin preset; the color panel is on the left and the component gallery is on the right"
+                alt="Cossplay editor themed with the Mono preset; the color panel is on the left and the component gallery is on the right"
                 className="w-full rounded-2xl border shadow-xl/5"
                 loading="lazy"
               />
@@ -308,7 +308,7 @@ function Landing() {
                 src="/screenshot.webp"
                 width="1280"
                 height="800"
-                alt="coss.com/ui themed with the Catppuccin preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
+                alt="coss.com/ui themed with the Mono preset; the inspector shows the tokens of the Get started button, and the Cossplay side panel has Primary's channel sliders open"
                 className="w-full rounded-2xl border shadow-xl/5"
                 loading="lazy"
               />
