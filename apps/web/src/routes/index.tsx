@@ -325,6 +325,7 @@ function Landing() {
               Open the editor
               <ArrowRightIcon />
             </Button>
+            <AddToChrome />
             <Button size="lg" variant="outline" render={<a href="#ship" />}>
               Install a preset
             </Button>
