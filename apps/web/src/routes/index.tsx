@@ -313,12 +313,12 @@ function Landing() {
       <main>
         <section className="mx-auto max-w-3xl px-4 pt-16 text-center sm:pt-24">
           <h1 className="text-balance font-semibold text-5xl tracking-tight sm:text-6xl lg:text-7xl">
-            Theme your coss ui app,{" "}
-            <span className="font-serif text-primary italic">live.</span>
+            Design your{" "}
+            <span className="font-serif text-primary italic">coss ui</span>{" "}
+            theme.
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-pretty text-lg text-muted-foreground">
-            Tune colors, type and radius on real components, then take the theme
-            with you.
+            Colors, type, and radius on a live preview. No account.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button size="lg" render={<a href="/editor" />}>
