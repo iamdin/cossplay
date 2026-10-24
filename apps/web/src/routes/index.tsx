@@ -53,11 +53,11 @@ export const Route = createFileRoute("/")({
   component: Landing,
 })
 
-/** Set once the Chrome Web Store listing is live. */
-const chromeStoreUrl = ""
+const chromeStoreUrl =
+  "https://chromewebstore.google.com/detail/odlgjkdboieignihoolihlebjhmjemlp"
 
 function AddToChrome() {
-  return chromeStoreUrl ? (
+  return (
     <Button
       size="lg"
       variant="outline"
@@ -65,11 +65,6 @@ function AddToChrome() {
     >
       <ChromeIcon />
       Add to Chrome
-    </Button>
-  ) : (
-    <Button size="lg" variant="outline" disabled>
-      <ChromeIcon />
-      Chrome extension · in review
     </Button>
   )
 }
@@ -120,9 +115,14 @@ const ways = [
     title: "On any coss ui site",
     body: "The Chrome extension docks in the side panel and edits the theme of the page you're on, localhost or production, and remembers it per site.",
     action: (
-      <span className="font-medium text-muted-foreground text-sm">
-        Chrome Web Store listing in review
-      </span>
+      <a
+        href={chromeStoreUrl}
+        target="_blank"
+        rel="noreferrer"
+        className="inline-flex items-center gap-1 font-medium text-sm hover:underline"
+      >
+        Add to Chrome <ArrowRightIcon className="size-4" />
+      </a>
     ),
   },
   {
@@ -325,6 +325,7 @@ function Landing() {
               Open the editor
               <ArrowRightIcon />
             </Button>
+            <AddToChrome />
             <Button size="lg" variant="outline" render={<a href="#ship" />}>
               Install a preset
             </Button>

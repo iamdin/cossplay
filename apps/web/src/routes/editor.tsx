@@ -139,7 +139,7 @@ function Editor() {
             Cossplay
           </a>
           <a
-            href="/#how"
+            href="/#ways"
             className="text-muted-foreground text-sm hover:text-foreground"
           >
             Chrome extension
