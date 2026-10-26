@@ -224,7 +224,11 @@ function CliCommand() {
   )
 }
 
-const checks = ["No account", "In your browser", "Export to Tailwind"]
+const checks = [
+  "No account required",
+  "Nothing to install",
+  "Export to Tailwind v4",
+]
 
 const shots = [
   {

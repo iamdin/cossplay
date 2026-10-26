@@ -500,3 +500,76 @@ export function presetRegistry() {
     },
   }
 }
+
+function toBase64(str: string): string {
+  const bytes = new TextEncoder().encode(str)
+  let binary = ""
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return btoa(binary)
+}
+
+function fromBase64(b64: string): string {
+  const binary = atob(b64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i)
+  }
+  return new TextDecoder().decode(bytes)
+}
+
+/** Encodes theme overrides and optional presetId into a URL-safe Base64 string. */
+export function encodeThemeHash(overrides: Overrides, themeId = ""): string {
+  const light = Object.fromEntries(
+    Object.entries(overrides.light ?? {}).filter(
+      ([, v]) => v != null && v !== ""
+    )
+  )
+  const dark = Object.fromEntries(
+    Object.entries(overrides.dark ?? {}).filter(
+      ([, v]) => v != null && v !== ""
+    )
+  )
+  const payload: Record<string, unknown> = {}
+  if (themeId) payload.t = themeId
+  if (Object.keys(light).length) payload.l = light
+  if (Object.keys(dark).length) payload.d = dark
+
+  const jsonStr = JSON.stringify(payload)
+  return toBase64(jsonStr)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "")
+}
+
+/** Decodes a theme hash string back into { overrides, themeId }. */
+export function decodeThemeHash(
+  raw: string
+): { overrides: Overrides; themeId: string } | null {
+  try {
+    const clean = raw
+      .replace(/^#?theme=/, "")
+      .replace(/^#/, "")
+      .trim()
+    if (!clean) return null
+    let base64 = clean.replace(/-/g, "+").replace(/_/g, "/")
+    while (base64.length % 4) base64 += "="
+    const jsonStr = fromBase64(base64)
+    const data = JSON.parse(jsonStr)
+    if (!data || typeof data !== "object") return null
+
+    const themeId = String(data.t ?? data.themeId ?? "")
+    const rawLight = data.l ?? data.overrides?.light ?? {}
+    const rawDark = data.d ?? data.overrides?.dark ?? {}
+
+    const base = themeId ? presetOverrides(themeId) : emptyOverrides()
+    const overrides: Overrides = {
+      light: { ...base.light, ...readTokens(rawLight) },
+      dark: { ...base.dark, ...readTokens(rawDark) },
+    }
+    return { overrides, themeId }
+  } catch {
+    return null
+  }
+}

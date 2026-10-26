@@ -1,5 +1,6 @@
 import {
   createStore,
+  decodeThemeHash,
   effective,
   fontsKey,
   type KeyValue,
@@ -9,7 +10,7 @@ import {
   siteKey,
   variables,
 } from "@cossplay/core/coss"
-import { setHost, usePanelStore } from "@cossplay/editor/store"
+import { applyOverrides, setHost, usePanelStore } from "@cossplay/editor/store"
 import { editorBaseline, installedStack } from "@/fonts"
 
 // The editor keeps one theme, under its own origin, in localStorage.
@@ -86,6 +87,16 @@ export function connect() {
   const unsubscribe = usePanelStore.subscribe(apply)
   document.head.append(style)
 
+  const syncHash = () => {
+    if (location.hash.includes("theme=")) {
+      const decoded = decodeThemeHash(location.hash)
+      if (decoded) {
+        applyOverrides(decoded.overrides, decoded.themeId)
+        usePanelStore.setState({ status: "Loaded shared theme" })
+      }
+    }
+  }
+
   let active = true
   Promise.all([stored(origin), kv.getItem(fontsKey(origin))]).then(
     ([site, fonts]) => {
@@ -108,11 +119,17 @@ export function connect() {
         mode: site.previewMode ?? "light",
         status: "Saved locally",
       })
+      syncHash()
     }
   )
+
+  const onHashChange = () => syncHash()
+  window.addEventListener("hashchange", onHashChange)
+
   return () => {
     active = false
     unsubscribe()
+    window.removeEventListener("hashchange", onHashChange)
     style.remove()
   }
 }
