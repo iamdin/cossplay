@@ -59,3 +59,7 @@ pnpm + Turborepo monorepo:
 ## Credits
 
 Presets, defaults and the theme data shape come from [tweakcn](https://github.com/jnsahaj/tweakcn) (Apache-2.0, see `licenses/tweakcn.txt`). Not affiliated with coss, tweakcn or shadcn/ui.
+
+## License
+
+[Apache-2.0](LICENSE)
