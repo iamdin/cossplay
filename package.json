@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12.0"
   },
   "packageManager": "pnpm@10.8.0",
   "scripts": {
@@ -14,18 +14,20 @@
     "check:type": "turbo run check:type",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
-    "format": "biome check --linter-enabled=false",
-    "format:fix": "biome check --linter-enabled=false --write",
-    "lint": "biome lint",
-    "lint:fix": "biome lint --write",
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt --write",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "lint:workspace": "pnpm dlx sherif@latest",
     "bump": "bumpp"
   },
   "devDependencies": {
-    "@biomejs/biome": "catalog:",
     "bumpp": "^10.4.0",
     "lint-staged": "^16.1.0",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
     "simple-git-hooks": "^2.13.0",
+    "tsrs": "catalog:",
     "turbo": "^2.5.0",
     "typescript": "catalog:"
   },
@@ -33,8 +35,10 @@
     "pre-commit": "pnpm lint-staged"
   },
   "lint-staged": {
-    "*": [
-      "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
-    ]
+    "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}": [
+      "oxlint --fix --no-error-on-unmatched-pattern",
+      "oxfmt --write --no-error-on-unmatched-pattern"
+    ],
+    "*.{json,jsonc,json5,css,scss,less,html,yml,yaml,md,mdx}": "oxfmt --write --no-error-on-unmatched-pattern"
   }
 }

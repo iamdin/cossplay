@@ -51,9 +51,13 @@ From the repository root:
 
 - `pnpm dev`: CRXJS dev mode with HMR for the extension, plus the web dev server
 - `pnpm build`: build the extension into `apps/extension/dist` and the website into `apps/web/dist/client`
-- `pnpm check:type`, `pnpm format`, `pnpm lint` (append `:fix` to fix)
+- `pnpm check:type`: TSRS type checking across all five workspaces
+- `pnpm format`, `pnpm lint`: Oxfmt and Oxlint (append `:fix` to fix)
+- `pnpm lint:workspace`: Sherif workspace-integrity checks, separate from source linting
 - `pnpm test`: core unit tests
 - `pnpm test:e2e`: build, then run the Playwright tests
+
+Use Node.js **22.12.0 or newer** and the pinned pnpm version. Pre-commit runs Oxlint fixes and Oxfmt on staged files. Existing CI format, lint and type-check steps call these root scripts. See [tooling and compatibility](docs/tooling.md) for versions, editor setup and migration limitations.
 
 ## Layout
 

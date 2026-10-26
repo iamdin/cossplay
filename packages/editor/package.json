@@ -10,7 +10,7 @@
     "./panel.css": "./src/panel.css"
   },
   "scripts": {
-    "check:type": "tsc"
+    "check:type": "tsrs --noEmit"
   },
   "dependencies": {
     "@cossplay/core": "workspace:*",
@@ -26,6 +26,7 @@
     "@types/react-dom": "catalog:react19",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
+    "tsrs": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {
