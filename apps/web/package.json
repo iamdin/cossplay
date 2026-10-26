@@ -6,7 +6,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "check:type": "tsc"
+    "check:type": "tsrs --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
@@ -27,6 +27,7 @@
     "@types/react-dom": "catalog:react19",
     "@vitejs/plugin-react": "^5.1.1",
     "tailwindcss": "catalog:",
+    "tsrs": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

@@ -147,7 +147,7 @@ function Swatches({ colors }: { colors: string[] }) {
     <span className="flex shrink-0 gap-0.5">
       {colors.map((color, i) => (
         <span
-          // biome-ignore lint/suspicious/noArrayIndexKey: fixed token order
+          // oxlint-disable-next-line react/no-array-index-key -- fixed token order
           key={i}
           className="size-3 rounded-sm border border-black/10"
           style={{ background: color }}
@@ -347,7 +347,7 @@ export function PanelAlerts() {
       {error && (
         <div
           role="alert"
-          className="relative mx-2 my-2 border border-destructive/30 bg-destructive/5 py-2.5 pr-7 pl-3 text-[11px] text-destructive [overflow-wrap:anywhere]"
+          className="relative mx-2 my-2 border border-destructive/30 bg-destructive/5 py-2.5 pr-7 pl-3 text-[11px] [overflow-wrap:anywhere] text-destructive"
         >
           {error}
           <button
@@ -538,7 +538,7 @@ export function PanelSections() {
             tweakcn. Custom fonts need to be installed or loaded.
           </p>
           <section className="mb-2 border bg-card p-2">
-            <h2 className="pb-3 font-semibold text-xs">Font family</h2>
+            <h2 className="pb-3 text-xs font-semibold">Font family</h2>
             {fontTokens.map((token) => (
               <FontControl
                 key={token}
@@ -550,7 +550,7 @@ export function PanelSections() {
             ))}
           </section>
           <section className="mb-2 border bg-card p-2">
-            <h2 className="pb-3 font-semibold text-xs">Letter spacing</h2>
+            <h2 className="pb-3 text-xs font-semibold">Letter spacing</h2>
             <NumericControl
               token="letter-spacing"
               value={styles["letter-spacing"]}
@@ -628,7 +628,7 @@ export function PanelSections() {
             ))}
           </Section>
           <section className="mb-2 border bg-card p-2">
-            <h2 className="pb-3 font-semibold text-xs">Radius & spacing</h2>
+            <h2 className="pb-3 text-xs font-semibold">Radius & spacing</h2>
             {(["radius", "spacing"] as const).map((token) => (
               <NumericControl
                 key={token}
@@ -744,7 +744,7 @@ export function Panel({ liveSite = false }: { liveSite?: boolean }) {
   const status = usePanelStore((s) => s.status)
   useUndoShortcuts()
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-background text-foreground text-xs">
+    <div className="flex h-full flex-col overflow-hidden bg-background text-xs text-foreground">
       <div className="shrink-0 border-b px-2 py-1.5">
         <div className="flex items-center gap-1">
           <PresetSelect />

@@ -84,11 +84,11 @@ function Section({
 }) {
   return (
     <section id={id} className="scroll-mt-20 py-16 sm:py-24">
-      <p className="font-medium text-muted-foreground text-sm">{eyebrow}</p>
-      <h2 className="mt-2 max-w-2xl text-balance font-semibold text-3xl tracking-tight sm:text-4xl">
+      <p className="text-sm font-medium text-muted-foreground">{eyebrow}</p>
+      <h2 className="mt-2 max-w-2xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
         {title}
       </h2>
-      <p className="mt-4 max-w-2xl text-pretty text-lg text-muted-foreground">
+      <p className="mt-4 max-w-2xl text-lg text-pretty text-muted-foreground">
         {lede}
       </p>
       <div className="mt-12">{children}</div>
@@ -104,7 +104,7 @@ const ways = [
     action: (
       <a
         href="/editor"
-        className="inline-flex items-center gap-1 font-medium text-sm hover:underline"
+        className="inline-flex items-center gap-1 text-sm font-medium hover:underline"
       >
         Open the editor <ArrowRightIcon className="size-4" />
       </a>
@@ -119,7 +119,7 @@ const ways = [
         href={chromeStoreUrl}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex items-center gap-1 font-medium text-sm hover:underline"
+        className="inline-flex items-center gap-1 text-sm font-medium hover:underline"
       >
         Add to Chrome <ArrowRightIcon className="size-4" />
       </a>
@@ -276,7 +276,7 @@ function Screenshot({
           />
         </DialogPopup>
       </Dialog>
-      <figcaption className="mt-3 text-muted-foreground text-sm">
+      <figcaption className="mt-3 text-sm text-muted-foreground">
         {caption}
       </figcaption>
     </figure>
@@ -293,7 +293,7 @@ function Landing() {
       <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
         <nav className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
           <Logo />
-          <div className="hidden items-center gap-5 text-muted-foreground text-sm sm:flex">
+          <div className="hidden items-center gap-5 text-sm text-muted-foreground sm:flex">
             <a href="#ways" className="hover:text-foreground">
               How to use
             </a>
@@ -312,11 +312,11 @@ function Landing() {
 
       <main>
         <section className="mx-auto max-w-3xl px-4 pt-16 text-center sm:pt-24">
-          <h1 className="text-balance font-semibold text-5xl tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 className="text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
             Theme your coss ui app,{" "}
             <span className="font-serif text-primary italic">live.</span>
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-pretty text-lg text-muted-foreground">
+          <p className="mx-auto mt-5 max-w-xl text-lg text-pretty text-muted-foreground">
             Tune colors, type and radius on real components, then take the theme
             with you.
           </p>
@@ -330,7 +330,7 @@ function Landing() {
               Install a preset
             </Button>
           </div>
-          <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-muted-foreground text-sm">
+          <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
             {checks.map((check) => (
               <li key={check} className="inline-flex items-center gap-1.5">
                 <CheckIcon className="size-3.5" />
@@ -341,7 +341,7 @@ function Landing() {
         </section>
         <ThemeChips id={id} onSelect={setId} />
 
-        <div className="mx-auto min-w-0 max-w-6xl px-4 sm:px-6">
+        <div className="mx-auto max-w-6xl min-w-0 px-4 sm:px-6">
           <Section
             id="ways"
             eyebrow="How to use"
@@ -356,7 +356,7 @@ function Landing() {
                 >
                   <way.icon className="size-5 text-muted-foreground" />
                   <h3 className="font-semibold">{way.title}</h3>
-                  <p className="flex-1 text-muted-foreground text-sm">
+                  <p className="flex-1 text-sm text-muted-foreground">
                     {way.body}
                   </p>
                   <div>{way.action}</div>
@@ -381,7 +381,7 @@ function Landing() {
                 <div key={feature.title} className="bg-card p-6">
                   <feature.icon className="size-5 text-muted-foreground" />
                   <h3 className="mt-4 font-semibold">{feature.title}</h3>
-                  <p className="mt-2 text-muted-foreground text-sm">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {feature.body}
                   </p>
                 </div>
@@ -398,7 +398,7 @@ function Landing() {
             <div className="grid gap-8 lg:grid-cols-2">
               <div className="flex min-w-0 flex-col gap-3">
                 <CliCommand />
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sm text-muted-foreground">
                   Edited a theme? Copy or download it from Export instead.
                 </p>
               </div>
@@ -429,7 +429,7 @@ function Landing() {
           </Section>
 
           <div className="mb-20 rounded-3xl border bg-muted/50 px-6 py-16 text-center">
-            <h2 className="text-balance font-semibold text-3xl tracking-tight">
+            <h2 className="text-3xl font-semibold tracking-tight text-balance">
               Let your coss ui app play dress-up.
             </h2>
             <p className="mt-3 text-muted-foreground">

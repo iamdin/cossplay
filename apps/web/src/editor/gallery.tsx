@@ -57,7 +57,7 @@ export function ParticleGallery({ category }: { category: string }) {
           key={name}
           className="flex min-h-48 min-w-0 flex-col rounded-xl border bg-card"
         >
-          <figcaption className="border-b px-4 py-2 font-mono text-muted-foreground text-xs">
+          <figcaption className="border-b px-4 py-2 font-mono text-xs text-muted-foreground">
             {name}
           </figcaption>
           <div className="flex flex-1 items-center justify-center overflow-x-auto p-6">
@@ -72,15 +72,15 @@ export function ParticleGallery({ category }: { category: string }) {
 export function Typography() {
   return (
     <article className="mx-auto max-w-2xl space-y-5 p-6 text-foreground">
-      <p className="text-muted-foreground text-sm">Typography</p>
-      <h1 className="font-heading font-semibold text-4xl tracking-tight">
+      <p className="text-sm text-muted-foreground">Typography</p>
+      <h1 className="font-heading text-4xl font-semibold tracking-tight">
         The quick brown fox jumps over the lazy dog
       </h1>
       <p className="text-lg text-muted-foreground">
         A theme is more than colors: font families, letter spacing and radius
         shape how every component reads.
       </p>
-      <h2 className="font-heading font-semibold text-2xl tracking-tight">
+      <h2 className="font-heading text-2xl font-semibold tracking-tight">
         Sans, serif and mono
       </h2>
       <p>
@@ -106,7 +106,7 @@ export function Typography() {
         </li>
         <li>Code blocks use the code colors.</li>
       </ul>
-      <pre className="overflow-x-auto rounded-lg border bg-code p-4 font-mono text-code-foreground text-sm">
+      <pre className="overflow-x-auto rounded-lg border bg-code p-4 font-mono text-sm text-code-foreground">
         <code>
           {`export function Button() {
   return <button className="bg-primary">Save</button>

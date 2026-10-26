@@ -230,7 +230,7 @@ export function CustomPreview() {
       </form>
       {!src ? (
         <div className="ui-chrome mx-auto flex w-full max-w-2xl flex-col gap-3 overflow-y-auto p-4 text-sm">
-          <h2 className="font-semibold text-base">Preview your own app</h2>
+          <h2 className="text-base font-semibold">Preview your own app</h2>
           <p className="text-muted-foreground">
             Add the Cossplay bridge to your app (only in development is enough),
             start it, and enter its URL above. The editor then themes it live as
@@ -242,12 +242,12 @@ export function CustomPreview() {
         <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 pb-4">
           <div className="ui-chrome shrink-0">
             {status === "loading" && (
-              <p className="flex items-center gap-2 text-muted-foreground text-xs">
+              <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Spinner className="size-3.5" /> Connecting to the bridge…
               </p>
             )}
             {status === "connected" && (
-              <p className="flex items-center gap-2 text-muted-foreground text-xs">
+              <p className="flex items-center gap-2 text-xs text-muted-foreground">
                 <CircleCheckIcon className="size-3.5 text-success" /> Connected
                 — edits apply live
               </p>
