@@ -7,8 +7,9 @@ const page = task.page("p1")
 const list = '[role="tablist"][aria-label="Preview"]'
 const trigger =
   '[role="group"][aria-label="Preview navigation"] [data-slot="menu-trigger"]'
+const tabLabels = ["Typography", "Color Palette", "Custom"]
 const tab = (label) =>
-  `${list} [role="tab"]:nth-of-type(${["Custom", "Typography", "Color Palette"].indexOf(label) + 1})`
+  `${list} [role="tab"]:nth-of-type(${tabLabels.indexOf(label) + 1})`
 const measure = async (label) => {
   await page.waitForFunction(() => {
     const menu = document.querySelector(
@@ -121,6 +122,23 @@ for (const width of [1440, 768, 390]) {
       "Saved locally"
   )
   await page.evaluate(() => document.fonts.ready)
+  assert.deepEqual(
+    await page.evaluate(
+      (selector) =>
+        [...document.querySelectorAll(`${selector} [role="tab"]`)].map(
+          (el) => el.textContent
+        ),
+      list
+    ),
+    tabLabels
+  )
+  assert.equal(
+    await page.evaluate(
+      (selector) => document.querySelector(selector).getAttribute("aria-label"),
+      trigger
+    ),
+    "Accordion"
+  )
   await measure(`${width}: initial category`)
   // The unchanged editor sidebar leaves less than a control width at phone sizes.
   if (width < 640) await page.click('button[aria-label="Fullscreen"]')
@@ -183,6 +201,8 @@ for (const width of [1440, 768, 390]) {
   )
   await page.click(tab("Custom"))
   await measure(`${width}: Custom / resting Particles`)
+  const draft = "http://localhost:3000/preserved-draft"
+  await page.fill('input[aria-label="App URL"]', draft)
   await page.focus(tab("Custom"))
   await page.keyboard.press("ArrowRight")
   await page.keyboard.press("Enter")
@@ -211,10 +231,20 @@ for (const width of [1440, 768, 390]) {
     "none",
     "Keyboard focus ring must remain visible"
   )
-  await page.keyboard.press("End")
+  await page.keyboard.press("ArrowRight")
   await page.keyboard.press("Enter")
   await page.waitForSelector(`${tab("Color Palette")}[aria-selected="true"]`)
   await measure(`${width}: Color Palette`)
+  await page.keyboard.press("End")
+  await page.keyboard.press("Enter")
+  await page.waitForSelector(`${tab("Custom")}[aria-selected="true"]`)
+  await measure(`${width}: keyboard Custom last`)
+  assert.equal(
+    await page.evaluate(
+      () => document.querySelector('input[aria-label="App URL"]').value
+    ),
+    draft
+  )
   await page.waitForFunction(() => {
     const el = document.activeElement
     const r = el.getBoundingClientRect()

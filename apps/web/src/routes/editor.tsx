@@ -61,9 +61,9 @@ export const Route = createFileRoute("/editor")({
 const bar = "ui-chrome flex h-14 shrink-0 items-center gap-1 border-b px-3"
 
 const pages = [
-  { id: "custom", label: "Custom", Page: CustomPreview },
   { id: "typography", label: "Typography", Page: Typography },
   { id: "palette", label: "Color Palette", Page: Palette },
+  { id: "custom", label: "Custom", Page: CustomPreview },
 ] as const
 
 type PreviewPage = (typeof pages)[number]["id"]
