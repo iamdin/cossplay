@@ -307,6 +307,15 @@ function Landing() {
             <a href="#ship" className="hover:text-foreground">
               Ship it
             </a>
+            <a
+              href="https://coss.com/ui/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground"
+            >
+              coss ui docs
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
           </div>
           <Button size="sm" className="ml-auto" render={<a href="/editor" />}>
             Open the editor
@@ -325,8 +334,17 @@ function Landing() {
             live. Export your theme as Tailwind CSS (v3 or v4) or JSON.
           </p>
           <p className="mx-auto mt-3 max-w-xl text-sm text-pretty text-muted-foreground">
-            Cossplay is an independent tool for theming coss ui, a React
-            component library.
+            Cossplay is an independent tool for theming{" "}
+            <a
+              href="https://coss.com/ui/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4 hover:text-foreground"
+            >
+              coss ui
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+            , a React component library.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-2 sm:gap-3">
             <Button size="lg" render={<a href="/editor" />}>
