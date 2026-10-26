@@ -11,6 +11,16 @@ const tab = (label) =>
   `${list} [role="tab"]:nth-of-type(${["Custom", "Typography", "Color Palette"].indexOf(label) + 1})`
 const measure = async (label) => {
   await page.waitForFunction(() => {
+    const menu = document.querySelector(
+      '[aria-label="Preview navigation"] [data-slot="menu-trigger"]'
+    )
+    return (
+      !menu ||
+      menu.matches(":focus-visible") ||
+      getComputedStyle(menu).outlineColor === "rgba(0, 0, 0, 0)"
+    )
+  })
+  await page.waitForFunction(() => {
     const selected = document.querySelector(
       '[aria-label="Preview"] [aria-selected="true"]'
     )
@@ -56,6 +66,8 @@ const measure = async (label) => {
       groupHeight: group?.getBoundingClientRect().height,
       commonBackground: group ? getComputedStyle(group).backgroundColor : null,
       menu: bounds(menu),
+      menuOutline: getComputedStyle(menu).outlineColor,
+      menuFocusVisible: menu.matches(":focus-visible"),
       tabs: [...tabs.querySelectorAll('[role="tab"]')].map(bounds),
       nestedBackground: getComputedStyle(tabs).backgroundColor,
       nestedPadding: getComputedStyle(tabs).padding,
@@ -69,6 +81,12 @@ const measure = async (label) => {
   console.log(label, JSON.stringify(result))
   assert(result.group, "Menu and tabs must share one visual navigation group")
   assert(!result.menuInTablist, "Menu button must not become a tab")
+  if (!result.menuFocusVisible)
+    assert.equal(
+      result.menuOutline,
+      "rgba(0, 0, 0, 0)",
+      "An unfocused dropdown must not have a standalone outline"
+    )
   assert.notEqual(result.commonBackground, "rgba(0, 0, 0, 0)")
   assert.equal(result.nestedBackground, "rgba(0, 0, 0, 0)")
   assert.equal(result.nestedPadding, "0px")
