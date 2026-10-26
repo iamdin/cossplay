@@ -5,6 +5,54 @@ const colors = new Set<string>(colorTokens)
 const colorUtility =
   /^(?:bg|text|border(?:-[xytrbl]|-[se])?|ring(?:-offset)?|inset-ring|outline|fill|stroke|from|via|to|divide|placeholder|caret|accent|decoration|shadow|inset-shadow)-([a-z0-9-]+)(?:\/\S+)?$/
 
+/**
+ * Detects whether a CSS custom property is overridden locally on or above `el`,
+ * returning a concise badge description if overridden, or null if using root value.
+ */
+export function tokenOverrideSource(
+  el: Element,
+  token: Token,
+  elStyles?: CSSStyleDeclaration,
+  rootStyles?: CSSStyleDeclaration
+): string | null {
+  try {
+    const root = document.documentElement
+    const rootVal = (rootStyles ?? getComputedStyle(root))
+      .getPropertyValue(`--${token}`)
+      .trim()
+    const elVal = (elStyles ?? getComputedStyle(el))
+      .getPropertyValue(`--${token}`)
+      .trim()
+    if (!elVal || !rootVal || elVal === rootVal) return null
+
+    for (let p: Element | null = el; p && p !== root; p = p.parentElement) {
+      const parentVal = p.parentElement
+        ? getComputedStyle(p.parentElement)
+            .getPropertyValue(`--${token}`)
+            .trim()
+        : rootVal
+      const thisVal = (
+        p === el ? (elStyles ?? getComputedStyle(p)) : getComputedStyle(p)
+      )
+        .getPropertyValue(`--${token}`)
+        .trim()
+      if (thisVal !== parentVal) {
+        if (p.classList.contains("dark")) return "⚡ .dark"
+        if (
+          p.hasAttribute("style") &&
+          p.getAttribute("style")!.includes(`--${token}`)
+        )
+          return "⚡ inline"
+        if (p.id) return `⚡ #${p.id}`
+        const cls = (p.getAttribute("class") ?? "").trim().split(/\s+/)[0]
+        if (cls) return `⚡ .${cls}`
+        return `⚡ <${p.tagName.toLowerCase()}>`
+      }
+    }
+  } catch {}
+  return null
+}
+
 /** The theme tokens a class attribute references, e.g. `hover:bg-accent/50` → `accent`. */
 export function tokenClasses(className: string) {
   const found: { className: string; token: Token }[] = []
@@ -34,13 +82,14 @@ const css = `
   font: 12px/1.4 ui-sans-serif, system-ui, sans-serif; color: #18181b; background: #fff;
   border: 1px solid #e4e4e7; border-radius: 8px; box-shadow: 0 8px 24px rgb(0 0 0 / 0.16); }
 .title { padding: 2px 6px 4px; color: #71717a; font-size: 11px; }
-button { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 12px minmax(0, 1fr); align-items: center;
+button { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center;
   column-gap: 6px; width: 100%; padding: 3px 6px; border-radius: 4px; cursor: pointer; }
 button:hover, button:focus-visible { background: #f4f4f5; }
 .swatch { width: 12px; height: 12px; box-sizing: border-box; border: 1px solid rgb(0 0 0 / 0.15); border-radius: 3px; }
 .token { font-weight: 500; }
 .classes { grid-column: 2; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #71717a; font-size: 10px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.badge { grid-column: 3; padding: 1px 4px; border-radius: 3px; font-size: 9px; font-weight: 500; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; white-space: nowrap; }
 `
 
 /**
@@ -88,6 +137,7 @@ export function startInspector(
     ).sort((a, b) => +a.className.includes(":") - +b.className.includes(":")))
       byToken.set(token, [...(byToken.get(token) ?? []), className])
     const styles = getComputedStyle(el)
+    const rootStyles = getComputedStyle(document.documentElement)
     card.replaceChildren(
       Object.assign(document.createElement("div"), {
         className: "title",
@@ -111,6 +161,15 @@ export function startInspector(
           title: names.join("\n"),
         })
         button.append(swatch, label, used)
+        const overrideBadge = tokenOverrideSource(el, token, styles, rootStyles)
+        if (overrideBadge) {
+          const badge = Object.assign(document.createElement("span"), {
+            className: "badge",
+            textContent: overrideBadge,
+            title: `Overridden at ancestor or local rule for --${token}`,
+          })
+          button.append(badge)
+        }
         button.addEventListener("click", () => onPick(token))
         return button
       })

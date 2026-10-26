@@ -1,4 +1,5 @@
 import {
+  encodeThemeHash,
   exportConfig,
   exportCss,
   exportLayout,
@@ -30,7 +31,7 @@ import {
   TabsTrigger,
 } from "@cossplay/ui/components/tabs"
 import { Textarea } from "@cossplay/ui/components/textarea"
-import { Copy } from "lucide-react"
+import { Copy, Share2 } from "lucide-react"
 import { useState } from "react"
 import fonts from "./fonts.json"
 import { importFrom, setError, usePanelStore } from "./store"
@@ -272,11 +273,33 @@ export function ExportDialog({
             value={output}
           />
         </DialogPanel>
-        <DialogFooter>
-          <Button variant="outline" onClick={download}>
-            Download
+        <DialogFooter className="flex-wrap items-center justify-between gap-2">
+          <Button
+            variant="ghost"
+            className="gap-1.5 text-xs"
+            onClick={async () => {
+              const site = usePanelStore.getState().site
+              const overrides = site?.current.overrides ?? {
+                light: {},
+                dark: {},
+              }
+              const hash = await encodeThemeHash(overrides, presetId)
+              const url = `${window.location.origin}/editor#theme=${hash}`
+              copyText(url)
+              usePanelStore.setState({
+                status: "Share link copied to clipboard",
+              })
+            }}
+          >
+            <Share2 className="size-3.5" />
+            Share link
           </Button>
-          <Button onClick={() => copyText(output)}>Copy code</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={download}>
+              Download
+            </Button>
+            <Button onClick={() => copyText(output)}>Copy code</Button>
+          </div>
         </DialogFooter>
       </DialogPopup>
     </Dialog>

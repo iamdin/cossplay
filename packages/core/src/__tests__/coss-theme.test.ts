@@ -7,7 +7,9 @@ import {
   clone,
   colorTokens,
   contrastPairs,
+  decodeThemeHash,
   defaults,
+  encodeThemeHash,
   exportCss,
   exportLayout,
   importOverrides,
@@ -257,4 +259,30 @@ test("layout export wires next/font variables for sans and mono", () => {
   assert.match(code, /import \{ Inter, Geist_Mono \} from "next\/font\/google"/)
   assert.match(code, /variable: "--font-mono"/)
   assert.ok(!exportLayout(defaults, []).includes("next/font/google"))
+})
+
+test("encodeThemeHash and decodeThemeHash roundtrip theme overrides", async () => {
+  const overrides = {
+    light: { primary: "#ff0055", radius: "12px" },
+    dark: { primary: "#ff3377" },
+  }
+  const hash = await encodeThemeHash(overrides, "modern-minimal")
+  assert.ok(hash.length > 0)
+  assert.ok(!hash.includes("+") && !hash.includes("/"))
+  assert.ok(hash.startsWith("z_"))
+
+  const decoded = await decodeThemeHash(hash)
+  assert.ok(decoded)
+  assert.equal(decoded.themeId, "modern-minimal")
+  assert.equal(decoded.overrides.light.primary, "#ff0055")
+  assert.equal(decoded.overrides.light.radius, "12px")
+  assert.equal(decoded.overrides.dark.primary, "#ff3377")
+
+  // Also test with leading '#theme='
+  const decodedWithPrefix = await decodeThemeHash(`#theme=${hash}`)
+  assert.ok(decodedWithPrefix)
+  assert.equal(decodedWithPrefix.overrides.light.primary, "#ff0055")
+
+  // Invalid hash returns null
+  assert.equal(await decodeThemeHash("invalid-base64-!@#$"), null)
 })
