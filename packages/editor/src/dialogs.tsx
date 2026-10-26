@@ -277,13 +277,13 @@ export function ExportDialog({
           <Button
             variant="ghost"
             className="gap-1.5 text-xs"
-            onClick={() => {
+            onClick={async () => {
               const site = usePanelStore.getState().site
               const overrides = site?.current.overrides ?? {
                 light: {},
                 dark: {},
               }
-              const hash = encodeThemeHash(overrides, presetId)
+              const hash = await encodeThemeHash(overrides, presetId)
               const url = `${window.location.origin}/editor#theme=${hash}`
               copyText(url)
               usePanelStore.setState({

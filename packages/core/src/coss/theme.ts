@@ -501,26 +501,60 @@ export function presetRegistry() {
   }
 }
 
-function toBase64(str: string): string {
-  const bytes = new TextEncoder().encode(str)
+function toBase64(bytes: Uint8Array): string {
   let binary = ""
-  for (let i = 0; i < bytes.byteLength; i++) {
+  for (let i = 0; i < bytes.byteLength; i++)
     binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary)
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
 }
 
-function fromBase64(b64: string): string {
-  const binary = atob(b64)
+function fromBase64(b64: string): Uint8Array {
+  let base64 = b64.replace(/-/g, "+").replace(/_/g, "/")
+  while (base64.length % 4) base64 += "="
+  const binary = atob(base64)
   const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  return bytes
+}
+
+async function compressToHash(str: string): Promise<string> {
+  const input = new TextEncoder().encode(str)
+  try {
+    if (typeof CompressionStream !== "undefined") {
+      const cs = new CompressionStream("deflate-raw")
+      const writer = cs.writable.getWriter()
+      writer.write(input as BufferSource)
+      writer.close()
+      const buf = await new Response(cs.readable).arrayBuffer()
+      return "z_" + toBase64(new Uint8Array(buf))
+    }
+  } catch {}
+  return toBase64(input)
+}
+
+async function decompressFromHash(raw: string): Promise<string> {
+  const clean = raw
+    .replace(/^#?theme=/, "")
+    .replace(/^#/, "")
+    .trim()
+  if (clean.startsWith("z_") && typeof DecompressionStream !== "undefined") {
+    const bytes = fromBase64(clean.slice(2))
+    const ds = new DecompressionStream("deflate-raw")
+    const writer = ds.writable.getWriter()
+    writer.write(bytes as BufferSource)
+    writer.close()
+    const buf = await new Response(ds.readable).arrayBuffer()
+    return new TextDecoder().decode(buf)
   }
+  const bytes = fromBase64(clean)
   return new TextDecoder().decode(bytes)
 }
 
-/** Encodes theme overrides and optional presetId into a URL-safe Base64 string. */
-export function encodeThemeHash(overrides: Overrides, themeId = ""): string {
+/** Encodes theme overrides and optional presetId into a compact URL-safe string. */
+export async function encodeThemeHash(
+  overrides: Overrides,
+  themeId = ""
+): Promise<string> {
   const light = Object.fromEntries(
     Object.entries(overrides.light ?? {}).filter(
       ([, v]) => v != null && v !== ""
@@ -536,26 +570,15 @@ export function encodeThemeHash(overrides: Overrides, themeId = ""): string {
   if (Object.keys(light).length) payload.l = light
   if (Object.keys(dark).length) payload.d = dark
 
-  const jsonStr = JSON.stringify(payload)
-  return toBase64(jsonStr)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "")
+  return compressToHash(JSON.stringify(payload))
 }
 
 /** Decodes a theme hash string back into { overrides, themeId }. */
-export function decodeThemeHash(
+export async function decodeThemeHash(
   raw: string
-): { overrides: Overrides; themeId: string } | null {
+): Promise<{ overrides: Overrides; themeId: string } | null> {
   try {
-    const clean = raw
-      .replace(/^#?theme=/, "")
-      .replace(/^#/, "")
-      .trim()
-    if (!clean) return null
-    let base64 = clean.replace(/-/g, "+").replace(/_/g, "/")
-    while (base64.length % 4) base64 += "="
-    const jsonStr = fromBase64(base64)
+    const jsonStr = await decompressFromHash(raw)
     const data = JSON.parse(jsonStr)
     if (!data || typeof data !== "object") return null
 

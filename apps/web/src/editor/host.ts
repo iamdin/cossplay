@@ -87,9 +87,9 @@ export function connect() {
   const unsubscribe = usePanelStore.subscribe(apply)
   document.head.append(style)
 
-  const syncHash = () => {
+  const syncHash = async () => {
     if (location.hash.includes("theme=")) {
-      const decoded = decodeThemeHash(location.hash)
+      const decoded = await decodeThemeHash(location.hash)
       if (decoded) {
         applyOverrides(decoded.overrides, decoded.themeId)
         usePanelStore.setState({ status: "Loaded shared theme" })
