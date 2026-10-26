@@ -14,6 +14,7 @@ import {
   CodeIcon,
   ContrastIcon,
   CopyIcon,
+  GithubIcon,
   HistoryIcon,
   PaletteIcon,
   PanelRightIcon,
@@ -295,9 +296,9 @@ function Landing() {
       style={{ ...style, fontFamily: "var(--font-sans)" }}
     >
       <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
-        <nav className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
+        <nav className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:gap-6 sm:px-6">
           <Logo />
-          <div className="hidden items-center gap-5 text-sm text-muted-foreground sm:flex">
+          <div className="hidden items-center gap-5 text-sm text-muted-foreground md:flex">
             <a href="#ways" className="hover:text-foreground">
               How to use
             </a>
@@ -317,9 +318,27 @@ function Landing() {
               <span className="sr-only"> (opens in a new tab)</span>
             </a>
           </div>
-          <Button size="sm" className="ml-auto" render={<a href="/editor" />}>
-            Open the editor
-          </Button>
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="max-md:w-7 max-md:px-0 max-sm:w-8"
+              render={
+                <a
+                  href="https://github.com/oxwen11/cossplay"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="oxwen11/cossplay on GitHub (opens in a new tab)"
+                />
+              }
+            >
+              <GithubIcon />
+              <span className="max-md:hidden">GitHub</span>
+            </Button>
+            <Button size="sm" render={<a href="/editor" />}>
+              Open the editor
+            </Button>
+          </div>
         </nav>
       </header>
 
