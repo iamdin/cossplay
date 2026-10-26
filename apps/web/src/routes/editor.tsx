@@ -162,7 +162,7 @@ function Editor() {
             <PanelAlerts />
             <PanelSections />
           </aside>
-          {/* biome-ignore lint/a11y/useSemanticElements: a focusable separator is the ARIA pattern for a splitter. */}
+          {/* A focusable separator is the ARIA pattern for a splitter. */}
           <div
             role="separator"
             aria-orientation="vertical"

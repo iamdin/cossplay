@@ -9,7 +9,7 @@
     "./coss/import": "./src/coss/import.ts"
   },
   "scripts": {
-    "check:type": "tsc",
+    "check:type": "tsrs --noEmit",
     "sync:defaults": "node scripts/sync-coss-defaults.ts",
     "test": "vitest run",
     "sync:tweakcn": "node scripts/sync-tweakcn.mjs"
@@ -28,6 +28,7 @@
     "jsdom": "catalog:",
     "shadcn": "^4.21.3",
     "tailwindcss": "catalog:",
+    "tsrs": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

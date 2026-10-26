@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": false,
+  "singleQuote": false,
+  "jsxSingleQuote": false,
+  "trailingComma": "es5",
+  "sortPackageJson": false,
+  "sortImports": {
+    "newlinesBetween": false,
+    "sortSideEffects": false
+  },
+  "sortTailwindcss": {
+    "stylesheet": "./packages/ui/src/styles/globals.css",
+    "functions": ["cn", "clsx", "cva"]
+  },
+  "ignorePatterns": [
+    "**/public/**",
+    "**/*.json.tmp",
+    "**/routeTree.gen.ts",
+    "pnpm-lock.yaml"
+  ],
+  "overrides": [
+    {
+      "files": ["apps/web/src/components/particles/**"],
+      "options": {
+        "sortTailwindcss": false
+      }
+    }
+  ]
+}

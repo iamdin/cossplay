@@ -147,7 +147,7 @@ function Swatches({ colors }: { colors: string[] }) {
     <span className="flex shrink-0 gap-0.5">
       {colors.map((color, i) => (
         <span
-          // biome-ignore lint/suspicious/noArrayIndexKey: fixed token order
+          // oxlint-disable-next-line react/no-array-index-key -- fixed token order
           key={i}
           className="size-3 rounded-sm border border-black/10"
           style={{ background: color }}

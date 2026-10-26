@@ -9,7 +9,7 @@
     "./components/*": "./src/components/*.tsx"
   },
   "scripts": {
-    "check:type": "tsc"
+    "check:type": "tsrs --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
@@ -27,6 +27,7 @@
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
     "tailwindcss": "catalog:",
+    "tsrs": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {
