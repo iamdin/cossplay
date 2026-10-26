@@ -18,6 +18,15 @@ export function Footer() {
           <a href="/privacy" className="hover:text-foreground">
             Privacy
           </a>
+          <a
+            href="https://coss.com/ui/docs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-foreground"
+          >
+            coss ui docs
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
           <span>
             Presets from{" "}
             <a

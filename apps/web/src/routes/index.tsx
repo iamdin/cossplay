@@ -326,15 +326,9 @@ function Landing() {
           </p>
           <p className="mx-auto mt-3 max-w-xl text-sm text-pretty text-muted-foreground">
             Cossplay is an independent tool for theming coss ui, a React
-            component library.{" "}
-            <a
-              href="https://coss.com/ui/docs"
-              className="underline underline-offset-4 hover:text-foreground"
-            >
-              coss ui docs
-            </a>
+            component library.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="mt-8 flex flex-wrap justify-center gap-2 sm:gap-3">
             <Button size="lg" render={<a href="/editor" />}>
               Open the editor
               <ArrowRightIcon />
