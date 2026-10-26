@@ -326,9 +326,11 @@ function Landing() {
       <main>
         <section className="mx-auto max-w-3xl px-4 pt-16 text-center sm:pt-24">
           <h1 className="text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
-            Design Your Perfect{" "}
-            <span className="whitespace-nowrap">coss/ui</span>{" "}
-            <span className="font-serif text-primary italic">Theme.</span>
+            {/* Spaces live inside text nodes: Chrome drops standalone
+                whitespace nodes at line breaks from the accessible name. */}
+            {"Design Your Perfect "}
+            <span className="whitespace-nowrap">coss/ui</span>
+            <span className="font-serif text-primary italic">{" Theme."}</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-pretty text-muted-foreground">
             Choose a preset, tune colors, fonts and radius, and see changes
