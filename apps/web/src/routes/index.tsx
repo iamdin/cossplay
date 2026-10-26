@@ -26,9 +26,9 @@ import { ThemeChips, useLandingTheme } from "@/landing/demo"
 import styles from "@/styles/landing.css?url"
 
 const site = "https://cossplay.vercel.app"
-const title = "Cossplay: live theme editor for coss ui"
+const title = "Cossplay: visual UI theme editor for coss ui"
 const description =
-  "Theme coss ui apps live: 42 tweakcn presets, colors, fonts, radius and contrast checks, in the browser or in Chrome's side panel on your own site. Export Tailwind CSS or install with the shadcn CLI."
+  "Visually customize a UI theme, see changes on real coss ui components live, and export Tailwind CSS (v3 or v4) or JSON. Cossplay is an independent theme editor."
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -317,12 +317,22 @@ function Landing() {
       <main>
         <section className="mx-auto max-w-3xl px-4 pt-16 text-center sm:pt-24">
           <h1 className="text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
-            Theme your coss ui app,{" "}
+            Customize your UI theme,{" "}
             <span className="font-serif text-primary italic">live.</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-pretty text-muted-foreground">
-            Tune colors, type and radius on real components, then take the theme
-            with you.
+            Choose a preset, tune colors, fonts and radius, and see changes
+            live. Export your theme as Tailwind CSS (v3 or v4) or JSON.
+          </p>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-pretty text-muted-foreground">
+            Cossplay is an independent tool for theming coss ui, a React
+            component library.{" "}
+            <a
+              href="https://coss.com/ui/docs"
+              className="underline underline-offset-4 hover:text-foreground"
+            >
+              coss ui docs
+            </a>
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button size="lg" render={<a href="/editor" />}>

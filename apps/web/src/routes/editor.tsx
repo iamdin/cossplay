@@ -34,6 +34,7 @@ import {
   particleCategories,
   Typography,
 } from "@/editor/gallery"
+import { GettingStarted } from "@/editor/getting-started"
 import { connect } from "@/editor/host"
 import { PreviewInspector } from "@/editor/inspect"
 import { Palette } from "@/editor/palette"
@@ -159,6 +160,7 @@ function Editor() {
             <div className={bar}>
               <PresetSelect />
             </div>
+            <GettingStarted />
             <PanelAlerts />
             <PanelSections />
           </aside>
