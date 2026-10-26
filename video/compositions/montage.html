@@ -1,0 +1,362 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("assets/fonts/geist.woff2") format("woff2");
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--color-ground, #f4f4f5);
+      overflow: hidden;
+      font-family: "Geist", sans-serif;
+      color: #18181b;
+    }
+    .mw {
+      position: absolute;
+      width: 1280px;
+      height: 844px;
+      border-radius: 24px;
+      overflow: hidden;
+      transform-origin: 0 0;
+      border: 2px solid #d4d4d8;
+      background: #fafafa;
+      box-shadow: 0 60px 120px rgba(24, 24, 27, 0.2);
+    }
+    .mw .bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1280px;
+      height: 44px;
+      background: #fafafa;
+      border-bottom: 1px solid #e4e4e7;
+    }
+    .mw .bar i {
+      position: absolute;
+      top: 14px;
+      width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      background: #d4d4d8;
+    }
+    .mw .bar span {
+      position: absolute;
+      left: 340px;
+      top: 6px;
+      width: 600px;
+      height: 32px;
+      border-radius: 8px;
+      background: #f0f0f1;
+      font-size: 22px;
+      line-height: 32px;
+      text-align: center;
+      color: #52525b;
+    }
+    .mw img {
+      position: absolute;
+      left: 0;
+      top: 44px;
+      width: 1280px;
+      height: 800px;
+    }
+    #mt-title {
+      position: absolute;
+      left: 150px;
+      top: 330px;
+      width: 600px;
+      font-size: 92px;
+      font-weight: 600;
+      letter-spacing: -0.035em;
+      line-height: 1.04;
+    }
+    #mt-title b {
+      display: inline-block;
+      font-weight: 600;
+    }
+    #mt-title em {
+      font-style: normal;
+      color: #71717a;
+    }
+  </style>
+  <div
+    id="root"
+    data-composition-id="montage"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div id="mt-w0" class="mw" style="left: 760px; top: 189px">
+      <div class="bar" data-layout-ignore>
+        <i style="left: 18px"></i><i style="left: 38px"></i
+        ><i style="left: 58px"></i><span>coss.com/ui</span>
+      </div>
+      <img
+        id="mt-0-0"
+        src="assets/cap/site-m0-0.png"
+        alt="coss.com/ui in its own theme"
+      />
+      <img
+        id="mt-0-1"
+        src="assets/cap/site-m0-1.png"
+        alt="coss.com/ui in Cosmic Night"
+      />
+      <img
+        id="mt-0-2"
+        src="assets/cap/site-m0-2d.png"
+        alt="coss.com/ui in Violet Bloom dark"
+      />
+      <img
+        id="mt-0-3"
+        src="assets/cap/site-m0-3.png"
+        alt="coss.com/ui in Catppuccin"
+      />
+      <img
+        id="mt-0-4"
+        src="assets/cap/site-m0-4d.png"
+        alt="coss.com/ui in Bubblegum dark"
+      />
+      <img
+        id="mt-0-5"
+        src="assets/cap/site-m0-5.png"
+        alt="coss.com/ui in Kodama Grove"
+      />
+      <img
+        id="mt-0-6"
+        src="assets/cap/site-m0-6d.png"
+        alt="coss.com/ui in Claymorphism dark"
+      />
+      <img
+        id="mt-0-7"
+        src="assets/cap/site-m0-7.png"
+        alt="coss.com/ui in Amethyst Haze"
+      />
+      <img
+        id="mt-0-8"
+        src="assets/cap/site-m0-8d.png"
+        alt="coss.com/ui in Cyberpunk dark"
+      />
+    </div>
+    <div id="mt-w1" class="mw" style="left: 1292px; top: 189px">
+      <div class="bar" data-layout-ignore>
+        <i style="left: 18px"></i><i style="left: 38px"></i
+        ><i style="left: 58px"></i><span>coss.com/ui/chat</span>
+      </div>
+      <img
+        id="mt-1-0"
+        src="assets/cap/site-m1-0.png"
+        alt="coss.com/ui/chat in its own theme"
+      />
+      <img
+        id="mt-1-1"
+        src="assets/cap/site-m1-3d.png"
+        alt="coss.com/ui/chat in Catppuccin dark"
+      />
+      <img
+        id="mt-1-2"
+        src="assets/cap/site-m1-4.png"
+        alt="coss.com/ui/chat in Bubblegum"
+      />
+      <img
+        id="mt-1-3"
+        src="assets/cap/site-m1-5d.png"
+        alt="coss.com/ui/chat in Kodama Grove dark"
+      />
+      <img
+        id="mt-1-4"
+        src="assets/cap/site-m1-6.png"
+        alt="coss.com/ui/chat in Claymorphism"
+      />
+      <img
+        id="mt-1-5"
+        src="assets/cap/site-m1-7d.png"
+        alt="coss.com/ui/chat in Amethyst Haze dark"
+      />
+      <img
+        id="mt-1-6"
+        src="assets/cap/site-m1-8.png"
+        alt="coss.com/ui/chat in Cyberpunk"
+      />
+      <img
+        id="mt-1-7"
+        src="assets/cap/site-m1-1d.png"
+        alt="coss.com/ui/chat in Cosmic Night dark"
+      />
+      <img
+        id="mt-1-8"
+        src="assets/cap/site-m1-2.png"
+        alt="coss.com/ui/chat in Violet Bloom"
+      />
+    </div>
+    <div id="mt-w2" class="mw" style="left: 760px; top: 552px">
+      <div class="bar" data-layout-ignore>
+        <i style="left: 18px"></i><i style="left: 38px"></i
+        ><i style="left: 58px"></i><span>coss.com</span>
+      </div>
+      <img
+        id="mt-2-0"
+        src="assets/cap/site-m2-0.png"
+        alt="coss.com in its own theme"
+      />
+      <img
+        id="mt-2-1"
+        src="assets/cap/site-m2-5.png"
+        alt="coss.com in Kodama Grove"
+      />
+      <img
+        id="mt-2-2"
+        src="assets/cap/site-m2-6d.png"
+        alt="coss.com in Claymorphism dark"
+      />
+      <img
+        id="mt-2-3"
+        src="assets/cap/site-m2-7.png"
+        alt="coss.com in Amethyst Haze"
+      />
+      <img
+        id="mt-2-4"
+        src="assets/cap/site-m2-8d.png"
+        alt="coss.com in Cyberpunk dark"
+      />
+      <img
+        id="mt-2-5"
+        src="assets/cap/site-m2-1.png"
+        alt="coss.com in Cosmic Night"
+      />
+      <img
+        id="mt-2-6"
+        src="assets/cap/site-m2-2d.png"
+        alt="coss.com in Violet Bloom dark"
+      />
+      <img
+        id="mt-2-7"
+        src="assets/cap/site-m2-3.png"
+        alt="coss.com in Catppuccin"
+      />
+      <img
+        id="mt-2-8"
+        src="assets/cap/site-m2-4d.png"
+        alt="coss.com in Bubblegum dark"
+      />
+    </div>
+    <div id="mt-w3" class="mw" style="left: 1292px; top: 552px">
+      <div class="bar" data-layout-ignore>
+        <i style="left: 18px"></i><i style="left: 38px"></i
+        ><i style="left: 58px"></i><span>coss.com/ui/particles</span>
+      </div>
+      <img
+        id="mt-3-0"
+        src="assets/cap/site-m3-0.png"
+        alt="coss.com/ui/particles in its own theme"
+      />
+      <img
+        id="mt-3-1"
+        src="assets/cap/site-m3-7d.png"
+        alt="coss.com/ui/particles in Amethyst Haze dark"
+      />
+      <img
+        id="mt-3-2"
+        src="assets/cap/site-m3-8.png"
+        alt="coss.com/ui/particles in Cyberpunk"
+      />
+      <img
+        id="mt-3-3"
+        src="assets/cap/site-m3-1d.png"
+        alt="coss.com/ui/particles in Cosmic Night dark"
+      />
+      <img
+        id="mt-3-4"
+        src="assets/cap/site-m3-2.png"
+        alt="coss.com/ui/particles in Violet Bloom"
+      />
+      <img
+        id="mt-3-5"
+        src="assets/cap/site-m3-3d.png"
+        alt="coss.com/ui/particles in Catppuccin dark"
+      />
+      <img
+        id="mt-3-6"
+        src="assets/cap/site-m3-4.png"
+        alt="coss.com/ui/particles in Bubblegum"
+      />
+      <img
+        id="mt-3-7"
+        src="assets/cap/site-m3-5d.png"
+        alt="coss.com/ui/particles in Kodama Grove dark"
+      />
+      <img
+        id="mt-3-8"
+        src="assets/cap/site-m3-6.png"
+        alt="coss.com/ui/particles in Claymorphism"
+      />
+    </div>
+    <div id="mt-title">
+      <b>Every</b><br /><b>coss</b> <b>ui</b> <b>site.</b><br /><em
+        ><b>Any</b> <b>theme.</b></em
+      >
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true })
+    // Four real coss ui pages, 0.397x in a 2x2 grid; the title is on screen from the first frame.
+    const S = 0.397
+    tl.fromTo(
+      ".mw",
+      { scale: S, x: 0, y: 0, opacity: 1, filter: "blur(0px)" },
+      { scale: S * 1.02, duration: 5.4, ease: "none" },
+      0
+    )
+    tl.fromTo(
+      "#mt-title b",
+      { opacity: 1, filter: "blur(0px)" },
+      { opacity: 1, duration: 0.01 },
+      0
+    )
+    tl.fromTo(
+      ".mw img:not([id$='-0'])",
+      { opacity: 0 },
+      { opacity: 0, duration: 0.01 },
+      0
+    )
+    // Every beat (0.6 s at 100 BPM) each site takes another preset, light and dark alternating; a small ripple across the grid.
+    for (let k = 1; k <= 8; k++)
+      for (let w = 0; w < 4; w++) {
+        const at = k * 0.6 + w * 0.04
+        tl.set(`#mt-w${w} img`, { opacity: 0 }, at)
+        tl.set(`#mt-${w}-${k}`, { opacity: 1 }, at)
+        tl.fromTo(
+          `#mt-w${w}`,
+          { y: -6 },
+          { y: 0, duration: 0.2, ease: "power2.out", immediateRender: false },
+          at
+        )
+      }
+    // Out: the title blurs away and the grid collapses toward the panel that opens the reveal.
+    tl.to(
+      "#mt-title b",
+      {
+        opacity: 0,
+        filter: "blur(8px)",
+        duration: 0.16,
+        stagger: 0.02,
+        ease: "power3.in",
+      },
+      5.4
+    )
+    tl.to(
+      ".mw",
+      {
+        x: (i) => [1400 - 760, 1400 - 1292, 1400 - 760, 1400 - 1292][i] + 40,
+        y: (i) => [162 - 189, 162 - 189, 162 - 552, 162 - 552][i] + 300,
+        scale: S * 0.5,
+        opacity: 0,
+        filter: "blur(12px)",
+        duration: 0.35,
+        stagger: 0.03,
+        ease: "power3.in",
+      },
+      5.5
+    )
+    window.__timelines["montage"] = tl
+  </script>
+</template>

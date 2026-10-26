@@ -1,0 +1,18 @@
+{
+  "SITES": [
+    "https://coss.com/ui",
+    "https://coss.com/ui/chat",
+    "https://coss.com",
+    "https://coss.com/ui/particles"
+  ],
+  "PRESETS": [
+    "Cosmic Night",
+    "Violet Bloom",
+    "Catppuccin",
+    "Bubblegum",
+    "Kodama Grove",
+    "Claymorphism",
+    "Amethyst Haze",
+    "Cyberpunk"
+  ]
+}

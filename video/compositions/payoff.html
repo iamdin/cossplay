@@ -1,0 +1,128 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #f4f4f5;
+      overflow: hidden;
+    }
+    #po-stage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1200px;
+      transform-origin: 0 40%;
+    }
+    .po-img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1200px;
+      opacity: 0;
+    }
+  </style>
+  <div
+    data-hf-id="hf-s4vk"
+    id="root"
+    data-composition-id="payoff"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div data-hf-id="hf-cibf" id="po-stage">
+      <img
+        data-hf-id="hf-h119"
+        id="po-0"
+        class="po-img"
+        src="assets/cap/site-payoff-0.png"
+        alt="coss.com/ui in Cosmic Night"
+      />
+      <img
+        data-hf-id="hf-lmnq"
+        id="po-2"
+        class="po-img"
+        src="assets/cap/site-payoff-2.png"
+        alt="coss.com/ui in Neo Brutalism"
+      />
+      <img
+        data-hf-id="hf-l5j2"
+        id="po-4"
+        class="po-img"
+        src="assets/cap/site-payoff-4.png"
+        alt="coss.com/ui in Ocean Breeze"
+      />
+      <img
+        data-hf-id="hf-eqz2"
+        id="po-10"
+        class="po-img"
+        src="assets/cap/site-payoff-10.png"
+        alt="coss.com/ui in Cyberpunk"
+      />
+      <img
+        id="po-chat-1"
+        class="po-img"
+        src="assets/cap/site-chat-1.png"
+        alt="coss.com/ui Chat UI in Violet Bloom"
+      />
+      <img
+        id="po-chat-2"
+        class="po-img"
+        src="assets/cap/site-chat-2.png"
+        alt="coss.com/ui Chat UI in Catppuccin"
+      />
+      <img
+        id="po-chat-3"
+        class="po-img"
+        src="assets/cap/site-chat-3.png"
+        alt="coss.com/ui Chat UI in Bubblegum"
+      />
+      <img
+        id="po-chat-4"
+        class="po-img"
+        src="assets/cap/site-chat-4.png"
+        alt="coss.com/ui Chat UI in Kodama Grove"
+      />
+      <img
+        id="po-chat-6"
+        class="po-img"
+        src="assets/cap/site-chat-6.png"
+        alt="coss.com/ui Chat UI in Amethyst Haze"
+      />
+      <img
+        id="po-chat-7"
+        class="po-img"
+        src="assets/cap/site-chat-7.png"
+        alt="coss.com/ui Chat UI in Cyberpunk"
+      />
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true })
+    // Four home-page plates, then the new Chat UI page on the bar line at 1.2.
+    const ids = [
+      0,
+      2,
+      4,
+      10,
+      "chat-1",
+      "chat-2",
+      "chat-3",
+      "chat-4",
+      "chat-6",
+      "chat-7",
+    ]
+    tl.fromTo(
+      "#po-stage",
+      { scale: 1 },
+      { scale: 1.05, duration: 3.0, ease: "none" },
+      0
+    )
+    // One real preset per half beat (0.3 s at 100 BPM).
+    ids.forEach((id, i) => {
+      tl.set(".po-img", { opacity: 0 }, i * 0.3)
+      tl.set("#po-" + id, { opacity: 1 }, i * 0.3)
+    })
+    window.__timelines["payoff"] = tl
+  </script>
+</template>

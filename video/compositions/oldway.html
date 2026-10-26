@@ -1,0 +1,439 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("assets/fonts/geist.woff2") format("woff2");
+      font-weight: 100 900;
+    }
+    @font-face {
+      font-family: "Geist Mono";
+      src: url("assets/fonts/geist-mono.woff2") format("woff2");
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--color-ground, #f4f4f5);
+      overflow: hidden;
+      font-family: "Geist", sans-serif;
+      color: #18181b;
+    }
+    .ow-title {
+      position: absolute;
+      left: 150px;
+      top: 430px;
+      width: 760px;
+      font-size: 104px;
+      font-weight: 600;
+      letter-spacing: -0.035em;
+      line-height: 1.02;
+    }
+    .ow-title b {
+      display: inline-block;
+      font-weight: 600;
+    }
+    #ow-card {
+      position: absolute;
+      left: 960px;
+      top: 120px;
+      width: 840px;
+      height: 840px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid #d4d4d8;
+      box-shadow: 0 40px 90px rgba(24, 24, 27, 0.16);
+      overflow: hidden;
+      transform-origin: 0 0;
+    }
+    #ow-inner {
+      position: absolute;
+      inset: 0;
+    }
+    #ow-head {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 840px;
+      height: 64px;
+      border-bottom: 1px solid #e4e4e7;
+      background: #fafafa;
+      font:
+        500 22px/64px "Geist Mono",
+        monospace;
+      color: #71717a;
+      padding-left: 28px;
+    }
+    #ow-view {
+      position: absolute;
+      left: 0;
+      top: 76px;
+      width: 840px;
+      height: 756px;
+      overflow: hidden;
+    }
+    #ow-list {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 840px;
+    }
+    .ln {
+      position: relative;
+      z-index: 1;
+      height: 46px;
+      padding-left: 28px;
+      font:
+        500 26px/46px "Geist Mono",
+        monospace;
+      color: #3f3f46;
+      white-space: pre;
+    }
+    .ln .p {
+      color: #18181b;
+    }
+    .ln .k {
+      color: #18181b;
+      font-weight: 600;
+    }
+    #ow-hl {
+      position: absolute;
+      z-index: 0;
+      left: 0;
+      top: 368px;
+      width: 840px;
+      height: 46px;
+      background: #e4e4e7;
+      opacity: 0;
+    }
+    #ow-val .n {
+      display: none;
+      color: #18181b;
+    }
+    #ow-caret {
+      display: inline-block;
+      width: 3px;
+      height: 30px;
+      margin-left: 2px;
+      vertical-align: -6px;
+      background: #18181b;
+      opacity: 0;
+    }
+  </style>
+  <div
+    data-hf-id="hf-r9rb"
+    id="root"
+    data-composition-id="oldway"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div data-hf-id="hf-8n55" id="ow-t1" class="ow-title">
+      <b data-hf-id="hf-ig4j">42</b> <b data-hf-id="hf-w6yo">CSS</b>
+      <b data-hf-id="hf-7smc">variables.</b>
+    </div>
+    <div data-hf-id="hf-cl96" id="ow-t2" class="ow-title">
+      <b data-hf-id="hf-zdnz">One</b> <b data-hf-id="hf-1fje">hex</b>
+      <b data-hf-id="hf-5cx4">at</b> <b data-hf-id="hf-ox58">a</b>
+      <b data-hf-id="hf-fi8u">time.</b>
+    </div>
+    <div data-hf-id="hf-gjd7" id="ow-t3" class="ow-title">
+      <b data-hf-id="hf-byy6">Gone</b> <b data-hf-id="hf-migg">on</b>
+      <b data-hf-id="hf-9vae">reload.</b>
+    </div>
+    <div data-hf-id="hf-73sq" id="ow-card">
+      <div data-hf-id="hf-9ka8" id="ow-inner">
+        <div data-hf-id="hf-1g36" id="ow-head" data-layout-ignore>
+          coss.com/ui · :root
+        </div>
+        <div data-hf-id="hf-kwh7" id="ow-view">
+          <div data-hf-id="hf-j5n3" id="ow-list" data-layout-ignore>
+            <div data-hf-id="hf-fxp0" id="ow-hl"></div>
+            <div data-hf-id="hf-l2nv" class="ln">
+              <span data-hf-id="hf-ftpa" class="k">:root</span> {
+            </div>
+            <div data-hf-id="hf-3c70" class="ln">
+              <span data-hf-id="hf-oonr" class="p">--radius</span>: .625rem;
+            </div>
+            <div data-hf-id="hf-e1u0" class="ln">
+              <span data-hf-id="hf-zam1" class="p">--background</span>:
+              var(--color-white);
+            </div>
+            <div data-hf-id="hf-8bjb" class="ln">
+              <span data-hf-id="hf-m1v8" class="p">--foreground</span>:
+              var(--color-neutral-800);
+            </div>
+            <div data-hf-id="hf-gpc0" class="ln">
+              <span data-hf-id="hf-7r2j" class="p">--card</span>:
+              var(--color-white);
+            </div>
+            <div data-hf-id="hf-qhvr" class="ln">
+              <span data-hf-id="hf-77b3" class="p">--card-foreground</span>:
+              var(--color-neutral-800);
+            </div>
+            <div data-hf-id="hf-fiex" class="ln">
+              <span data-hf-id="hf-bhx2" class="p">--popover</span>:
+              var(--color-white);
+            </div>
+            <div data-hf-id="hf-q3kq" class="ln">
+              <span data-hf-id="hf-6p5o" class="p">--popover-foreground</span>:
+              var(--color-neutral-800);
+            </div>
+            <div data-hf-id="hf-szvh" class="ln" id="ow-edit-line">
+              <span data-hf-id="hf-u565" class="p">--primary</span>:
+              <span data-hf-id="hf-2m2y" id="ow-val"
+                ><span data-hf-id="hf-4e1e" class="o">v</span
+                ><span data-hf-id="hf-00o3" class="o">a</span
+                ><span data-hf-id="hf-5z9i" class="o">r</span
+                ><span data-hf-id="hf-mo4o" class="o">(</span
+                ><span data-hf-id="hf-kolj" class="o">-</span
+                ><span data-hf-id="hf-4luv" class="o">-</span
+                ><span data-hf-id="hf-z821" class="o">c</span
+                ><span data-hf-id="hf-ugdp" class="o">o</span
+                ><span data-hf-id="hf-vnas" class="o">l</span
+                ><span data-hf-id="hf-hx5t" class="o">o</span
+                ><span data-hf-id="hf-0de2" class="o">r</span
+                ><span data-hf-id="hf-47ju" class="o">-</span
+                ><span data-hf-id="hf-uuoq" class="o">n</span
+                ><span data-hf-id="hf-yffz" class="o">e</span
+                ><span data-hf-id="hf-4scf" class="o">u</span
+                ><span data-hf-id="hf-56ng" class="o">t</span
+                ><span data-hf-id="hf-0rp3" class="o">r</span
+                ><span data-hf-id="hf-1kyr" class="o">a</span
+                ><span data-hf-id="hf-4dl8" class="o">l</span
+                ><span data-hf-id="hf-3t8t" class="o">-</span
+                ><span data-hf-id="hf-t114" class="o">8</span
+                ><span data-hf-id="hf-w7hc" class="o">0</span
+                ><span data-hf-id="hf-sezc" class="o">0</span
+                ><span data-hf-id="hf-m9tn" class="o">)</span
+                ><span data-hf-id="hf-6yfi" class="n">#</span
+                ><span data-hf-id="hf-co8k" class="n">e</span
+                ><span data-hf-id="hf-gw37" class="n">8</span
+                ><span data-hf-id="hf-cipw" class="n">5</span
+                ><span data-hf-id="hf-bq3u" class="n">7</span
+                ><span data-hf-id="hf-64lv" class="n">8</span
+                ><span data-hf-id="hf-bhbh" class="n">f</span></span
+              ><span data-hf-id="hf-fpqy" id="ow-caret"></span>;
+            </div>
+            <div data-hf-id="hf-mzb0" class="ln">
+              <span data-hf-id="hf-gec1" class="p">--primary-foreground</span>:
+              var(--color-neutral-50);
+            </div>
+            <div data-hf-id="hf-1twf" class="ln">
+              <span data-hf-id="hf-axot" class="p">--secondary</span>:
+              #0000000a;
+            </div>
+            <div data-hf-id="hf-pp9p" class="ln">
+              <span data-hf-id="hf-5p4h" class="p">--secondary-foreground</span
+              >: var(--color-neutral-800);
+            </div>
+            <div data-hf-id="hf-juov" class="ln">
+              <span data-hf-id="hf-9nlw" class="p">--muted</span>: #0000000a;
+            </div>
+            <div data-hf-id="hf-vgok" class="ln">
+              <span data-hf-id="hf-vqpu" class="p">--muted-foreground</span>:
+              #686868;
+            </div>
+            <div data-hf-id="hf-jgdu" class="ln">
+              <span data-hf-id="hf-t9v7" class="p">--accent</span>: #0000000a;
+            </div>
+            <div data-hf-id="hf-shew" class="ln">
+              <span data-hf-id="hf-a6lz" class="p">--accent-foreground</span>:
+              var(--color-neutral-800);
+            </div>
+            <div data-hf-id="hf-e7ik" class="ln">
+              <span data-hf-id="hf-gosn" class="p">--destructive</span>:
+              var(--color-red-500);
+            </div>
+            <div data-hf-id="hf-l1um" class="ln">
+              <span data-hf-id="hf-rstn" class="p"
+                >--destructive-foreground</span
+              >: var(--color-red-700);
+            </div>
+            <div data-hf-id="hf-g7vp" class="ln">
+              <span data-hf-id="hf-n5bl" class="p">--info</span>:
+              var(--color-blue-500);
+            </div>
+            <div data-hf-id="hf-0qir" class="ln">
+              <span data-hf-id="hf-c4kl" class="p">--info-foreground</span>:
+              var(--color-blue-700);
+            </div>
+            <div data-hf-id="hf-parr" class="ln">
+              <span data-hf-id="hf-dml8" class="p">--success</span>:
+              var(--color-emerald-500);
+            </div>
+            <div data-hf-id="hf-gi7t" class="ln">
+              <span data-hf-id="hf-kg96" class="p">--success-foreground</span>:
+              var(--color-emerald-700);
+            </div>
+            <div data-hf-id="hf-mad8" class="ln">
+              <span data-hf-id="hf-l48r" class="p">--warning</span>:
+              var(--color-amber-500);
+            </div>
+            <div data-hf-id="hf-pbf2" class="ln">
+              <span data-hf-id="hf-glbj" class="p">--warning-foreground</span>:
+              var(--color-amber-700);
+            </div>
+            <div data-hf-id="hf-ce3x" class="ln">
+              <span data-hf-id="hf-n09v" class="p">--border</span>: #00000014;
+            </div>
+            <div data-hf-id="hf-unnk" class="ln">
+              <span data-hf-id="hf-vibz" class="p">--input</span>: #0000001a;
+            </div>
+            <div data-hf-id="hf-ebpn" class="ln">
+              <span data-hf-id="hf-27en" class="p">--ring</span>:
+              var(--color-neutral-400);
+            </div>
+            <div data-hf-id="hf-a4x2" class="ln">
+              <span data-hf-id="hf-fsat" class="p">--chart-1</span>:
+              var(--color-orange-600);
+            </div>
+            <div data-hf-id="hf-9epe" class="ln">
+              <span data-hf-id="hf-gz7w" class="p">--chart-2</span>:
+              var(--color-teal-600);
+            </div>
+            <div data-hf-id="hf-nxxe" class="ln">
+              <span data-hf-id="hf-gkwv" class="p">--chart-3</span>:
+              var(--color-cyan-900);
+            </div>
+            <div data-hf-id="hf-7tdv" class="ln">
+              <span data-hf-id="hf-hrty" class="p">--chart-4</span>:
+              var(--color-amber-400);
+            </div>
+            <div data-hf-id="hf-dbw4" class="ln">
+              <span data-hf-id="hf-hdix" class="p">--chart-5</span>:
+              var(--color-amber-500);
+            </div>
+            <div data-hf-id="hf-33xw" class="ln">
+              <span data-hf-id="hf-ut83" class="p">--sidebar</span>:
+              var(--color-neutral-50);
+            </div>
+            <div data-hf-id="hf-85sy" class="ln">
+              <span data-hf-id="hf-c2pj" class="p">--sidebar-foreground</span>:
+              #262626;
+            </div>
+            <div data-hf-id="hf-s33v" class="ln">
+              <span data-hf-id="hf-968c" class="p">--sidebar-primary</span>:
+              var(--color-neutral-800);
+            </div>
+            <div data-hf-id="hf-1x0t" class="ln">
+              <span data-hf-id="hf-t3ui" class="p"
+                >--sidebar-primary-foreground</span
+              >: var(--color-neutral-50);
+            </div>
+            <div data-hf-id="hf-j22t" class="ln">
+              <span data-hf-id="hf-ctzw" class="p">--sidebar-accent</span>:
+              #0000000a;
+            </div>
+            <div data-hf-id="hf-rosu" class="ln">
+              <span data-hf-id="hf-p6oa" class="p"
+                >--sidebar-accent-foreground</span
+              >: var(--color-neutral-800);
+            </div>
+            <div data-hf-id="hf-wf6s" class="ln">
+              <span data-hf-id="hf-sf8g" class="p">--sidebar-border</span>:
+              #0000000f;
+            </div>
+            <div data-hf-id="hf-rwa3" class="ln">
+              <span data-hf-id="hf-2n5c" class="p">--sidebar-ring</span>:
+              var(--color-neutral-400);
+            </div>
+            <div data-hf-id="hf-fwpy" class="ln">
+              <span data-hf-id="hf-q9r4" class="p">--code</span>:
+              var(--color-white);
+            </div>
+            <div data-hf-id="hf-rrao" class="ln">
+              <span data-hf-id="hf-xxge" class="p">--code-foreground</span>:
+              var(--foreground);
+            </div>
+            <div data-hf-id="hf-lu80" class="ln">
+              <span data-hf-id="hf-ublx" class="p">--code-highlight</span>:
+              #0000000a;
+            </div>
+            <div data-hf-id="hf-iotp" class="ln">}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true })
+    const words = (sel, at) =>
+      tl.fromTo(
+        sel + " b",
+        { opacity: 0, filter: "blur(6px)" },
+        {
+          opacity: 1,
+          filter: "blur(0px)",
+          duration: 0.13,
+          stagger: 0.07,
+          ease: "power4.out",
+        },
+        at
+      )
+    const out = (sel, at) =>
+      tl.to(
+        sel + " b",
+        {
+          opacity: 0,
+          filter: "blur(8px)",
+          duration: 0.16,
+          stagger: 0.03,
+          ease: "power3.in",
+        },
+        at
+      )
+    tl.fromTo(
+      ["#ow-t1 b", "#ow-t2 b", "#ow-t3 b"],
+      { opacity: 0 },
+      { opacity: 0, duration: 0.01 },
+      0
+    )
+    // The card arrives from the right as the hook whips out; the list scrolls up through all 42 lines.
+    tl.fromTo(
+      "#ow-card",
+      { x: 700, filter: "blur(14px)" },
+      { x: 0, filter: "blur(0px)", duration: 0.55, ease: "expo.out" },
+      0
+    )
+    tl.fromTo(
+      "#ow-list",
+      { y: -1268 },
+      { y: 0, duration: 1.8, ease: "power2.inOut" },
+      0.05
+    )
+    words("#ow-t1", 0.25)
+    out("#ow-t1", 1.95)
+    words("#ow-t2", 2.15)
+    tl.to("#ow-hl", { opacity: 1, duration: 0.15 }, 2.0)
+    tl.set("#ow-caret", { opacity: 1 }, 2.1)
+    const o = Array.from(document.querySelectorAll("#ow-val .o"))
+    const n = Array.from(document.querySelectorAll("#ow-val .n"))
+    o.slice()
+      .reverse()
+      .forEach((el, i) => tl.set(el, { display: "none" }, 2.3 + i * 0.03))
+    n.forEach((el, i) => tl.set(el, { display: "inline" }, 3.15 + i * 0.075))
+    out("#ow-t2", 4.15)
+    words("#ow-t3", 4.4)
+    // Reload: the edit is gone.
+    tl.set("#ow-hl", { backgroundColor: "#fecaca" }, 4.8)
+    n.forEach((el) => tl.set(el, { display: "none" }, 4.8))
+    o.forEach((el) => tl.set(el, { display: "inline" }, 4.8))
+    tl.set("#ow-caret", { opacity: 0 }, 4.8)
+    tl.to("#ow-hl", { opacity: 0, duration: 0.5, ease: "power2.out" }, 5.0)
+    out("#ow-t3", 5.55)
+    // The card heads for the side panel's place in the window: 1400,162 at 400 x 800.
+    tl.to("#ow-inner", { opacity: 0, duration: 0.18, ease: "power2.in" }, 5.6)
+    tl.to(
+      "#ow-card",
+      {
+        x: 440,
+        y: 42,
+        scaleX: 400 / 840,
+        scaleY: 800 / 840,
+        duration: 0.4,
+        ease: "power3.inOut",
+      },
+      5.6
+    )
+    window.__timelines["oldway"] = tl
+  </script>
+</template>

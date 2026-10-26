@@ -1,0 +1,211 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("assets/fonts/geist.woff2") format("woff2");
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--color-ground, #f4f4f5);
+      overflow: hidden;
+      font-family: "Geist", sans-serif;
+      color: #18181b;
+    }
+    #ec-lock {
+      position: absolute;
+      left: 0;
+      top: 330px;
+      width: 1920px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+    }
+    #ec-mark {
+      width: 190px;
+      height: 190px;
+    }
+    #ec-mark img {
+      width: 190px;
+      height: 190px;
+      display: block;
+    }
+    #ec-word {
+      font-size: 156px;
+      font-weight: 600;
+      letter-spacing: -0.045em;
+      line-height: 1;
+    }
+    #ec-cta {
+      position: absolute;
+      left: 0;
+      top: 640px;
+      width: 1920px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+    #ec-btn2 {
+      padding: 24px 40px;
+      border-radius: 16px;
+      background: #18181b;
+      color: #fafafa;
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    #ec-btn {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 22px 38px;
+      border-radius: 16px;
+      border: 2px solid #d4d4d8;
+      background: #fff;
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    #ec-url {
+      font-size: 40px;
+      font-weight: 500;
+      color: #52525b;
+      letter-spacing: -0.02em;
+    }
+    #ec-cur {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 64px;
+      height: 64px;
+      transform-origin: 0 0;
+      z-index: 5;
+    }
+  </style>
+  <div
+    data-hf-id="hf-32ii"
+    id="root"
+    data-composition-id="endcard"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div data-hf-id="hf-punv" id="ec-lock">
+      <div data-hf-id="hf-pah9" id="ec-mark">
+        <img
+          data-hf-id="hf-2m6m"
+          src="assets/img/logo.svg"
+          alt="Cossplay mark"
+        />
+      </div>
+      <div data-hf-id="hf-veyo" id="ec-word">Cossplay</div>
+    </div>
+    <div data-hf-id="hf-f8i0" id="ec-cta">
+      <div id="ec-btn2">Open the editor</div>
+      <div data-hf-id="hf-rh0m" id="ec-btn">
+        <svg
+          data-hf-id="hf-vt6x"
+          width="40"
+          height="40"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#18181b"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle data-hf-id="hf-m1lh" cx="12" cy="12" r="10" />
+          <circle data-hf-id="hf-kysq" cx="12" cy="12" r="4" />
+          <line data-hf-id="hf-lytc" x1="21.17" x2="12" y1="8" y2="8" />
+          <line data-hf-id="hf-3gn3" x1="3.95" x2="8.54" y1="6.06" y2="14" />
+          <line data-hf-id="hf-2lz6" x1="10.88" x2="15.46" y1="21.94" y2="14" />
+        </svg>
+        <span data-hf-id="hf-h25p">Add to Chrome</span>
+      </div>
+      <div data-hf-id="hf-sb6p" id="ec-url">cossplay.vercel.app</div>
+    </div>
+    <div data-hf-id="hf-6aj0" id="ec-cur">
+      <svg data-hf-id="hf-q016" viewBox="0 0 24 24" width="64" height="64">
+        <path
+          data-hf-id="hf-h8fr"
+          d="M3 2 L3 19 L7.6 14.8 L10.6 21.6 L13.6 20.3 L10.7 13.6 L17 13.6 Z"
+          fill="#111"
+          stroke="#fff"
+          stroke-width="1.4"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true })
+    // The cursor clicks the empty centre on the beat and the mark springs out of it.
+    tl.fromTo(
+      "#ec-cur",
+      { x: 1500, y: 900, scale: 1 },
+      { x: 962, y: 440, duration: 0.01 },
+      0
+    )
+    tl.fromTo("#ec-lock", { x: 340 }, { x: 340, duration: 0.01 }, 0)
+    tl.fromTo(
+      "#ec-word",
+      { clipPath: "inset(0% 100% 0% 0%)", x: -30 },
+      { clipPath: "inset(0% 100% 0% 0%)", x: -30, duration: 0.01 },
+      0
+    )
+    tl.fromTo(
+      "#ec-mark",
+      { scale: 0, rotation: -30 },
+      { scale: 1, rotation: 0, duration: 0.7, ease: "elastic.out(1, 0.6)" },
+      0.02
+    )
+    tl.to("#ec-cur", { scale: 0.86, duration: 0.06 }, 0)
+    tl.to("#ec-cur", { scale: 1, duration: 0.16 }, 0.06)
+    tl.to(
+      "#ec-cur",
+      { x: 1400, y: 1150, duration: 0.5, ease: "power3.in" },
+      0.25
+    )
+    // The lockup opens: the mark slides left as the wordmark wipes in beside it.
+    tl.to("#ec-lock", { x: 0, duration: 0.55, ease: "expo.out" }, 0.3)
+    tl.to(
+      "#ec-word",
+      { clipPath: "inset(0% 0% 0% 0%)", x: 0, duration: 0.5, ease: "expo.out" },
+      0.32
+    )
+    tl.fromTo(
+      "#ec-btn",
+      { y: 30, opacity: 0, filter: "blur(8px)" },
+      {
+        y: 0,
+        opacity: 1,
+        filter: "blur(0px)",
+        duration: 0.45,
+        ease: "expo.out",
+      },
+      0.76
+    )
+    tl.fromTo(
+      "#ec-btn2",
+      { y: 30, opacity: 0, filter: "blur(8px)" },
+      {
+        y: 0,
+        opacity: 1,
+        filter: "blur(0px)",
+        duration: 0.45,
+        ease: "expo.out",
+      },
+      0.7
+    )
+    tl.fromTo(
+      "#ec-url",
+      { opacity: 0, filter: "blur(8px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power2.out" },
+      0.86
+    )
+    window.__timelines["endcard"] = tl
+  </script>
+</template>

@@ -1,0 +1,520 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("assets/fonts/geist.woff2") format("woff2");
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--color-ground, #f4f4f5);
+      overflow: hidden;
+      font-family: "Geist", sans-serif;
+      color: #18181b;
+    }
+    #pf-stage {
+      position: absolute;
+      inset: 0;
+    }
+    #pf-win {
+      position: absolute;
+      left: 120px;
+      top: 118px;
+      width: 1680px;
+      height: 844px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #d4d4d8;
+      background: #fafafa;
+      box-shadow: 0 40px 90px rgba(24, 24, 27, 0.16);
+      transform-origin: 0 0;
+    }
+    #pf-win .bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1680px;
+      height: 44px;
+      background: #fafafa;
+      border-bottom: 1px solid #e4e4e7;
+    }
+    #pf-win .bar i {
+      position: absolute;
+      top: 16px;
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      background: #d4d4d8;
+    }
+    #pf-win .bar span {
+      position: absolute;
+      left: 640px;
+      top: 8px;
+      width: 400px;
+      height: 28px;
+      border-radius: 8px;
+      background: #f0f0f1;
+      font-size: 15px;
+      line-height: 28px;
+      text-align: center;
+      color: #52525b;
+    }
+    #pf-win .site,
+    #pf-win .panel {
+      position: absolute;
+      top: 44px;
+      height: 800px;
+    }
+    #pf-win .site {
+      left: 0;
+      width: 1280px;
+    }
+    #pf-win .panel {
+      left: 1280px;
+      width: 400px;
+    }
+    #pf-win img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+    }
+    #pf-frame {
+      position: absolute;
+      left: 680px;
+      top: 90px;
+      width: 1160px;
+      height: 900px;
+      border-radius: 20px;
+      border: 1px solid #d4d4d8;
+      opacity: 0;
+    }
+    .pf-title {
+      position: absolute;
+      left: 150px;
+      top: 360px;
+      width: 500px;
+      font-size: 92px;
+      font-weight: 600;
+      letter-spacing: -0.035em;
+      line-height: 1.04;
+    }
+    .pf-title b {
+      display: inline-block;
+      font-weight: 600;
+      opacity: 0;
+    }
+    #pf-cur {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 64px;
+      height: 64px;
+      transform-origin: 0 0;
+      z-index: 5;
+    }
+  </style>
+  <div
+    data-hf-id="hf-s4mz"
+    id="root"
+    data-composition-id="proof"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div data-hf-id="hf-8lbq" id="pf-stage">
+      <div data-hf-id="hf-p0zq" id="pf-win">
+        <div data-hf-id="hf-i3la" class="bar" data-layout-ignore>
+          <i data-hf-id="hf-akbv" style="left: 18px"></i
+          ><i data-hf-id="hf-4nv5" style="left: 38px"></i
+          ><i data-hf-id="hf-gl07" style="left: 58px"></i
+          ><span data-hf-id="hf-n4h5">coss.com/ui</span>
+        </div>
+        <div data-hf-id="hf-pykx" class="site">
+          <img
+            data-hf-id="hf-3ogw"
+            id="pf-site-tangerine"
+            class="pf-site"
+            src="assets/cap/site-tangerine.png"
+            alt="site tangerine"
+          />
+          <img
+            data-hf-id="hf-tx1p"
+            id="pf-site-tangerine-dark"
+            class="pf-site"
+            src="assets/cap/site-tangerine-dark.png"
+            alt="site tangerine-dark"
+          />
+          <img
+            data-hf-id="hf-wsrk"
+            id="pf-site-hue-0"
+            class="pf-site"
+            src="assets/cap/site-hue-0.png"
+            alt="site hue-0"
+          />
+          <img
+            data-hf-id="hf-hfeb"
+            id="pf-site-hue-1"
+            class="pf-site"
+            src="assets/cap/site-hue-1.png"
+            alt="site hue-1"
+          />
+          <img
+            data-hf-id="hf-nifa"
+            id="pf-site-hue-2"
+            class="pf-site"
+            src="assets/cap/site-hue-2.png"
+            alt="site hue-2"
+          />
+          <img
+            data-hf-id="hf-nkf5"
+            id="pf-site-hue-3"
+            class="pf-site"
+            src="assets/cap/site-hue-3.png"
+            alt="site hue-3"
+          />
+          <img
+            data-hf-id="hf-0rq4"
+            id="pf-site-hue-4"
+            class="pf-site"
+            src="assets/cap/site-hue-4.png"
+            alt="site hue-4"
+          />
+          <img
+            data-hf-id="hf-h39z"
+            id="pf-site-hue-5"
+            class="pf-site"
+            src="assets/cap/site-hue-5.png"
+            alt="site hue-5"
+          />
+          <img
+            data-hf-id="hf-x26q"
+            id="pf-site-hue-6"
+            class="pf-site"
+            src="assets/cap/site-hue-6.png"
+            alt="site hue-6"
+          />
+          <img
+            data-hf-id="hf-b9yd"
+            id="pf-site-hue-7"
+            class="pf-site"
+            src="assets/cap/site-hue-7.png"
+            alt="site hue-7"
+          />
+          <img
+            data-hf-id="hf-v1oo"
+            id="pf-site-hue-8"
+            class="pf-site"
+            src="assets/cap/site-hue-8.png"
+            alt="site hue-8"
+          />
+          <img
+            data-hf-id="hf-jrf3"
+            id="pf-site-inspect"
+            class="pf-site"
+            src="assets/cap/site-inspect.png"
+            alt="site inspect"
+          />
+        </div>
+        <div data-hf-id="hf-owjm" class="panel">
+          <img
+            data-hf-id="hf-nb7a"
+            id="pf-panel-tangerine"
+            class="pf-panel"
+            src="assets/cap/panel-tangerine.png"
+            alt="panel tangerine"
+          />
+          <img
+            data-hf-id="hf-joxn"
+            id="pf-panel-tangerine-dark"
+            class="pf-panel"
+            src="assets/cap/panel-tangerine-dark.png"
+            alt="panel tangerine-dark"
+          />
+          <img
+            data-hf-id="hf-090u"
+            id="pf-panel-hue-0"
+            class="pf-panel"
+            src="assets/cap/panel-hue-0.png"
+            alt="panel hue-0"
+          />
+          <img
+            data-hf-id="hf-zm4h"
+            id="pf-panel-hue-1"
+            class="pf-panel"
+            src="assets/cap/panel-hue-1.png"
+            alt="panel hue-1"
+          />
+          <img
+            data-hf-id="hf-k6ws"
+            id="pf-panel-hue-2"
+            class="pf-panel"
+            src="assets/cap/panel-hue-2.png"
+            alt="panel hue-2"
+          />
+          <img
+            data-hf-id="hf-1ken"
+            id="pf-panel-hue-3"
+            class="pf-panel"
+            src="assets/cap/panel-hue-3.png"
+            alt="panel hue-3"
+          />
+          <img
+            data-hf-id="hf-c67e"
+            id="pf-panel-hue-4"
+            class="pf-panel"
+            src="assets/cap/panel-hue-4.png"
+            alt="panel hue-4"
+          />
+          <img
+            data-hf-id="hf-e5m5"
+            id="pf-panel-hue-5"
+            class="pf-panel"
+            src="assets/cap/panel-hue-5.png"
+            alt="panel hue-5"
+          />
+          <img
+            data-hf-id="hf-xce0"
+            id="pf-panel-hue-6"
+            class="pf-panel"
+            src="assets/cap/panel-hue-6.png"
+            alt="panel hue-6"
+          />
+          <img
+            data-hf-id="hf-poaj"
+            id="pf-panel-hue-7"
+            class="pf-panel"
+            src="assets/cap/panel-hue-7.png"
+            alt="panel hue-7"
+          />
+          <img
+            data-hf-id="hf-bmeu"
+            id="pf-panel-hue-8"
+            class="pf-panel"
+            src="assets/cap/panel-hue-8.png"
+            alt="panel hue-8"
+          />
+          <img
+            data-hf-id="hf-pnph"
+            id="pf-panel-inspect"
+            class="pf-panel"
+            src="assets/cap/panel-inspect.png"
+            alt="panel inspect"
+          />
+          <img
+            data-hf-id="hf-9qh3"
+            id="pf-panel-export"
+            class="pf-panel"
+            src="assets/cap/panel-export.png"
+            alt="panel export"
+          />
+        </div>
+      </div>
+    </div>
+    <div data-hf-id="hf-67zn" id="pf-frame"></div>
+    <div data-hf-id="hf-3sc5" id="pf-p1" class="pf-title">
+      <b data-hf-id="hf-0jmu">Flip</b> <b data-hf-id="hf-35f4">it</b>
+      <b data-hf-id="hf-9q8h">dark.</b>
+    </div>
+    <div data-hf-id="hf-7qg6" id="pf-p2" class="pf-title">
+      <b data-hf-id="hf-72c3">Tune</b> <b data-hf-id="hf-248d">any</b>
+      <b data-hf-id="hf-sdys">token.</b>
+    </div>
+    <div data-hf-id="hf-dw5z" id="pf-p3" class="pf-title">
+      <b data-hf-id="hf-15q8">See</b> <b data-hf-id="hf-km6n">what</b>
+      <b data-hf-id="hf-4k5k">it</b> <b data-hf-id="hf-vqoh">uses.</b>
+    </div>
+    <div data-hf-id="hf-hua0" id="pf-p4" class="pf-title">
+      <b data-hf-id="hf-27jn">Export</b> <b data-hf-id="hf-cc51">Tailwind</b>
+      <b data-hf-id="hf-iiuj">v4.</b>
+    </div>
+    <div data-hf-id="hf-7cru" id="pf-cur">
+      <svg data-hf-id="hf-q016" viewBox="0 0 24 24" width="64" height="64">
+        <path
+          data-hf-id="hf-h8fr"
+          d="M3 2 L3 19 L7.6 14.8 L10.6 21.6 L13.6 20.3 L10.7 13.6 L17 13.6 Z"
+          fill="#111"
+          stroke="#fff"
+          stroke-width="1.4"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true })
+    const cam = (s, fx, fy, cx = 1260, cy = 540) => ({
+      scale: s,
+      x: cx - 120 - s * fx,
+      y: cy - 118 - s * fy,
+    })
+    const show = (kind, name, at) => {
+      tl.set(".pf-" + kind, { opacity: 0 }, at)
+      tl.set("#pf-" + kind + "-" + name, { opacity: 1 }, at)
+    }
+    const click = (at) => {
+      tl.to(
+        "#pf-cur",
+        { scale: 0.86, duration: 0.07, ease: "power2.in" },
+        at - 0.07
+      )
+      tl.to("#pf-cur", { scale: 1, duration: 0.18, ease: "power2.out" }, at)
+    }
+    const words = (id, at) =>
+      tl.fromTo(
+        id + " b",
+        { opacity: 0, filter: "blur(6px)" },
+        {
+          opacity: 1,
+          filter: "blur(0px)",
+          duration: 0.13,
+          stagger: 0.07,
+          ease: "power4.out",
+        },
+        at
+      )
+    const out = (id, at) =>
+      tl.to(
+        id + " b",
+        {
+          opacity: 0,
+          filter: "blur(8px)",
+          duration: 0.16,
+          stagger: 0.03,
+          ease: "power3.in",
+        },
+        at
+      )
+    const LENS = "inset(90px 80px 90px 680px round 20px)"
+
+    show("site", "tangerine", 0)
+    show("panel", "tangerine", 0)
+    tl.fromTo(
+      "#pf-cur",
+      { x: 2000, y: 1100, scale: 1 },
+      { x: 2000, y: 1100, duration: 0.01 },
+      0
+    )
+    // From the whole window into the lens.
+    tl.fromTo(
+      "#pf-win",
+      { ...cam(1, 840, 422, 960, 540), filter: "blur(0px)" },
+      { ...cam(1.3, 1300, 300), duration: 0.55, ease: "power2.inOut" },
+      0
+    )
+    tl.fromTo(
+      "#pf-stage",
+      { clipPath: "inset(0px 0px 0px 0px round 0px)" },
+      { clipPath: LENS, duration: 0.55, ease: "power2.inOut" },
+      0
+    )
+    tl.fromTo("#pf-frame", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.3)
+
+    // 1. Dark.
+    words("#pf-p1", 0.2)
+    tl.to(
+      "#pf-cur",
+      { x: 1483, y: 279, duration: 0.42, ease: "power3.out" },
+      0.12
+    )
+    click(0.6)
+    show("site", "tangerine-dark", 0.6)
+    show("panel", "tangerine-dark", 0.6)
+    out("#pf-p1", 2.2)
+
+    // 2. Tune: back to light, then drag Primary's hue across nine real frames.
+    words("#pf-p2", 2.45)
+    click(2.4)
+    show("site", "hue-0", 2.4)
+    show("panel", "hue-0", 2.4)
+    tl.to(
+      "#pf-win",
+      { ...cam(2.0, 1512, 304), duration: 0.5, ease: "power2.inOut" },
+      2.5
+    )
+    tl.to(
+      "#pf-cur",
+      { x: 1041, y: 539, duration: 0.5, ease: "power2.inOut" },
+      2.5
+    )
+    click(3.12)
+    tl.to("#pf-cur", { x: 1303, duration: 0.95, ease: "none" }, 3.15)
+    for (let i = 0; i <= 8; i++) {
+      show("site", "hue-" + i, 3.15 + i * 0.115)
+      show("panel", "hue-" + i, 3.15 + i * 0.115)
+    }
+    tl.to("#pf-cur", { y: 1150, duration: 0.35, ease: "power3.in" }, 4.15)
+    tl.to(
+      "#pf-win",
+      { ...cam(2.2, 75, 402), duration: 0.38, ease: "power3.inOut" },
+      4.2
+    )
+    tl.to(
+      "#pf-win",
+      { filter: "blur(16px)", duration: 0.19, ease: "power2.in" },
+      4.2
+    )
+    tl.to(
+      "#pf-win",
+      { filter: "blur(0px)", duration: 0.19, ease: "power2.out" },
+      4.39
+    )
+    out("#pf-p2", 4.6)
+
+    // 3. Inspect the button.
+    words("#pf-p3", 4.85)
+    tl.to(
+      "#pf-win",
+      { ...cam(1.45, 330, 450), duration: 0.5, ease: "power2.inOut" },
+      4.8
+    )
+    tl.set("#pf-cur", { x: 1150, y: 1100 }, 4.9)
+    tl.to(
+      "#pf-cur",
+      { x: 900, y: 476, duration: 0.42, ease: "power3.out" },
+      4.95
+    )
+    show("site", "inspect", 5.4)
+    show("panel", "inspect", 5.4)
+    out("#pf-p3", 7.0)
+
+    // 4. Export.
+    words("#pf-p4", 7.25)
+    tl.to(
+      "#pf-win",
+      { ...cam(1.6, 1580, 744), duration: 0.45, ease: "power2.inOut" },
+      7.2
+    )
+    tl.to(
+      "#pf-cur",
+      { x: 1351, y: 665, duration: 0.45, ease: "power2.inOut" },
+      7.25
+    )
+    click(7.8)
+    show("panel", "export", 7.8)
+    tl.to(
+      "#pf-cur",
+      { x: 2000, y: 1150, duration: 0.4, ease: "power3.in" },
+      8.0
+    )
+    tl.to(
+      "#pf-win",
+      { ...cam(1.75, 1480, 360), duration: 0.6, ease: "power2.inOut" },
+      8.1
+    )
+    out("#pf-p4", 9.05)
+    tl.to(
+      "#pf-stage",
+      {
+        clipPath: "inset(0px 0px 0px 0px round 0px)",
+        duration: 0.4,
+        ease: "power3.in",
+      },
+      9.2
+    )
+    tl.to("#pf-frame", { opacity: 0, duration: 0.15 }, 9.2)
+    window.__timelines["proof"] = tl
+  </script>
+</template>

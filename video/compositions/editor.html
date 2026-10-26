@@ -1,0 +1,217 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("assets/fonts/geist.woff2") format("woff2");
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--color-ground, #f4f4f5);
+      overflow: hidden;
+      font-family: "Geist", sans-serif;
+      color: #18181b;
+    }
+    #ed-title {
+      position: absolute;
+      left: 150px;
+      top: 380px;
+      width: 540px;
+      font-size: 92px;
+      font-weight: 600;
+      letter-spacing: -0.035em;
+      line-height: 1.04;
+    }
+    #ed-title b {
+      display: inline-block;
+      font-weight: 600;
+    }
+    #ed-win {
+      position: absolute;
+      left: 760px;
+      top: 194px;
+      width: 1280px;
+      height: 844px;
+      border-radius: 16px;
+      overflow: hidden;
+      transform-origin: 0 0;
+      border: 1px solid #d4d4d8;
+      background: #fafafa;
+      box-shadow: 0 40px 90px rgba(24, 24, 27, 0.16);
+    }
+    #ed-win .bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1280px;
+      height: 44px;
+      background: #fafafa;
+      border-bottom: 1px solid #e4e4e7;
+    }
+    #ed-win .bar i {
+      position: absolute;
+      top: 16px;
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      background: #d4d4d8;
+    }
+    #ed-win .bar span {
+      position: absolute;
+      left: 440px;
+      top: 8px;
+      width: 400px;
+      height: 28px;
+      border-radius: 8px;
+      background: #f0f0f1;
+      font-size: 15px;
+      line-height: 28px;
+      text-align: center;
+      color: #52525b;
+    }
+    #ed-win img {
+      position: absolute;
+      left: 0;
+      top: 44px;
+      width: 1280px;
+      height: 800px;
+    }
+    #ed-cur {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 64px;
+      height: 64px;
+      transform-origin: 0 0;
+      z-index: 5;
+    }
+  </style>
+  <div
+    id="root"
+    data-composition-id="editor"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div id="ed-title">
+      <b>No</b> <b>install?</b> <b>Open</b> <b>the</b> <b>editor.</b>
+    </div>
+    <div id="ed-win">
+      <div class="bar" data-layout-ignore>
+        <i style="left: 18px"></i><i style="left: 38px"></i
+        ><i style="left: 58px"></i><span>cossplay.vercel.app/editor</span>
+      </div>
+      <img
+        id="ed-0"
+        src="assets/cap/editor-0.png"
+        alt="Cossplay web editor in Ocean Breeze"
+      />
+      <img
+        id="ed-1"
+        src="assets/cap/editor-1.png"
+        alt="Cossplay web editor in Retro Arcade"
+      />
+      <img
+        id="ed-2"
+        src="assets/cap/editor-2.png"
+        alt="Cossplay web editor in Midnight Bloom"
+      />
+      <img
+        id="ed-3"
+        src="assets/cap/editor-3.png"
+        alt="Cossplay web editor in Candyland"
+      />
+    </div>
+    <div id="ed-cur">
+      <svg viewBox="0 0 24 24" width="64" height="64">
+        <path
+          d="M3 2 L3 19 L7.6 14.8 L10.6 21.6 L13.6 20.3 L10.7 13.6 L17 13.6 Z"
+          fill="#111"
+          stroke="#fff"
+          stroke-width="1.4"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true })
+    // Cut on the bar from the export: the editor window rises beside the title.
+    tl.fromTo(
+      "#ed-win",
+      { scale: 0.82, y: 120, opacity: 0, filter: "blur(10px)" },
+      {
+        y: 0,
+        opacity: 1,
+        filter: "blur(0px)",
+        duration: 0.5,
+        ease: "expo.out",
+      },
+      0.1
+    )
+    tl.fromTo(
+      "#ed-title b",
+      { opacity: 0, filter: "blur(6px)" },
+      {
+        opacity: 1,
+        filter: "blur(0px)",
+        duration: 0.13,
+        stagger: 0.07,
+        ease: "power2.out",
+      },
+      0.25
+    )
+    // The cursor steps the preset with the editor's Next button on each beat (window 0.82x at 760,194; button at 294,128).
+    const [bx, by] = [760 + 0.82 * 294 - 8, 194 + 0.82 * 128 - 5]
+    tl.fromTo(
+      ["#ed-1", "#ed-2", "#ed-3"],
+      { opacity: 0 },
+      { opacity: 0, duration: 0.01 },
+      0
+    )
+    tl.fromTo(
+      "#ed-cur",
+      { x: 1500, y: 900, scale: 1 },
+      { x: bx, y: by, duration: 0.35, ease: "power3.inOut" },
+      0.15
+    )
+    ;[0.6, 1.2, 1.8].forEach((t, i) => {
+      tl.to(
+        "#ed-cur",
+        { scale: 0.86, duration: 0.06, ease: "power2.in" },
+        t - 0.06
+      )
+      tl.set("#ed-" + (i + 1), { opacity: 1 }, t)
+      tl.to("#ed-cur", { scale: 1, duration: 0.16, ease: "power2.out" }, t)
+    })
+    // Out: the cursor heads to where the end card's mark appears.
+    tl.to(
+      "#ed-cur",
+      { x: 962, y: 440, duration: 0.45, ease: "power3.inOut" },
+      1.95
+    )
+    tl.to(
+      "#ed-title b",
+      {
+        opacity: 0,
+        filter: "blur(8px)",
+        duration: 0.16,
+        stagger: 0.02,
+        ease: "power3.in",
+      },
+      2.15
+    )
+    tl.to(
+      "#ed-win",
+      {
+        y: 60,
+        opacity: 0,
+        filter: "blur(8px)",
+        duration: 0.22,
+        ease: "power3.in",
+      },
+      2.15
+    )
+    window.__timelines["editor"] = tl
+  </script>
+</template>

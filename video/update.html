@@ -1,0 +1,596 @@
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+  {"id":"color-ground","type":"color","label":"Background","default":"#f4f4f5"},
+  {"id":"color-ink","type":"color","label":"Text","default":"#18181b"},
+  {"id":"color-accent","type":"color","label":"Accent","default":"#3b82f6"}
+]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Geist";
+        src: url("assets/fonts/geist.woff2") format("woff2");
+        font-weight: 100 900;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #f4f4f5;
+        font-family: "Geist", sans-serif;
+        color: #18181b;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Titles */
+      .scene-title {
+        position: absolute;
+        left: 140px;
+        top: 380px;
+        width: 560px;
+        font-size: 84px;
+        font-weight: 600;
+        letter-spacing: -0.035em;
+        line-height: 1.05;
+      }
+      .scene-title b {
+        display: inline-block;
+        font-weight: 600;
+        opacity: 0;
+      }
+      .scene-sub {
+        position: absolute;
+        left: 140px;
+        top: 580px;
+        width: 540px;
+        font-size: 24px;
+        color: #71717a;
+        font-weight: 400;
+        line-height: 1.4;
+        opacity: 0;
+      }
+
+      /* Browser Windows */
+      .win {
+        position: absolute;
+        left: 740px;
+        top: 140px;
+        width: 1060px;
+        height: 800px;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid #d4d4d8;
+        background: #fafafa;
+        box-shadow: 0 40px 90px rgba(24, 24, 27, 0.16);
+        opacity: 0;
+        transform-origin: 0 0;
+      }
+      .win .bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 44px;
+        background: #fafafa;
+        border-bottom: 1px solid #e4e4e7;
+        z-index: 2;
+      }
+      .win .bar i {
+        position: absolute;
+        top: 16px;
+        width: 12px;
+        height: 12px;
+        border-radius: 6px;
+        background: #d4d4d8;
+      }
+      .win .bar span {
+        position: absolute;
+        left: 240px;
+        top: 8px;
+        width: 580px;
+        height: 28px;
+        border-radius: 8px;
+        background: #f0f0f1;
+        font-size: 14px;
+        line-height: 28px;
+        text-align: center;
+        color: #52525b;
+        font-family: ui-monospace, monospace;
+      }
+      .win img {
+        position: absolute;
+        left: 0;
+        top: 44px;
+        width: 1060px;
+        height: calc(100% - 44px);
+        object-fit: cover;
+        object-position: top left;
+      }
+
+      /* Cursors */
+      .cur {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        transform-origin: 0 0;
+        z-index: 10;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Pulse badge highlight */
+      .highlight-box {
+        position: absolute;
+        border: 2px solid #f59e0b;
+        border-radius: 6px;
+        background: rgba(245, 158, 11, 0.15);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      /* End card */
+      #end-layer {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        background: #f4f4f5;
+        z-index: 20;
+      }
+      #end-badge {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 42px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        margin-bottom: 24px;
+      }
+      #end-logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: #18181b;
+        display: grid;
+        place-items: center;
+      }
+      #end-logo span {
+        width: 22px;
+        height: 22px;
+        border-radius: 11px;
+        border: 4px solid #fff;
+      }
+      #end-url {
+        font-size: 32px;
+        font-family: ui-monospace, monospace;
+        color: #2563eb;
+        background: #eff6ff;
+        padding: 8px 24px;
+        border-radius: 12px;
+        border: 1px solid #bfdbfe;
+        margin-bottom: 20px;
+      }
+      #end-tags {
+        display: flex;
+        gap: 16px;
+        font-size: 18px;
+        color: #71717a;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="update"
+      data-start="0"
+      data-duration="12"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Audio Tracks -->
+      <audio
+        id="bgm"
+        class="clip"
+        src="assets/bgm/funk.mp3"
+        data-start="0"
+        data-duration="12"
+        data-track-index="0"
+        data-volume="0.85"
+        data-fade-in="0.2"
+        data-fade-out="1.0"
+      ></audio>
+      <audio
+        id="sfx-w1"
+        class="clip"
+        src="assets/sfx/whoosh-short.mp3"
+        data-start="0.1"
+        data-duration="0.5"
+        data-track-index="2"
+        data-volume="0.6"
+      ></audio>
+      <audio
+        id="sfx-p1"
+        class="clip"
+        src="assets/sfx/pop.mp3"
+        data-start="1.8"
+        data-duration="0.5"
+        data-track-index="3"
+        data-volume="0.8"
+      ></audio>
+      <audio
+        id="sfx-w2"
+        class="clip"
+        src="assets/sfx/whoosh.mp3"
+        data-start="4.1"
+        data-duration="0.6"
+        data-track-index="2"
+        data-volume="0.6"
+      ></audio>
+      <audio
+        id="sfx-c1"
+        class="clip"
+        src="assets/sfx/click.mp3"
+        data-start="5.8"
+        data-duration="0.3"
+        data-track-index="3"
+        data-volume="0.8"
+      ></audio>
+      <audio
+        id="sfx-s1"
+        class="clip"
+        src="assets/sfx/click-soft.mp3"
+        data-start="6.0"
+        data-duration="0.3"
+        data-track-index="2"
+        data-volume="0.7"
+      ></audio>
+      <audio
+        id="sfx-w3"
+        class="clip"
+        src="assets/sfx/whoosh-short.mp3"
+        data-start="7.8"
+        data-duration="0.5"
+        data-track-index="2"
+        data-volume="0.6"
+      ></audio>
+      <audio
+        id="sfx-hit"
+        class="clip"
+        src="assets/sfx/impact-bass-1.mp3"
+        data-start="8.4"
+        data-duration="1.5"
+        data-track-index="3"
+        data-volume="0.7"
+      ></audio>
+      <audio
+        id="sfx-p2"
+        class="clip"
+        src="assets/sfx/pop.mp3"
+        data-start="10.2"
+        data-duration="0.5"
+        data-track-index="2"
+        data-volume="0.8"
+      ></audio>
+
+      <!-- Scene 1: Override Tracing -->
+      <div id="t1" class="scene-title">
+        <b>Trace</b> <b>token</b> <b>overrides</b> <b>live.</b>
+      </div>
+      <div id="s1" class="scene-sub">
+        Instant ⚡ .dark and inline ancestor badges in inspector
+      </div>
+      <div id="win-1" class="win">
+        <div class="bar">
+          <i style="left: 18px"></i><i style="left: 38px"></i
+          ><i style="left: 58px"></i><span>cossplay.vercel.app/editor</span>
+        </div>
+        <img
+          src="assets/cap/update-inspector-override.png"
+          alt="Inspector override"
+        />
+        <div
+          id="hl-badge"
+          class="highlight-box"
+          style="left: 630px; top: 155px; width: 140px; height: 60px"
+        ></div>
+      </div>
+
+      <!-- Scene 2: Share Link -->
+      <div id="t2" class="scene-title">
+        <b>Share</b> <b>themes</b> <b>with</b> <b>one</b> <b>link.</b>
+      </div>
+      <div id="s2" class="scene-sub">
+        Compact deflate-raw hash · Send to anyone
+      </div>
+      <div id="win-2" class="win">
+        <div class="bar">
+          <i style="left: 18px"></i><i style="left: 38px"></i
+          ><i style="left: 58px"></i><span>cossplay.vercel.app/editor</span>
+        </div>
+        <img
+          id="img-export"
+          src="assets/cap/update-export-share.png"
+          alt="Export Share"
+        />
+        <img
+          id="img-toast"
+          src="assets/cap/update-share-toast.png"
+          style="opacity: 0"
+          alt="Share Toast"
+        />
+      </div>
+
+      <!-- Scene 3: URL instant load -->
+      <div id="t3" class="scene-title">
+        <b>Zero</b> <b>install.</b> <b>Instant</b> <b>live.</b>
+      </div>
+      <div id="s3" class="scene-sub">
+        Loads your customized palette in seconds
+      </div>
+      <div id="win-3" class="win">
+        <div class="bar">
+          <i style="left: 18px"></i><i style="left: 38px"></i
+          ><i style="left: 58px"></i
+          ><span id="url-text">cossplay.vercel.app/editor#theme=z_...</span>
+        </div>
+        <img src="assets/cap/update-shared-theme.png" alt="Shared Theme" />
+      </div>
+
+      <!-- Cursor -->
+      <div id="cur" class="cur">
+        <svg viewBox="0 0 24 24" width="64" height="64">
+          <path
+            d="M3 2 L3 19 L7.6 14.8 L10.6 21.6 L13.6 20.3 L10.7 13.6 L17 13.6 Z"
+            fill="#111"
+            stroke="#fff"
+            stroke-width="1.4"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+
+      <!-- End Card -->
+      <div id="end-layer">
+        <div id="end-badge">
+          <div id="end-logo"><span></span></div>
+          <span>Cossplay</span>
+        </div>
+        <div id="end-url">cossplay.vercel.app/editor</div>
+        <div id="end-tags">
+          <span>100% In Browser</span> · <span>No Account Required</span> ·
+          <span>Open Source</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true })
+
+      // Helper: blur-in words
+      const wordsIn = (sel, at) =>
+        tl.fromTo(
+          sel + " b",
+          { opacity: 0, filter: "blur(8px)", y: 15 },
+          {
+            opacity: 1,
+            filter: "blur(0px)",
+            y: 0,
+            duration: 0.18,
+            stagger: 0.08,
+            ease: "power2.out",
+          },
+          at
+        )
+      const wordsOut = (sel, at) =>
+        tl.to(
+          sel + " b",
+          {
+            opacity: 0,
+            filter: "blur(6px)",
+            y: -10,
+            duration: 0.15,
+            stagger: 0.03,
+            ease: "power2.in",
+          },
+          at
+        )
+      const click = (at) => {
+        tl.to(
+          "#cur",
+          { scale: 0.85, duration: 0.06, ease: "power2.in" },
+          at - 0.06
+        )
+        tl.to("#cur", { scale: 1, duration: 0.15, ease: "power2.out" }, at)
+      }
+
+      // ==========================
+      // ACT 1: Override Tracing (0.0 - 4.2s)
+      // ==========================
+      wordsIn("#t1", 0.2)
+      tl.fromTo(
+        "#s1",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
+        0.6
+      )
+      tl.fromTo(
+        "#win-1",
+        { opacity: 0, y: 80, scale: 0.94, filter: "blur(10px)" },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          duration: 0.5,
+          ease: "expo.out",
+        },
+        0.1
+      )
+
+      // Highlight pulse over the ⚡ .dark badge
+      tl.fromTo(
+        "#hl-badge",
+        { opacity: 0, scale: 0.8 },
+        { opacity: 1, scale: 1.05, duration: 0.3, ease: "back.out(2)" },
+        1.8
+      )
+      tl.to("#hl-badge", { scale: 1, duration: 0.2 }, 2.1)
+
+      // Exit Act 1
+      wordsOut("#t1", 3.8)
+      tl.to("#s1", { opacity: 0, duration: 0.2 }, 3.8)
+      tl.to(
+        "#win-1",
+        {
+          opacity: 0,
+          y: -40,
+          filter: "blur(8px)",
+          duration: 0.35,
+          ease: "power2.in",
+        },
+        3.9
+      )
+
+      // ==========================
+      // ACT 2: Share Link (4.2 - 8.0s)
+      // ==========================
+      wordsIn("#t2", 4.3)
+      tl.fromTo(
+        "#s2",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
+        4.7
+      )
+      tl.fromTo(
+        "#win-2",
+        { opacity: 0, y: 60, scale: 0.95, filter: "blur(8px)" },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          duration: 0.45,
+          ease: "expo.out",
+        },
+        4.2
+      )
+
+      // Move cursor to "Share link" button at dialog bottom left
+      tl.fromTo(
+        "#cur",
+        { x: 1400, y: 850, opacity: 0 },
+        { x: 880, y: 840, opacity: 1, duration: 0.45, ease: "power3.out" },
+        4.9
+      )
+      click(5.8)
+
+      // Toast appears
+      tl.to("#img-toast", { opacity: 1, duration: 0.05 }, 5.85)
+
+      // Exit Act 2
+      wordsOut("#t2", 7.6)
+      tl.to("#s2", { opacity: 0, duration: 0.2 }, 7.6)
+      tl.to(
+        "#win-2",
+        {
+          opacity: 0,
+          scale: 0.96,
+          filter: "blur(6px)",
+          duration: 0.3,
+          ease: "power2.in",
+        },
+        7.7
+      )
+      tl.to("#cur", { opacity: 0, duration: 0.2 }, 7.6)
+
+      // ==========================
+      // ACT 3: URL Instant Load (8.0 - 10.4s)
+      // ==========================
+      wordsIn("#t3", 8.1)
+      tl.fromTo(
+        "#s3",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
+        8.5
+      )
+      tl.fromTo(
+        "#win-3",
+        { opacity: 0, y: 70, scale: 0.94, filter: "blur(10px)" },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          duration: 0.45,
+          ease: "expo.out",
+        },
+        8.0
+      )
+
+      // Exit Act 3
+      wordsOut("#t3", 10.0)
+      tl.to("#s3", { opacity: 0, duration: 0.15 }, 10.0)
+      tl.to(
+        "#win-3",
+        {
+          opacity: 0,
+          scale: 1.05,
+          filter: "blur(10px)",
+          duration: 0.35,
+          ease: "power2.in",
+        },
+        10.0
+      )
+
+      // ==========================
+      // ACT 4: End Card (10.2 - 12.0s)
+      // ==========================
+      tl.fromTo(
+        "#end-layer",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.35, ease: "power2.out" },
+        10.2
+      )
+      tl.fromTo(
+        "#end-badge",
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(1.7)" },
+        10.3
+      )
+      tl.fromTo(
+        "#end-url",
+        { y: 15, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" },
+        10.5
+      )
+      tl.fromTo(
+        "#end-tags",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.3 },
+        10.7
+      )
+
+      window.__timelines = window.__timelines || {}
+      window.__timelines["update"] = tl
+    </script>
+  </body>
+</html>

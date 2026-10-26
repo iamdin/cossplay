@@ -1,0 +1,222 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Geist";
+      src: url("assets/fonts/geist.woff2") format("woff2");
+      font-weight: 100 900;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      background: var(--color-ground, #f4f4f5);
+      overflow: hidden;
+      font-family: "Geist", sans-serif;
+    }
+    #hk-win {
+      position: absolute;
+      left: 120px;
+      top: 118px;
+      width: 1680px;
+      height: 844px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #d4d4d8;
+      background: #fafafa;
+      box-shadow: 0 40px 90px rgba(24, 24, 27, 0.16);
+      transform-origin: 0 0;
+    }
+    #hk-win .bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1680px;
+      height: 44px;
+      background: #fafafa;
+      border-bottom: 1px solid #e4e4e7;
+    }
+    #hk-win .bar i {
+      position: absolute;
+      top: 16px;
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      background: #d4d4d8;
+    }
+    #hk-win .bar span {
+      position: absolute;
+      left: 640px;
+      top: 8px;
+      width: 400px;
+      height: 28px;
+      border-radius: 8px;
+      background: #f0f0f1;
+      font-size: 15px;
+      line-height: 28px;
+      text-align: center;
+      color: #52525b;
+    }
+    #hk-win .site,
+    #hk-win .panel {
+      position: absolute;
+      top: 44px;
+      height: 800px;
+    }
+    #hk-win .site {
+      left: 0;
+      width: 1280px;
+    }
+    #hk-win .panel {
+      left: 1280px;
+      width: 400px;
+      border-left: 1px solid #e4e4e7;
+    }
+    #hk-win img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #hk-title {
+      position: absolute;
+      left: 150px;
+      top: 390px;
+      width: 560px;
+      font-size: 92px;
+      font-weight: 600;
+      letter-spacing: -0.035em;
+      line-height: 1.04;
+      color: #18181b;
+    }
+    #hk-title b {
+      display: inline-block;
+      font-weight: 600;
+    }
+    #hk-cur {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 64px;
+      height: 64px;
+      transform-origin: 0 0;
+      z-index: 5;
+    }
+  </style>
+  <div
+    data-hf-id="hf-ktv8"
+    id="root"
+    data-composition-id="hook"
+    data-width="1920"
+    data-height="1080"
+  >
+    <div data-hf-id="hf-vb9n" id="hk-win">
+      <div data-hf-id="hf-i3la" class="bar" data-layout-ignore>
+        <i data-hf-id="hf-akbv" style="left: 18px"></i
+        ><i data-hf-id="hf-4nv5" style="left: 38px"></i
+        ><i data-hf-id="hf-gl07" style="left: 58px"></i
+        ><span data-hf-id="hf-n4h5">coss.com/ui</span>
+      </div>
+      <div data-hf-id="hf-pykx" class="site">
+        <img
+          data-hf-id="hf-k45l"
+          id="hk-site-a"
+          src="assets/cap/site-default.png"
+          alt="coss.com/ui in its default theme"
+        />
+        <img
+          data-hf-id="hf-tehh"
+          id="hk-site-b"
+          src="assets/cap/site-hook.png"
+          alt="coss.com/ui in the Bubblegum preset"
+        />
+      </div>
+      <div data-hf-id="hf-owjm" class="panel">
+        <img
+          data-hf-id="hf-s5z9"
+          id="hk-panel-a"
+          src="assets/cap/panel-menu.png"
+          alt="Cossplay panel with the preset menu open"
+        />
+        <img
+          data-hf-id="hf-n8nt"
+          id="hk-panel-b"
+          src="assets/cap/panel-hook.png"
+          alt="Cossplay panel with Bubblegum applied"
+        />
+      </div>
+    </div>
+    <div id="hk-title">
+      <b>Theme</b> <b>any</b> <b>coss</b> <b>ui</b> <b>site,</b> <b>live.</b>
+    </div>
+    <div data-hf-id="hf-amcv" id="hk-cur">
+      <svg data-hf-id="hf-q016" viewBox="0 0 24 24" width="64" height="64">
+        <path
+          data-hf-id="hf-h8fr"
+          d="M3 2 L3 19 L7.6 14.8 L10.6 21.6 L13.6 20.3 L10.7 13.6 L17 13.6 Z"
+          fill="#111"
+          stroke="#fff"
+          stroke-width="1.4"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true })
+    // The title is on screen from the first frame; the window (0.62x, right) shows the open preset menu.
+    const W = { scale: 0.62, x: 790 - 120, y: 278 - 118 }
+    tl.fromTo(
+      "#hk-win",
+      { ...W, filter: "blur(0px)" },
+      { scale: 0.66, duration: 3.3, ease: "none" },
+      0
+    )
+    tl.fromTo(
+      "#hk-title b",
+      { opacity: 1, filter: "blur(0px)" },
+      { opacity: 1, duration: 0.01 },
+      0
+    )
+    tl.fromTo(
+      ["#hk-site-b", "#hk-panel-b"],
+      { opacity: 0 },
+      { opacity: 0, duration: 0.01 },
+      0
+    )
+    // Bubblegum's row (window 1387,301) at 0.62x, less the arrow tip offset.
+    tl.fromTo(
+      "#hk-cur",
+      { x: 1800, y: 900, scale: 1 },
+      {
+        x: 790 + 0.62 * 1387 - 8,
+        y: 278 + 0.62 * 301 - 5,
+        duration: 0.8,
+        ease: "power3.inOut",
+      },
+      0.2
+    )
+    // Click on the beat at 1.2: the site and the panel change on the same frame.
+    tl.to("#hk-cur", { scale: 0.86, duration: 0.07, ease: "power2.in" }, 1.13)
+    tl.set(["#hk-site-b", "#hk-panel-b"], { opacity: 1 }, 1.2)
+    tl.to("#hk-cur", { scale: 1, duration: 0.18, ease: "power2.out" }, 1.2)
+    tl.to("#hk-cur", { x: 2050, y: 980, duration: 0.5, ease: "power3.in" }, 1.7)
+    // Whip out to the left.
+    tl.to(
+      "#hk-title b",
+      {
+        opacity: 0,
+        filter: "blur(8px)",
+        duration: 0.16,
+        stagger: 0.02,
+        ease: "power3.in",
+      },
+      3.3
+    )
+    tl.to(
+      "#hk-win",
+      { x: W.x - 1500, filter: "blur(18px)", duration: 0.3, ease: "power3.in" },
+      3.3
+    )
+    window.__timelines["hook"] = tl
+  </script>
+</template>
