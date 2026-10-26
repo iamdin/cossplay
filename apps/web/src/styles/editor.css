@@ -2,3 +2,4 @@
 
 /* The panel comes from @cossplay/editor. */
 @source "../../../../packages/editor/src";
+@source "../../../../packages/ui/src/lib/segmented-control.ts";

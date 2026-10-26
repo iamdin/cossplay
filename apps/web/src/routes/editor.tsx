@@ -24,6 +24,10 @@ import {
   TabsTab,
 } from "@cossplay/ui/components/tabs"
 import { ToastProvider } from "@cossplay/ui/components/toast"
+import {
+  segmentedControlItemVariants,
+  segmentedControlRootClassName,
+} from "@cossplay/ui/lib/segmented-control"
 import { cn } from "@cossplay/ui/lib/utils"
 import { createFileRoute } from "@tanstack/react-router"
 import { ChevronDownIcon, Maximize2Icon, Minimize2Icon } from "lucide-react"
@@ -58,9 +62,9 @@ export const Route = createFileRoute("/editor")({
 const bar = "ui-chrome flex h-14 shrink-0 items-center gap-1 border-b px-3"
 
 const pages = [
-  { id: "custom", label: "Custom", Page: CustomPreview },
   { id: "typography", label: "Typography", Page: Typography },
   { id: "palette", label: "Color Palette", Page: Palette },
+  { id: "custom", label: "Custom", Page: CustomPreview },
 ] as const
 
 type PreviewPage = (typeof pages)[number]["id"]
@@ -211,52 +215,71 @@ function Editor() {
               className="flex min-h-0 flex-1 flex-col gap-0"
             >
               <div className="ui-chrome flex shrink-0 flex-wrap items-center gap-2 px-4 pt-3 pb-1">
-                <Menu>
-                  <MenuTrigger
-                    render={
-                      <Button
-                        aria-label={particleLabel}
-                        variant={page === null ? "secondary" : "ghost"}
-                        size="sm"
+                <div
+                  role="group"
+                  aria-label="Preview navigation"
+                  onFocus={(event) => {
+                    // Tabs prevent native focus scrolling; reveal them in this shared scroller.
+                    if (event.target.getAttribute("role") === "tab")
+                      event.target.scrollIntoView({
+                        block: "nearest",
+                        inline: "nearest",
+                      })
+                  }}
+                  className={cn(
+                    segmentedControlRootClassName,
+                    "max-w-full scroll-px-0.5 justify-start overflow-x-auto"
+                  )}
+                >
+                  <Menu>
+                    <MenuTrigger
+                      aria-label={particleLabel}
+                      data-active={page === null ? "" : undefined}
+                      className={cn(
+                        segmentedControlItemVariants(),
+                        "data-active:bg-background data-active:text-foreground data-active:shadow-sm/5 dark:data-active:bg-input"
+                      )}
+                    >
+                      <WidestLabel
+                        labels={particleCategories.map((item) => item.label)}
+                        current={particleLabel}
                       />
-                    }
+                      <ChevronDownIcon />
+                    </MenuTrigger>
+                    <MenuPopup className="ui-chrome" align="start">
+                      <MenuGroup>
+                        <MenuGroupLabel>Particles</MenuGroupLabel>
+                        <MenuRadioGroup
+                          value={page === null ? categoryId : ""}
+                          onValueChange={(id) => {
+                            setCategoryId(id)
+                            setPage(null)
+                          }}
+                        >
+                          {particleCategories.map((item) => (
+                            <MenuRadioItem
+                              key={item.id}
+                              value={item.id}
+                              closeOnClick
+                            >
+                              {item.label}
+                            </MenuRadioItem>
+                          ))}
+                        </MenuRadioGroup>
+                      </MenuGroup>
+                    </MenuPopup>
+                  </Menu>
+                  <TabsList
+                    aria-label="Preview"
+                    className="shrink-0 rounded-none bg-transparent p-0"
                   >
-                    <WidestLabel
-                      labels={particleCategories.map((item) => item.label)}
-                      current={particleLabel}
-                    />
-                    <ChevronDownIcon />
-                  </MenuTrigger>
-                  <MenuPopup className="ui-chrome" align="start">
-                    <MenuGroup>
-                      <MenuGroupLabel>Particles</MenuGroupLabel>
-                      <MenuRadioGroup
-                        value={page === null ? categoryId : ""}
-                        onValueChange={(id) => {
-                          setCategoryId(id)
-                          setPage(null)
-                        }}
-                      >
-                        {particleCategories.map((item) => (
-                          <MenuRadioItem
-                            key={item.id}
-                            value={item.id}
-                            closeOnClick
-                          >
-                            {item.label}
-                          </MenuRadioItem>
-                        ))}
-                      </MenuRadioGroup>
-                    </MenuGroup>
-                  </MenuPopup>
-                </Menu>
-                <TabsList aria-label="Preview">
-                  {pages.map((item) => (
-                    <TabsTab key={item.id} value={item.id}>
-                      {item.label}
-                    </TabsTab>
-                  ))}
-                </TabsList>
+                    {pages.map((item) => (
+                      <TabsTab key={item.id} value={item.id}>
+                        {item.label}
+                      </TabsTab>
+                    ))}
+                  </TabsList>
+                </div>
                 <Button
                   variant="ghost"
                   size="icon-sm"
