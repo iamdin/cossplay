@@ -42,7 +42,7 @@ function DialogError() {
   return error ? (
     <p
       role="alert"
-      className="text-destructive text-xs [overflow-wrap:anywhere]"
+      className="text-xs [overflow-wrap:anywhere] text-destructive"
     >
       {error}
     </p>
@@ -61,7 +61,7 @@ async function copyText(text: string) {
 function CodeBlock({ code, label }: { code: string; label: string }) {
   return (
     <div className="flex min-w-0 items-start gap-1 rounded-lg border bg-muted/50 p-2">
-      <pre className="min-w-0 flex-1 overflow-x-auto whitespace-pre font-mono text-xs leading-relaxed">
+      <pre className="min-w-0 flex-1 overflow-x-auto font-mono text-xs leading-relaxed whitespace-pre">
         {code}
       </pre>
       <Button
@@ -194,7 +194,7 @@ const runners = {
 function InstallCommand({ presetId }: { presetId: string }) {
   if (!presetId)
     return (
-      <p className="text-muted-foreground text-xs">
+      <p className="text-xs text-muted-foreground">
         The shadcn CLI command is available for unedited presets. For this
         theme, use the CSS export below.
       </p>
@@ -202,7 +202,7 @@ function InstallCommand({ presetId }: { presetId: string }) {
   return (
     <Tabs defaultValue="pnpm" className="min-w-0 gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-medium text-sm">Install with shadcn CLI</h3>
+        <h3 className="text-sm font-medium">Install with shadcn CLI</h3>
         <TabsList aria-label="Package manager">
           {Object.keys(runners).map((pm) => (
             <TabsTrigger key={pm} value={pm} className="text-xs">

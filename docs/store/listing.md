@@ -54,12 +54,12 @@ Not affiliated with coss, tweakcn or shadcn/ui. Presets come from tweakcn (Apach
 
 **Graphics**:
 
-| Field | File |
-|---|---|
-| Store icon (128x128) | `apps/extension/public/icons/icon-128.png` |
-| Screenshots (1280x800) | `screenshot-1-presets.png`, `screenshot-2-dark-channels.png`, `screenshot-3-inspect.png`, `screenshot-4-export.png` |
-| Small promo tile (440x280) | `promo-small-440x280.png` |
-| Marquee promo tile (1400x560) | `promo-marquee-1400x560.png` |
+| Field                         | File                                                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Store icon (128x128)          | `apps/extension/public/icons/icon-128.png`                                                                          |
+| Screenshots (1280x800)        | `screenshot-1-presets.png`, `screenshot-2-dark-channels.png`, `screenshot-3-inspect.png`, `screenshot-4-export.png` |
+| Small promo tile (440x280)    | `promo-small-440x280.png`                                                                                           |
+| Marquee promo tile (1400x560) | `promo-marquee-1400x560.png`                                                                                        |
 
 **Official URL**: none (needs a site verified in Search Console). **Homepage URL**: https://cossplay.vercel.app. **Support URL**: https://github.com/iamdin/cossplay/issues.
 
@@ -71,12 +71,12 @@ Not affiliated with coss, tweakcn or shadcn/ui. Presets come from tweakcn (Apach
 
 **Permission justifications**:
 
-| Permission | Justification |
-|---|---|
-| `sidePanel` | The editor is a side panel next to the page it edits; clicking the toolbar icon opens it. |
-| `storage` | Saves each site's theme edits, on/off switch, undo history and picked Google font stylesheets in `chrome.storage.local`, so edits survive reloads. Nothing is synced or uploaded. |
-| `tabs` | The side panel follows the active tab of its window (`tabs.query`, `tabs.onActivated`, `tabs.onUpdated`) and reads its URL to know which site's theme to load, connects to the tab's content script for messaging and inspect mode, and shows "Open an HTTP(S) website" on other pages. |
-| `scripting` | Injects the edited theme variables as a user-origin stylesheet (`scripting.insertCSS` / `removeCSS`) so they win over the site's own CSS, and registers a tiny script (`scripting.registerContentScripts`) only for sites the user has edited, which hides the page for at most 1.5 s while the saved theme is restored, to avoid a flash of the original theme. |
+| Permission                                   | Justification                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `sidePanel`                                  | The editor is a side panel next to the page it edits; clicking the toolbar icon opens it.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `storage`                                    | Saves each site's theme edits, on/off switch, undo history and picked Google font stylesheets in `chrome.storage.local`, so edits survive reloads. Nothing is synced or uploaded.                                                                                                                                                                                                                                                                                                                                                          |
+| `tabs`                                       | The side panel follows the active tab of its window (`tabs.query`, `tabs.onActivated`, `tabs.onUpdated`) and reads its URL to know which site's theme to load, connects to the tab's content script for messaging and inspect mode, and shows "Open an HTTP(S) website" on other pages.                                                                                                                                                                                                                                                    |
+| `scripting`                                  | Injects the edited theme variables as a user-origin stylesheet (`scripting.insertCSS` / `removeCSS`) so they win over the site's own CSS, and registers a tiny script (`scripting.registerContentScripts`) only for sites the user has edited, which hides the page for at most 1.5 s while the saved theme is restored, to avoid a flash of the original theme.                                                                                                                                                                           |
 | Host permissions `http://*/*`, `https://*/*` | The extension's purpose is editing the theme of whichever site the user opens, which can be any domain, including localhost and staging hosts, so the hosts cannot be listed in advance. The content script reads the page's CSS variables and applies the user's edits; injected CSS needs host access to the tab; and the service worker fetches the page's cross-origin stylesheets (which the page's CSSOM cannot read) to find its theme. On sites the user has not edited, the extension only reads stylesheets and changes nothing. |
 
 **Remote code**: No, I am not using remote code. (The service worker fetches CSS text and theme JSON as data: Google Fonts stylesheets, theme URLs the user pastes into Import, and the current page's stylesheets. No JavaScript is fetched or evaluated.)

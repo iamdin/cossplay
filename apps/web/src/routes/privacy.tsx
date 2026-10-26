@@ -21,7 +21,7 @@ export const Route = createFileRoute("/privacy")({
 function Part({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-10">
-      <h2 className="font-semibold text-lg">{title}</h2>
+      <h2 className="text-lg font-semibold">{title}</h2>
       <div className="mt-3 flex flex-col gap-3 text-muted-foreground">
         {children}
       </div>
@@ -38,7 +38,7 @@ function Privacy() {
         </nav>
       </header>
       <main className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <h1 className="font-semibold text-3xl tracking-tight">Privacy</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">Privacy</h1>
         <p className="mt-3 text-muted-foreground">
           Last updated October 7, 2026
         </p>

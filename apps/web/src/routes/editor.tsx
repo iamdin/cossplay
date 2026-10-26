@@ -140,7 +140,7 @@ function Editor() {
           </a>
           <a
             href="/#ways"
-            className="text-muted-foreground text-sm hover:text-foreground"
+            className="text-sm text-muted-foreground hover:text-foreground"
           >
             Chrome extension
           </a>
@@ -192,7 +192,7 @@ function Editor() {
             <div className={bar}>
               <span
                 role="status"
-                className="mr-auto truncate text-muted-foreground text-xs"
+                className="mr-auto truncate text-xs text-muted-foreground"
               >
                 {status}
               </span>
