@@ -61,7 +61,7 @@ Not affiliated with coss, tweakcn or shadcn/ui. Presets come from tweakcn (Apach
 | Small promo tile (440x280)    | `promo-small-440x280.png`                                                                                           |
 | Marquee promo tile (1400x560) | `promo-marquee-1400x560.png`                                                                                        |
 
-**Official URL**: none (needs a site verified in Search Console). **Homepage URL**: https://cossplay.vercel.app. **Support URL**: https://github.com/iamdin/cossplay/issues.
+**Official URL**: none (needs a site verified in Search Console). **Homepage URL**: https://cossplay.vercel.app. **Support URL**: https://github.com/oxwen11/cossplay/issues.
 
 ## Privacy tab
 
