@@ -125,7 +125,7 @@
         object-position: top left;
       }
 
-      /* Cursors */
+      /* Cursor */
       .cur {
         position: absolute;
         width: 64px;
@@ -194,7 +194,7 @@
       id="root"
       data-composition-id="mario"
       data-start="0"
-      data-duration="8"
+      data-duration="10"
       data-fps="60"
       data-width="1920"
       data-height="1080"
@@ -205,7 +205,7 @@
         class="clip"
         src="assets/bgm/funk.mp3"
         data-start="0"
-        data-duration="8"
+        data-duration="10"
         data-track-index="0"
         data-volume="0.85"
         data-fade-in="0.2"
@@ -221,10 +221,19 @@
         data-volume="0.6"
       ></audio>
       <audio
+        id="sfx-p1"
+        class="clip"
+        src="assets/sfx/pop.mp3"
+        data-start="2.8"
+        data-duration="0.5"
+        data-track-index="3"
+        data-volume="0.8"
+      ></audio>
+      <audio
         id="sfx-w2"
         class="clip"
         src="assets/sfx/whoosh-short.mp3"
-        data-start="3.0"
+        data-start="5.2"
         data-duration="0.5"
         data-track-index="2"
         data-volume="0.6"
@@ -233,53 +242,68 @@
         id="sfx-c1"
         class="clip"
         src="assets/sfx/click.mp3"
-        data-start="4.2"
+        data-start="6.5"
         data-duration="0.3"
         data-track-index="3"
         data-volume="0.8"
       ></audio>
       <audio
-        id="sfx-p1"
+        id="sfx-s1"
         class="clip"
-        src="assets/sfx/pop.mp3"
-        data-start="4.35"
-        data-duration="0.5"
+        src="assets/sfx/click-soft.mp3"
+        data-start="6.65"
+        data-duration="0.3"
         data-track-index="2"
-        data-volume="0.8"
+        data-volume="0.7"
       ></audio>
       <audio
         id="sfx-hit"
         class="clip"
         src="assets/sfx/impact-bass-1.mp3"
-        data-start="6.8"
+        data-start="8.6"
         data-duration="1.2"
         data-track-index="3"
         data-volume="0.7"
       ></audio>
 
-      <!-- Act 1: 8-bit Super Mario Theme -->
+      <!-- Act 1: The Feature Hook -->
       <div id="t1" class="scene-title">
-        <b>8-bit</b> <b>Super</b> <b>Mario</b> <b>theme.</b>
+        <b>Share</b> <b>any</b> <b>theme</b> <b>with</b> <b>one</b> <b>link.</b>
       </div>
       <div id="s1" class="scene-sub">
-        NES red · coin gold · 0px pixel radius
+        New in Cossplay: 1-click theme sharing
       </div>
       <div id="win-1" class="win">
         <div class="bar">
           <i style="left: 18px"></i><i style="left: 38px"></i
           ><i style="left: 58px"></i><span>cossplay.vercel.app/editor</span>
         </div>
-        <img src="assets/cap/mario-editor.png" alt="Mario Editor" />
+        <img src="assets/cap/editor-0.png" alt="Cossplay Editor" />
       </div>
 
-      <!-- Act 2: 1-Click Theme Sharing -->
+      <!-- Act 2: Demonstration (Mario Theme) -->
       <div id="t2" class="scene-title">
-        <b>1-click</b> <b>theme</b> <b>sharing.</b>
+        <b>Like</b> <b>this</b> <b>8-bit</b> <b>Mario</b> <b>theme.</b>
       </div>
       <div id="s2" class="scene-sub">
-        Hit "Share link" to get an instant theme URL
+        NES red · coin gold · 0px pixel radius
       </div>
       <div id="win-2" class="win">
+        <div class="bar">
+          <i style="left: 18px"></i><i style="left: 38px"></i
+          ><i style="left: 58px"></i><span>cossplay.vercel.app/editor</span>
+        </div>
+        <img src="assets/cap/mario-editor.png" alt="Mario Theme" />
+      </div>
+
+      <!-- Act 3: 1-Click Share link action -->
+      <div id="t3" class="scene-title">
+        <b>Hit</b> <b>"Share</b> <b>link".</b> <b>Send</b> <b>it.</b>
+      </div>
+      <div id="s3" class="scene-sub">
+        Anyone can open your theme with zero setup
+      </div>
+      <div id="win-3" class="win">
         <div class="bar">
           <i style="left: 18px"></i><i style="left: 38px"></i
           ><i style="left: 58px"></i><span>cossplay.vercel.app/editor</span>
@@ -316,7 +340,7 @@
           <div id="end-logo"><span></span></div>
           <span>Cossplay</span>
         </div>
-        <div id="end-url">cossplay.vercel.app/editor#theme=z_...</div>
+        <div id="end-url">cossplay.vercel.app/editor</div>
         <div id="end-tags">
           <span>Instant in Browser</span> · <span>No Account Needed</span> ·
           <span>Open Source</span>
@@ -336,7 +360,7 @@
             filter: "blur(0px)",
             y: 0,
             duration: 0.18,
-            stagger: 0.07,
+            stagger: 0.08,
             ease: "power2.out",
           },
           at
@@ -364,7 +388,7 @@
       }
 
       // ==========================
-      // ACT 1: Mario Theme Showcase (0.0 - 3.2s)
+      // ACT 1: The Feature Hook (0.0 - 2.8s)
       // ==========================
       wordsIn("#t1", 0.15)
       tl.fromTo(
@@ -388,29 +412,29 @@
       )
 
       // Exit Act 1
-      wordsOut("#t1", 2.8)
-      tl.to("#s1", { opacity: 0, duration: 0.2 }, 2.8)
+      wordsOut("#t1", 2.5)
+      tl.to("#s1", { opacity: 0, duration: 0.2 }, 2.5)
       tl.to(
         "#win-1",
         {
           opacity: 0,
           y: -40,
           filter: "blur(8px)",
-          duration: 0.35,
+          duration: 0.3,
           ease: "power2.in",
         },
-        2.9
+        2.55
       )
 
       // ==========================
-      // ACT 2: 1-Click Share link (3.2 - 6.8s)
+      // ACT 2: Super Mario Demo (2.8 - 5.4s)
       // ==========================
-      wordsIn("#t2", 3.1)
+      wordsIn("#t2", 2.75)
       tl.fromTo(
         "#s2",
         { opacity: 0, y: 10 },
         { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
-        3.5
+        3.1
       )
       tl.fromTo(
         "#win-2",
@@ -423,26 +447,65 @@
           duration: 0.45,
           ease: "expo.out",
         },
-        3.1
+        2.75
       )
 
-      // Cursor moves to "Share link" button
+      // Exit Act 2
+      wordsOut("#t2", 5.1)
+      tl.to("#s2", { opacity: 0, duration: 0.2 }, 5.1)
+      tl.to(
+        "#win-2",
+        {
+          opacity: 0,
+          scale: 0.96,
+          filter: "blur(6px)",
+          duration: 0.3,
+          ease: "power2.in",
+        },
+        5.15
+      )
+
+      // ==========================
+      // ACT 3: Click Share link Action (5.4 - 8.6s)
+      // ==========================
+      wordsIn("#t3", 5.35)
+      tl.fromTo(
+        "#s3",
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" },
+        5.7
+      )
+      tl.fromTo(
+        "#win-3",
+        { opacity: 0, y: 60, scale: 0.95, filter: "blur(8px)" },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+          duration: 0.45,
+          ease: "expo.out",
+        },
+        5.35
+      )
+
+      // Cursor moves to "Share link" button and clicks
       tl.fromTo(
         "#cur",
         { x: 1400, y: 850, opacity: 0 },
         { x: 880, y: 840, opacity: 1, duration: 0.45, ease: "power3.out" },
-        3.6
+        5.8
       )
-      click(4.2)
+      click(6.5)
 
       // Toast appears
-      tl.to("#img-mario-toast", { opacity: 1, duration: 0.05 }, 4.25)
+      tl.to("#img-mario-toast", { opacity: 1, duration: 0.05 }, 6.55)
 
-      // Exit Act 2
-      wordsOut("#t2", 6.4)
-      tl.to("#s2", { opacity: 0, duration: 0.2 }, 6.4)
+      // Exit Act 3
+      wordsOut("#t3", 8.2)
+      tl.to("#s3", { opacity: 0, duration: 0.2 }, 8.2)
       tl.to(
-        "#win-2",
+        "#win-3",
         {
           opacity: 0,
           scale: 0.96,
@@ -450,32 +513,32 @@
           duration: 0.35,
           ease: "power2.in",
         },
-        6.5
+        8.3
       )
-      tl.to("#cur", { opacity: 0, duration: 0.2 }, 6.4)
+      tl.to("#cur", { opacity: 0, duration: 0.2 }, 8.2)
 
       // ==========================
-      // ACT 3: End Card (6.8 - 8.0s)
+      // ACT 4: End Card (8.6 - 10.0s)
       // ==========================
       tl.fromTo(
         "#end-layer",
         { opacity: 0 },
         { opacity: 1, duration: 0.35, ease: "power2.out" },
-        6.8
+        8.6
       )
       tl.fromTo(
         "#end-badge",
         { scale: 0.8, opacity: 0 },
         { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(1.7)" },
-        6.9
+        8.7
       )
       tl.fromTo(
         "#end-url",
         { y: 15, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" },
-        7.1
+        8.9
       )
-      tl.fromTo("#end-tags", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 7.3)
+      tl.fromTo("#end-tags", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 9.1)
 
       window.__timelines = window.__timelines || {}
       window.__timelines["mario"] = tl
