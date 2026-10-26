@@ -26,9 +26,9 @@ import { ThemeChips, useLandingTheme } from "@/landing/demo"
 import styles from "@/styles/landing.css?url"
 
 const site = "https://cossplay.vercel.app"
-const title = "Cossplay: live theme editor for coss ui"
+const title = "Cossplay: visual UI theme editor for coss ui"
 const description =
-  "Theme coss ui apps live: 42 tweakcn presets, colors, fonts, radius and contrast checks, in the browser or in Chrome's side panel on your own site. Export Tailwind CSS or install with the shadcn CLI."
+  "Visually customize a UI theme, see changes on real coss ui components live, and export Tailwind CSS (v3 or v4) or JSON. Cossplay is an independent theme editor."
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -307,6 +307,15 @@ function Landing() {
             <a href="#ship" className="hover:text-foreground">
               Ship it
             </a>
+            <a
+              href="https://coss.com/ui/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground"
+            >
+              coss ui docs
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
           </div>
           <Button size="sm" className="ml-auto" render={<a href="/editor" />}>
             Open the editor
@@ -315,16 +324,33 @@ function Landing() {
       </header>
 
       <main>
-        <section className="mx-auto max-w-3xl px-4 pt-16 text-center sm:pt-24">
-          <h1 className="text-5xl font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
-            Theme your coss ui app,{" "}
-            <span className="font-serif text-primary italic">live.</span>
+        <section className="mx-auto max-w-5xl px-4 pt-16 text-center sm:pt-24">
+          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl sm:text-balance lg:text-8xl">
+            {/* Spaces live inside text nodes: Chrome drops standalone
+                whitespace nodes at line breaks from the accessible name. */}
+            {"Design Your "}
+            <span className="font-serif font-normal italic">{"Perfect "}</span>
+            <span className="whitespace-nowrap text-primary">coss/ui</span>
+            {" Theme."}
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-pretty text-muted-foreground">
-            Tune colors, type and radius on real components, then take the theme
-            with you.
+            Choose a preset, tune colors, fonts and radius, and see changes
+            live. Export your theme as Tailwind CSS (v3 or v4) or JSON.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <p className="mx-auto mt-3 max-w-xl text-sm text-pretty text-muted-foreground">
+            Cossplay is an independent tool for theming{" "}
+            <a
+              href="https://coss.com/ui/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4 hover:text-foreground"
+            >
+              coss ui
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+            , a React component library.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-2 sm:gap-3">
             <Button size="lg" render={<a href="/editor" />}>
               Open the editor
               <ArrowRightIcon />
