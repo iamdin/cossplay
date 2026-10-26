@@ -325,7 +325,7 @@ function Landing() {
 
       <main>
         <section className="mx-auto max-w-5xl px-4 pt-16 text-center sm:pt-24">
-          <h1 className="text-5xl font-bold tracking-tight text-balance sm:text-6xl lg:text-8xl">
+          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl sm:text-balance lg:text-8xl">
             {/* Spaces live inside text nodes: Chrome drops standalone
                 whitespace nodes at line breaks from the accessible name. */}
             {"Design Your "}
