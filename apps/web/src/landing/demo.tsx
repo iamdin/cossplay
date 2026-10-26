@@ -97,7 +97,7 @@ function Chip({
       tabIndex={tabIndex}
       aria-pressed={selected}
       className={cn(
-        "inline-flex shrink-0 items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-foreground text-sm shadow-xs",
+        "inline-flex shrink-0 items-center gap-2 rounded-full border bg-card px-3 py-1.5 text-sm text-foreground shadow-xs",
         selected && "border-primary bg-primary/8"
       )}
       onClick={() => onSelect(preset)}
@@ -174,7 +174,7 @@ export function ThemeChips({
   onSelect: (id: string) => void
 }) {
   return (
-    <div className="mt-12 flex w-full min-w-0 max-w-full flex-col gap-2 overflow-hidden py-1 [mask-image:linear-gradient(to_right,transparent,#000_4rem,#000_calc(100%-4rem),transparent)]">
+    <div className="mt-12 flex w-full max-w-full min-w-0 flex-col gap-2 overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_4rem,#000_calc(100%-4rem),transparent)] py-1">
       {rows.map((presets, row) => (
         <MarqueeRow
           key={presets[0]}

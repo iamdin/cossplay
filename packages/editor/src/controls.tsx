@@ -44,7 +44,7 @@ export function Section({
 }) {
   return (
     <details className="group mb-1.5" open={open}>
-      <summary className="inline-flex cursor-pointer select-none items-center gap-1 rounded-md border px-1.5 py-0.5 font-medium text-[10px] text-muted-foreground uppercase tracking-wide hover:text-foreground [&::-webkit-details-marker]:hidden">
+      <summary className="inline-flex cursor-pointer items-center gap-1 rounded-md border px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-muted-foreground uppercase select-none hover:text-foreground [&::-webkit-details-marker]:hidden">
         <ChevronRight className="size-3 transition-transform group-open:rotate-90" />
         {label}
         {count !== undefined && (

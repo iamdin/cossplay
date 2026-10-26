@@ -70,7 +70,7 @@ export function startInspector(
     root.contains(event.target) &&
     !event.target.closest(".ui-chrome")
   const inspected = (node: Element) => {
-    for (let el: Element | null = node; el && root.contains(el); )
+    for (let el: Element | null = node; el && root.contains(el);)
       if (tokenClasses(el.getAttribute("class") ?? "").length) return el
       else el = el.parentElement
     return null

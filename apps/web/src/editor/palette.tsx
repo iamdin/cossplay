@@ -10,7 +10,7 @@ export function Palette() {
     <div className="space-y-6 px-4 pt-2 pb-6">
       {Object.entries(groups).map(([group, tokens]) => (
         <section key={group}>
-          <h2 className="mb-2 font-medium text-muted-foreground text-xs uppercase tracking-wide">
+          <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
             {group}
           </h2>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-3">
@@ -26,7 +26,7 @@ export function Palette() {
                   className="block h-16 border-b"
                   style={{ background: `var(--${token})` }}
                 />
-                <span className="block truncate px-2 pt-1.5 font-medium text-xs">
+                <span className="block truncate px-2 pt-1.5 text-xs font-medium">
                   {token}
                 </span>
                 <span className="block truncate px-2 pb-1.5 font-mono text-[10px] text-muted-foreground">
