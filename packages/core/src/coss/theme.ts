@@ -1,5 +1,5 @@
-// coss ui's theme variables (packages/ui/src/styles/globals.css) plus tweakcn's shared fields, as
-// in Shadify. coss values come from scripts/sync-coss-defaults.ts; tweakcn defaults, presets and
+// coss ui's theme variables (packages/ui/src/styles/globals.css) plus tweakcn's shared fields.
+// coss values come from scripts/sync-coss-defaults.ts; tweakcn defaults, presets and
 // HSL presets from a frozen tweakcn revision (scripts/sync-tweakcn.mjs). A page's detected values
 // take precedence over both.
 
