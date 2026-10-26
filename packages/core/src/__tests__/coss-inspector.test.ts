@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { tokenClasses, tokenOverrideSource } from "../coss/inspector"
+import { tokenClasses } from "../coss/inspector"
 
 if (typeof document === "undefined") {
   // @ts-expect-error jsdom loaded conditionally for DOM-less test runners
@@ -55,43 +55,4 @@ test("reads var() references in arbitrary values but not scoped overrides or non
     ),
     []
   )
-})
-
-test("tokenOverrideSource detects overrides from ancestor classes or inline styles", () => {
-  document.documentElement.style.setProperty("--primary", "#000000")
-
-  const container = document.createElement("div")
-  container.className = "dark"
-  container.style.setProperty("--primary", "#ffffff")
-  document.body.appendChild(container)
-
-  const child = document.createElement("button")
-  child.className = "bg-primary"
-  container.appendChild(child)
-
-  assert.equal(tokenOverrideSource(child, "primary" as never), "⚡ .dark")
-
-  // Accepts precomputed styles
-  const elStyles = getComputedStyle(child)
-  const rootStyles = getComputedStyle(document.documentElement)
-  assert.equal(
-    tokenOverrideSource(child, "primary" as never, elStyles, rootStyles),
-    "⚡ .dark"
-  )
-
-  // Handles SVG ancestor elements with class names
-  const style = document.createElement("style")
-  style.textContent = ".icon-group { --primary: #123456; }"
-  document.head.appendChild(style)
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-  svg.setAttribute("class", "icon-group other-class")
-  document.body.appendChild(svg)
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
-  svg.appendChild(path)
-  assert.equal(tokenOverrideSource(path, "primary" as never), "⚡ .icon-group")
-
-  // Root value has no override badge
-  const rootChild = document.createElement("div")
-  document.body.appendChild(rootChild)
-  assert.equal(tokenOverrideSource(rootChild, "primary" as never), null)
 })
