@@ -375,8 +375,20 @@ function Landing() {
               <ArrowRightIcon />
             </Button>
             <AddToChrome />
-            <Button size="lg" variant="outline" render={<a href="#ship" />}>
-              Install a preset
+            <Button
+              size="lg"
+              variant="outline"
+              render={
+                <a
+                  href="https://github.com/oxwen11/cossplay"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="oxwen11/cossplay on GitHub (opens in a new tab)"
+                />
+              }
+            >
+              <GithubIcon />
+              GitHub
             </Button>
           </div>
           <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
